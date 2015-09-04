@@ -62,7 +62,7 @@ tw_bitmap_free(struct tw_bitmap *bitmap);
 /**
  * tw_bitmap_set() - set position in bitmap
  * @bitmap: bitmap affected
- * @pos:    the position of the bit to set
+ * @pos:    position of the bit to set
  */
 void
 tw_bitmap_set(struct tw_bitmap *bitmap, uint32_t pos);
@@ -70,7 +70,7 @@ tw_bitmap_set(struct tw_bitmap *bitmap, uint32_t pos);
 /**
  * tw_bitmap_clear() - clear position in bitmap
  * @bitmap: bitmap affected
- * @pos:    the position of the bit to clear
+ * @pos:    position of the bit to clear
  */
 void
 tw_bitmap_clear(struct tw_bitmap *bitmap, uint32_t pos);
@@ -78,9 +78,9 @@ tw_bitmap_clear(struct tw_bitmap *bitmap, uint32_t pos);
 /**
  * tw_bitmap_test() - test postition in bitmap
  * @bitmap: bitmap targetted
- * @pos:    the position of the bit to test
+ * @pos:    position of the bit to test
  *
- * Return: the value of the bitmap
+ * Return: value of the bitmap
  */
 bool
 tw_bitmap_test(const struct tw_bitmap *bitmap, uint32_t pos);
@@ -88,9 +88,9 @@ tw_bitmap_test(const struct tw_bitmap *bitmap, uint32_t pos);
 /**
  * tw_bitmap_test_and_set() - test position in bitmap and set afterward
  * @bitmap: bitmap affected
- * @pos:    the position of the bit to test and clear
+ * @pos:    position of the bit to test and clear
  *
- * Return: the value of the position in the bitmap before setting it.
+ * Return: value of the position in the bitmap before setting it.
  */
 bool
 tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos);
@@ -98,9 +98,9 @@ tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos);
 /**
  * tw_bitmap_test_and_clear() - test position in bitmap and clear afterward
  * @bitmap: bitmap affected
- * @pos:    the position of the bit to test and set
+ * @pos:    position of the bit to test and set
  *
- * Return: the value of the position in the bitmap before clearing it.
+ * Return: value of the position in the bitmap before clearing it.
  */
 bool
 tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos);

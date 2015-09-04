@@ -139,7 +139,7 @@ void
 tw_bitmap_zero(struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_zero() - set all bits in a bitmap
+ * tw_bitmap_fill() - set all bits in a bitmap
  * @bitmap: bitmap to fill
  */
 void

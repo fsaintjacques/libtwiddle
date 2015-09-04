@@ -29,8 +29,9 @@ struct tw_bitmap_info {
 };
 
 #define tw_bitmap_info_init(nbits) (struct tw_bitmap_info) {.size = nbits, .count = 0U}
+#define tw_bitmap_info_count(info) (info.count)
 #define tw_bitmap_info_empty(info) (info.count == 0U)
-#define tw_bitmap_info_full(info) (info.size == info.count)
+#define tw_bitmap_info_full(info)  (info.count == info.size)
 
 /**
  * struct tw_bitmap - bitmap data structure
@@ -122,6 +123,13 @@ tw_bitmap_empty(const struct tw_bitmap *bitmap);
  */
 bool
 tw_bitmap_full(const struct tw_bitmap *bitmap);
+
+/**
+ * tw_bitmap_count() - count the number of active bits
+ * @bitmap: bitmap to count
+ */
+uint32_t
+tw_bitmap_count(const struct tw_bitmap *bitmap);
 
 /**
  * tw_bitmap_zero() - clear all bits in a bitmap

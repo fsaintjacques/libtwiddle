@@ -35,7 +35,7 @@
 
 add_c_library(
     libtwiddle
-    OUTPUT_NAME libtwiddle
+    OUTPUT_NAME twiddle
     PKGCONFIG_NAME libtwiddle
     VERSION 0.0.0
     SOURCES

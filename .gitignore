@@ -1,0 +1,12 @@
+/build/
+/.build/
+
+libtwiddle.pc
+
+/libtwiddle*.tar.gz
+/libtwiddle*.tar.bz2
+
+*.[oa]
+*.os
+*.so
+*.dylib

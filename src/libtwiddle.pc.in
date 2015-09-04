@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+sharedir=${prefix}/share
+
+Name: libtwiddle
+Description: library to help you twiddle bits.
+Version: @VERSION@
+URL: https://github.com/fsaintjacques/libtwiddle
+Libs: -L${libdir} -ltwiddle
+Cflags: -I${includedir}

@@ -1,14 +1,12 @@
-Installation instructions
-=========================
+INSTALL
+=======
 
-The LIBRARY_NAME library is written in ANSI C. It uses cmake as its
-build manager.
-
+libtwiddle is written in ANSI C. It uses cmake as its build manager.
 
 Prerequisite libraries
 ----------------------
 
-To build LIBRARY_NAME, you need the following libraries installed on
+To build libtwiddle, you need the following libraries installed on
 your system:
 
   * pkg-config
@@ -19,8 +17,7 @@ your system:
 Building from source
 --------------------
 
-The LIBRARY_NAME library uses cmake as its build manager.  In most
-cases, you should be able to build the source code using the following:
+In most cases, you should be able to build the source code using the following:
 
     $ mkdir build
     $ cd build
@@ -29,5 +26,5 @@ cases, you should be able to build the source code using the following:
     $ make test
     $ make install
 
-You might have to run the last command using sudo, if you need
-administrative privileges to write to the $PREFIX directory.
+You might have to run the last command using sudo, if you need administrative
+privileges to write to the $PREFIX directory.

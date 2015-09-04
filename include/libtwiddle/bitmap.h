@@ -83,7 +83,7 @@ tw_bitmap_clear(struct tw_bitmap *bitmap, uint32_t pos);
  * Return: the value of the bitmap
  */
 bool
-tw_bitmap_test(struct tw_bitmap *bitmap, uint32_t pos);
+tw_bitmap_test(const struct tw_bitmap *bitmap, uint32_t pos);
 
 /**
  * tw_bitmap_test_and_set() - test position in bitmap and set afterward
@@ -112,7 +112,7 @@ tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos);
  * Return: true if the bitmap is empty, false otherwise.
  */
 bool
-tw_bitmap_empty(struct tw_bitmap *bitmap);
+tw_bitmap_empty(const struct tw_bitmap *bitmap);
 
 /**
  * tw_bitmap_full() - verify if bitmap is full
@@ -121,7 +121,7 @@ tw_bitmap_empty(struct tw_bitmap *bitmap);
  * Return: true if the bitmap is full, false otherwise.
  */
 bool
-tw_bitmap_full(struct tw_bitmap *bitmap);
+tw_bitmap_full(const struct tw_bitmap *bitmap);
 
 /**
  * tw_bitmap_zero() - clear all bits in a bitmap

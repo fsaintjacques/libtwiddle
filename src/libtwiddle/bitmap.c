@@ -32,7 +32,7 @@ tw_bitmap_clear(struct tw_bitmap *bitmap, uint32_t pos)
 }
 
 bool
-tw_bitmap_test(struct tw_bitmap *bitmap, uint32_t pos)
+tw_bitmap_test(const struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos <= bitmap->info.size);
   return !!(bitmap->data[BYTE_POS(pos)] & MASK(pos));
@@ -43,7 +43,7 @@ tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos <= bitmap->info.size);
   char *addr = (char *) &(bitmap->data[BYTE_POS(pos)]);
-  bool prev = (*addr) & MASK(pos);
+  const bool prev = (*addr) & MASK(pos);
 
   if(!prev)
     bitmap->info.count++;
@@ -58,7 +58,7 @@ tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos <= bitmap->info.size);
   char *addr = (char *) &(bitmap->data[BYTE_POS(pos)]);
-  bool prev = (*addr) & MASK(pos);
+  const bool prev = (*addr) & MASK(pos);
 
   if(prev)
     bitmap->info.count--;
@@ -69,14 +69,14 @@ tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos)
 }
 
 bool
-tw_bitmap_empty(struct tw_bitmap *bitmap)
+tw_bitmap_empty(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
   return tw_bitmap_info_empty(bitmap->info);
 }
 
 bool
-tw_bitmap_full(struct tw_bitmap *bitmap)
+tw_bitmap_full(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
   return tw_bitmap_info_full(bitmap->info);

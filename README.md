@@ -1,7 +1,16 @@
+LIBTWIDDLE
+==========
+
+libtwiddle is a small library that implements bit data structures:
+
+  * bitmaps
+  * bloom filters
+  * tries
+
 INSTALL
 =======
 
-libtwiddle is written in ANSI C. It uses cmake as its build manager.
+libtwiddle uses cmake as its build manager.
 
 Prerequisite libraries
 ----------------------

@@ -72,7 +72,6 @@ bool
 tw_bitmap_empty(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-
   return tw_bitmap_info_empty(bitmap->info);
 }
 
@@ -80,7 +79,6 @@ bool
 tw_bitmap_full(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-
   return tw_bitmap_info_full(bitmap->info);
 }
 
@@ -100,7 +98,7 @@ tw_bitmap_fill(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
   for (size_t i = 0; i < BITMAP_PER_BITS(bitmap->info.size); ++i)
-    bitmap->data[i] = 0UL;
+    bitmap->data[i] = ~0UL;
 
   bitmap->info.count = bitmap->info.size;
 }

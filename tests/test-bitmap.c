@@ -73,10 +73,16 @@ START_TEST(test_bitmap_zero_and_fill)
 
       tw_bitmap_fill(bitmap);
 
+      for (uint32_t pos = 0; pos < nbits; ++pos)
+        ck_assert(tw_bitmap_test(bitmap, pos));
+
       ck_assert(tw_bitmap_full(bitmap));
       ck_assert(!tw_bitmap_empty(bitmap));
 
       tw_bitmap_zero(bitmap);
+
+      for (uint32_t pos = 0; pos < nbits; ++pos)
+        ck_assert(!tw_bitmap_test(bitmap, pos));
 
       ck_assert(tw_bitmap_empty(bitmap));
       ck_assert(!tw_bitmap_full(bitmap));

@@ -44,8 +44,8 @@ START_TEST(test_bitmap_basic)
   const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 1 << 17};
   const int32_t offsets[] = {-1, 0, 1};
 
-  for (size_t i = 0; i < ARRAY_SIZE(sizes); ++i) {
-    for (size_t j = 0; j < ARRAY_SIZE(offsets); ++j) {
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
       const int32_t nbits = sizes[i] + j;
       struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
       validate_bitmap(bitmap, nbits);
@@ -63,8 +63,8 @@ START_TEST(test_bitmap_zero_and_fill)
   const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096};
   const int32_t offsets[] = {-1, 0, 1};
 
-  for (size_t i = 0; i < ARRAY_SIZE(sizes); ++i) {
-    for (size_t j = 0; j < ARRAY_SIZE(offsets); ++j) {
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
       const int32_t nbits = sizes[i] + j;
       struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
 

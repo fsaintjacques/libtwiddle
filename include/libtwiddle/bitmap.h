@@ -11,12 +11,12 @@
  * We define the bitmap to be a 64 bits block.
  */
 #define bitmap_t uint64_t
-#define BYTES_PER_BITMAP sizeof(bitmap_t)
+#define TW_BYTES_PER_BITMAP sizeof(bitmap_t)
 
 /**
  * Computes the number of required `bitmap_t` to hold `nbits` bits.
  */
-#define BITMAP_PER_BITS(nbits)   DIV_ROUND_UP(nbits, BYTES_PER_BITMAP)
+#define TW_BITMAP_PER_BITS(nbits)   TW_DIV_ROUND_UP(nbits, TW_BYTES_PER_BITMAP)
 
 /**
  * struct tw_bitmap_info - bitmap miscellaneous information

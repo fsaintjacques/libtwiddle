@@ -11,8 +11,6 @@ your system:
 
   * pkg-config
   * check (http://check.sourceforge.net)
-  * [ADD OTHERS AS NEEDED]
-
 
 Building from source
 --------------------

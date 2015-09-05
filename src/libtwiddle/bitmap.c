@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <libtwiddle/bitmap.h>
+#include <libtwiddle/internal/bitops.h>
 
 struct tw_bitmap *
 tw_bitmap_new(uint32_t nbits)
@@ -19,13 +20,13 @@ tw_bitmap_free(struct tw_bitmap *bitmap)
   free(bitmap);
 }
 
-void
+void __always_inline
 tw_bitmap_set(struct tw_bitmap *bitmap, uint32_t pos)
 {
   tw_bitmap_test_and_set(bitmap, pos);
 }
 
-void
+void __always_inline
 tw_bitmap_clear(struct tw_bitmap *bitmap, uint32_t pos)
 {
   tw_bitmap_test_and_clear(bitmap, pos);
@@ -35,37 +36,27 @@ bool
 tw_bitmap_test(const struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos <= bitmap->info.size);
-  return !!(bitmap->data[TW_BYTE_POS(pos)] & TW_BIT_POS(pos));
+  return variable_test_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
 }
 
 bool
 tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos <= bitmap->info.size);
-  char *addr = (char *) &(bitmap->data[TW_BYTE_POS(pos)]);
-  const bool prev = (*addr) & TW_BIT_POS(pos);
-
-  if(!prev)
+  bool val = __test_and_set_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
+  if(!val)
     bitmap->info.count++;
-
-  *addr |= TW_BIT_POS(pos);
-
-  return prev;
+  return val;
 }
 
 bool
 tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos <= bitmap->info.size);
-  char *addr = (char *) &(bitmap->data[TW_BYTE_POS(pos)]);
-  const bool prev = (*addr) & TW_BIT_POS(pos);
-
-  if(prev)
+  bool val = __test_and_clear_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
+  if(val)
     bitmap->info.count--;
-
-  *addr &= ~TW_BIT_POS(pos);
-
-  return prev;
+  return val;
 }
 
 bool

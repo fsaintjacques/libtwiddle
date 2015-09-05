@@ -9,4 +9,12 @@
 #define TW_BIT_POS(x)  (1 << (x % TW_BITS_IN_WORD))
 #define TW_BYTE_POS(x) (x / TW_BITS_IN_WORD)
 
+#define tw_likely(x)       __builtin_expect((x),1)
+#define tw_unlikely(x)     __builtin_expect((x),0)
+
+#define tw_ffsl(x) __builtin_ffsl(x)
+#define tw_ffzl(x) __builtin_popcountl(x & (~x - 1))
+#define tw_clzl(x) __builtin_clzl(x)
+#define tw_ctzl(x) __builtin_ctzl(x)
+
 #endif /* LIBTWIDDLE_INTERNAL_UTILS_H */

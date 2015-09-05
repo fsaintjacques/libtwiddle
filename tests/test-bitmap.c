@@ -18,8 +18,11 @@ validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)
                   "Unexpected bit from freshly initialized bitmap at pos: %d",
                   pos);
     tw_bitmap_set(bitmap, pos);
-    ck_assert_msg(tw_bitmap_test(bitmap, pos),
-                  "Unexpected zero at pos: %d", pos);
+  }
+
+  for (uint32_t pos = 0; pos < nbits; ++pos) {
+    ck_assert_msg(tw_bitmap_test(bitmap, (nbits - 1) - pos),
+                  "Unexpected zero at pos: %d", (nbits - 1) - pos);
   }
 
   ck_assert_msg(tw_bitmap_full(bitmap), "A full bitmap should be full");
@@ -46,7 +49,7 @@ START_TEST(test_bitmap_basic)
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + j;
+      const int32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
       validate_bitmap(bitmap, nbits);
       tw_bitmap_free(bitmap);

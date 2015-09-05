@@ -12,11 +12,13 @@
  */
 #define bitmap_t uint64_t
 #define TW_BYTES_PER_BITMAP sizeof(bitmap_t)
+#define TW_BITS_PER_BITMAP  (TW_BYTES_PER_BITMAP * TW_BITS_IN_WORD)
 
 /**
  * Computes the number of required `bitmap_t` to hold `nbits` bits.
  */
-#define TW_BITMAP_PER_BITS(nbits)   TW_DIV_ROUND_UP(nbits, TW_BYTES_PER_BITMAP)
+#define TW_BITMAP_PER_BITS(nbits)   TW_DIV_ROUND_UP(nbits, TW_BITS_PER_BITMAP)
+#define TW_BITMAP_POS(nbits)        (nbits / TW_BITS_PER_BITMAP)
 
 /**
  * struct tw_bitmap_info - bitmap miscellaneous information

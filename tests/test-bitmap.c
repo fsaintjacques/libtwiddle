@@ -5,7 +5,7 @@
 #include <libtwiddle/bitmap.h>
 #include <libtwiddle/internal/utils.h>
 
-#include "helpers.h"
+#include "include/helpers.h"
 
 static void
 validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)

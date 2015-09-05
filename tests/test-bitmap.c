@@ -68,7 +68,7 @@ START_TEST(test_bitmap_zero_and_fill)
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + j;
+      const int32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
 
       ck_assert(tw_bitmap_empty(bitmap));

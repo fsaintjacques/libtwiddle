@@ -147,4 +147,22 @@ tw_bitmap_zero(struct tw_bitmap *bitmap);
 void
 tw_bitmap_fill(struct tw_bitmap *bitmap);
 
+/**
+ * tw_bitmap_find_first_zero() - find the first zero
+ * @bitmap: bitmap to find first zero
+ *
+ * Return: -1 if not found, otherwise the bit position.
+ */
+int64_t
+tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap);
+
+/**
+ * tw_bitmap_find_first_bit() - find the first bit
+ * @bitmap: bitmap to find first bit
+ *
+ * Return: -1 if not found, otherwise the bit position.
+ */
+int64_t
+tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap);
+
 #endif /* LIBTWIDDLE_BITMAP_H */

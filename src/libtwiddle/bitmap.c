@@ -100,3 +100,36 @@ tw_bitmap_fill(struct tw_bitmap *bitmap)
   bitmap->info.count = bitmap->info.size;
 }
 
+int64_t
+tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap)
+{
+  assert(bitmap);
+
+  if (tw_unlikely(tw_bitmap_full(bitmap)))
+    return -1;
+
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
+    const int pos = tw_ffzl(bitmap->data[i]);
+    if(pos)
+      return (i * TW_BITS_PER_BITMAP) + (pos-1);
+  }
+
+  return -1;
+}
+
+int64_t
+tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
+{
+  assert(bitmap);
+
+  if (tw_unlikely(tw_bitmap_empty(bitmap)))
+    return -1;
+
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
+    const uint64_t pos = tw_ffsl(bitmap->data[i]);
+    if(pos)
+      return (i * TW_BITS_PER_BITMAP) + (pos-1);
+  }
+
+  return -1;
+}

@@ -105,6 +105,11 @@ tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
+  /**
+   * This check is required since we allocate memory on multiple of bitmap_t.
+   * Thus if bitmap.size is not aligned on 64 bits, a full bitmap
+   * would incorrectly report nbits+1 as the position of the first zero.
+   */
   if (tw_unlikely(tw_bitmap_full(bitmap)))
     return -1;
 
@@ -122,6 +127,12 @@ tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
+  /**
+   * This check is required since we allocate memory on multiple of bitmap_t
+   * Thus if bitmap.size is not aligned on 64 bits, a full bitmap
+   * filled with tw_bitmap_fill and then cleared manually with tw_bitmap_clear,
+   * could report the first bit to be greater than nbits.
+   */
   if (tw_unlikely(tw_bitmap_empty(bitmap)))
     return -1;
 

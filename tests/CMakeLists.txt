@@ -35,3 +35,5 @@ if (PYTHON_EXECUTABLE)
 else (PYTHON_EXECUTABLE)
     message(WARNING "Unable to find Python; skipping cram tests.")
 endif (PYTHON_EXECUTABLE)
+
+add_subdirectory(examples)

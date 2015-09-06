@@ -7,6 +7,33 @@ libtwiddle is a small library that implements bit data structures:
   * bloom filters
   * tries
 
+USAGE
+=====
+
+bitmap
+------
+
+```C
+#include <assert.h>
+#include <libtwiddle/bitmap.h>
+
+int main(int argc, char* argv[]) {
+  const uint32_t nbits = 1024;
+  struct tw_bitmap* bitmap = tw_bitmap_new(nbits);
+
+  assert(bitmap);
+
+  tw_bitmap_set(bitmap, 512);
+  assert(tw_bitmap_test_and_clear(bitmap, 512));
+  assert(!tw_bitmap_test(bitmap, 512));
+
+  tw_bitmap_set(bitmap, 768);
+  assert(tw_bitmap_find_first_bit(bitmap) == 768);
+
+  return 0;
+}
+```
+
 INSTALL
 =======
 
@@ -32,6 +59,3 @@ In most cases, you should be able to build the source code using the following:
     $ make
     $ make test
     $ make install
-
-You might have to run the last command using sudo, if you need administrative
-privileges to write to the $PREFIX directory.

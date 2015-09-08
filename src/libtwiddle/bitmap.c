@@ -39,7 +39,7 @@ tw_bitmap_copy(const struct tw_bitmap *src, struct tw_bitmap *dst)
    * No memory leaks are involved since calls to tw_bitmap_free don't depends
    * on bitmap->info.size;
    */
-  if (dst->info.size != src->info.size)
+  if (tw_unlikely(dst->info.size != src->info.size))
     return NULL;
 
   tw_bitmap_info_copy(src->info, dst->info);

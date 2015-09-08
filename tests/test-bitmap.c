@@ -59,6 +59,37 @@ START_TEST(test_bitmap_basic)
 }
 END_TEST
 
+START_TEST(test_bitmap_copy)
+{
+  DESCRIBE_TEST;
+
+  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096};
+  const int32_t offsets[] = {-1, 0, 1};
+
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap *src = tw_bitmap_new(nbits);
+      struct tw_bitmap *dst = tw_bitmap_new(nbits);
+
+      for (uint32_t k = 0; k < nbits; ++k)
+        if (k % 2)
+          tw_bitmap_set(src, k);
+
+      ck_assert(tw_bitmap_copy(src, dst) != NULL);
+
+      for (uint32_t k = 0; k < nbits; ++k)
+        if (k % 2)
+          tw_bitmap_test(dst, k);
+
+      tw_bitmap_free(src);
+      tw_bitmap_free(dst);
+    }
+  }
+
+}
+END_TEST
+
 START_TEST(test_bitmap_zero_and_fill)
 {
   DESCRIBE_TEST;
@@ -153,6 +184,7 @@ int run_tests() {
   SRunner *runner = srunner_create(s);
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_bitmap_basic);
+  tcase_add_test(tc, test_bitmap_copy);
   tcase_add_test(tc, test_bitmap_zero_and_fill);
   tcase_add_test(tc, test_bitmap_find_first);
   suite_add_tcase(s, tc);

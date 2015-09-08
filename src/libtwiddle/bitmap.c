@@ -1,15 +1,16 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include <libtwiddle/bitmap.h>
 #include <libtwiddle/internal/bitops.h>
 
 struct tw_bitmap *
 tw_bitmap_new(uint32_t nbits)
 {
-  assert(nbits <= UINT32_MAX);
-  struct tw_bitmap *bitmap = calloc(1,
-                                    sizeof(struct tw_bitmap_info) +
-                                      TW_BITMAP_PER_BITS(nbits) * TW_BYTES_PER_BITMAP);
+  const size_t alloc_size = sizeof(struct tw_bitmap_info) +
+                            TW_BITMAP_PER_BITS(nbits) * TW_BYTES_PER_BITMAP;
+  struct tw_bitmap *bitmap = calloc(1, alloc_size);
   bitmap->info = tw_bitmap_info_init(nbits);
   return bitmap;
 }
@@ -18,6 +19,34 @@ void
 tw_bitmap_free(struct tw_bitmap *bitmap)
 {
   free(bitmap);
+}
+
+struct tw_bitmap *
+tw_bitmap_copy(const struct tw_bitmap *src, struct tw_bitmap *dst)
+{
+  assert(src && dst);
+
+  /**
+   * When bitmaps size are not equal, memory fragmentation becomes a problem if
+   * one consecutively copy from a decreasing size bitmap, e.g.:
+   *
+   *   a.size == 32, b.size == 32, c.size == 31;
+   *
+   *   assert(tw_bitmap_copy(a, b) == b);  // ok
+   *   assert(tw_bitmap_copy(c, b) == b);  // ok
+   *   assert(tw_bitmap_copy(a, b) == b);  // fails because b.size is now 31
+   *
+   * No memory leaks are involved since calls to tw_bitmap_free don't depends
+   * on bitmap->info.size;
+   */
+  if (dst->info.size != src->info.size)
+    return NULL;
+
+  tw_bitmap_info_copy(src->info, dst->info);
+  memcpy(dst->data, src->data,
+         TW_BITMAP_PER_BITS(src->info.size) * TW_BYTES_PER_BITMAP);
+
+  return dst;
 }
 
 void __always_inline

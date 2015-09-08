@@ -31,6 +31,8 @@ struct tw_bitmap_info {
 };
 
 #define tw_bitmap_info_init(nbits) (struct tw_bitmap_info) {.size = nbits, .count = 0U}
+#define tw_bitmap_info_copy(src, dst) \
+  dst = (struct tw_bitmap_info) {.size = src.size, .count = src.count}
 #define tw_bitmap_info_count(info) (info.count)
 #define tw_bitmap_info_empty(info) (info.count == 0U)
 #define tw_bitmap_info_full(info)  (info.count == info.size)
@@ -61,6 +63,18 @@ tw_bitmap_new(uint32_t nbits);
  */
 void
 tw_bitmap_free(struct tw_bitmap *bitmap);
+
+/**
+ * tw_bitmap_copy() - copy src bitmap into dst
+ * @src: bitmap to copy from
+ * @dst: bitmap to copy to
+ *
+ * Size of bitmap must be equals.
+ *
+ * Return: NULL if copy failed, otherwise a pointer to dst.
+ */
+struct tw_bitmap *
+tw_bitmap_copy(const struct tw_bitmap *src, struct tw_bitmap *dst);
 
 /**
  * tw_bitmap_set() - set position in bitmap

@@ -175,7 +175,7 @@ static inline unsigned long __fls(unsigned long word)
  * set bit if value is nonzero. The first (least significant) bit
  * is at position 1.
  */
-static inline int ffs(int x)
+static inline int tw_ffs(int x)
 {
   int r;
 
@@ -205,7 +205,7 @@ static inline int ffs(int x)
  * set bit if value is nonzero. The last (most significant) bit is
  * at position 32.
  */
-static inline int fls(int x)
+static inline int tw_fls(int x)
 {
   int r;
 

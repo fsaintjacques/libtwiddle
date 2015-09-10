@@ -34,6 +34,7 @@ struct tw_bitmap_info {
 #define tw_bitmap_info_copy(src, dst) \
   dst = (struct tw_bitmap_info) {.size = src.size, .count = src.count}
 #define tw_bitmap_info_count(info) (info.count)
+#define tw_bitmap_info_density(info) (info.count / (1.0 * info.size))
 #define tw_bitmap_info_empty(info) (info.count == 0U)
 #define tw_bitmap_info_full(info)  (info.count == info.size)
 
@@ -146,6 +147,13 @@ tw_bitmap_full(const struct tw_bitmap *bitmap);
  */
 uint32_t
 tw_bitmap_count(const struct tw_bitmap *bitmap);
+
+/**
+ * tw_bitmap_density() - count the percentage of active bits
+ * @bitmap: bitmap to count the density
+ */
+float
+tw_bitmap_density(const struct tw_bitmap *bitmap);
 
 /**
  * tw_bitmap_zero() - clear all bits in a bitmap

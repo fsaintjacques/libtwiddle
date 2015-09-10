@@ -1,0 +1,22 @@
+#include <assert.h>
+#include <string.h>
+
+#include <libtwiddle/bloomfilter.h>
+
+int main(int argc, char *argv[]) {
+  const uint32_t nbits = 1024;
+  const uint32_t k = 7;
+  struct tw_bloomfilter *bf = tw_bloomfilter_new(nbits, k);
+  assert(bf);
+
+  char *values[] = {"herp", "derp", "ferp", "merp"};
+
+  for (int i = 0; i < ((sizeof(values) / sizeof(values[0]))); ++i) {
+    tw_bloomfilter_set(bf, strlen(values[i]), values[i]);
+    assert(tw_bloomfilter_test(bf, strlen(values[i]), values[i]));
+  }
+
+  assert(!tw_bloomfilter_test(bf, sizeof("nope"), "nope"));
+
+  return 0;
+}

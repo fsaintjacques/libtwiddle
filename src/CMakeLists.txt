@@ -41,6 +41,8 @@ add_c_library(
     SOURCES
         libtwiddle/bitmap.c
         libtwiddle/bitmap_rle.c
+        libtwiddle/bloomfilter.c
+        libtwiddle/hash.c
    #LIBRARIES
        #libcork
 )

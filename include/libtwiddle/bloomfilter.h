@@ -21,15 +21,6 @@ struct tw_bloomfilter {
   struct tw_bitmap *bitmap;
 };
 
-static inline
-void
-tw_bloomfilter_hash_positions(uint32_t positions[], uint32_t k,
-                              size_t size, const char * buf)
-{
-  for (int i = 0; i < k; ++i)
-    positions[i] = 1;
-}
-
 struct tw_bloomfilter *
 tw_bloomfilter_new(uint32_t size, uint32_t k);
 

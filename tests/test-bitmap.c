@@ -103,6 +103,7 @@ START_TEST(test_bitmap_zero_and_fill)
       struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
 
       ck_assert(tw_bitmap_empty(bitmap));
+      ck_assert(tw_bitmap_density(bitmap) == 0.0);
       ck_assert(!tw_bitmap_full(bitmap));
 
       tw_bitmap_fill(bitmap);
@@ -111,6 +112,7 @@ START_TEST(test_bitmap_zero_and_fill)
         ck_assert(tw_bitmap_test(bitmap, pos));
 
       ck_assert(tw_bitmap_full(bitmap));
+      ck_assert(tw_bitmap_density(bitmap) == 1.0);
       ck_assert(!tw_bitmap_empty(bitmap));
 
       tw_bitmap_zero(bitmap);
@@ -177,6 +179,29 @@ START_TEST(test_bitmap_find_first)
   }
 END_TEST
 
+START_TEST(test_bitmap_report)
+  DESCRIBE_TEST;
+  struct tw_bitmap *bitmap = tw_bitmap_new(4);
+
+  ck_assert(tw_bitmap_empty(bitmap));
+  ck_assert(!tw_bitmap_full(bitmap));
+  ck_assert(tw_bitmap_density(bitmap) == 0.0);
+
+  tw_bitmap_set(bitmap, 0);
+  ck_assert(tw_bitmap_density(bitmap) == 0.25);
+
+  tw_bitmap_set(bitmap, 1);
+  ck_assert(tw_bitmap_density(bitmap) == 0.50);
+
+  tw_bitmap_set(bitmap, 2);
+  ck_assert(tw_bitmap_density(bitmap) == 0.75);
+
+  tw_bitmap_set(bitmap, 3);
+  ck_assert(!tw_bitmap_empty(bitmap));
+  ck_assert(tw_bitmap_full(bitmap));
+  ck_assert(tw_bitmap_density(bitmap) == 1.0);
+END_TEST
+
 int run_tests() {
   int number_failed;
 
@@ -184,6 +209,7 @@ int run_tests() {
   SRunner *runner = srunner_create(s);
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_bitmap_basic);
+  tcase_add_test(tc, test_bitmap_report);
   tcase_add_test(tc, test_bitmap_copy);
   tcase_add_test(tc, test_bitmap_zero_and_fill);
   tcase_add_test(tc, test_bitmap_find_first);

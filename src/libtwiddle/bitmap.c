@@ -109,6 +109,13 @@ tw_bitmap_count(const struct tw_bitmap *bitmap)
   return tw_bitmap_info_count(bitmap->info);
 }
 
+float
+tw_bitmap_density(const struct tw_bitmap *bitmap)
+{
+  assert(bitmap);
+  return tw_bitmap_info_density(bitmap->info);
+}
+
 void
 tw_bitmap_zero(struct tw_bitmap *bitmap)
 {

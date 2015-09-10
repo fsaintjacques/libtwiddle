@@ -1,6 +1,8 @@
 #ifndef LIBTWIDDLE_INTERNAL_UTILS_H
 #define LIBTWIDDLE_INTERNAL_UTILS_H
 
+#define TW_CACHELINE 64
+
 #define TW_DIV_ROUND_UP(n,d)        (((n) + (d) - 1) / (d))
 
 #define TW_ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))

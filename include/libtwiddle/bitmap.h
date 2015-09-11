@@ -42,6 +42,13 @@ struct tw_bitmap_info {
  * struct tw_bitmap - bitmap data structure
  * @info: bitmap info header
  * @data: buffer holding the bits
+ *
+ * This is the most basic implementation of a bitmap. It does not support
+ * resizing and concurrent operations (unless constrained to reads only).
+ *
+ * There's a small overhead when setting/clearing bit to maintain the
+ * number of active bits. This comes with a O(1) tw_bitmap_count and derived
+ * operations.
  */
 struct tw_bitmap {
   struct tw_bitmap_info info;
@@ -158,15 +165,19 @@ tw_bitmap_density(const struct tw_bitmap *bitmap);
 /**
  * tw_bitmap_zero() - clear all bits in a bitmap
  * @bitmap: bitmap to empty
+ *
+ * Return: the bitmap
  */
-void
+struct tw_bitmap *
 tw_bitmap_zero(struct tw_bitmap *bitmap);
 
 /**
  * tw_bitmap_fill() - set all bits in a bitmap
  * @bitmap: bitmap to fill
+ *
+ * Return: the bitmap
  */
-void
+struct tw_bitmap *
 tw_bitmap_fill(struct tw_bitmap *bitmap);
 
 /**

@@ -198,4 +198,59 @@ tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap);
 int64_t
 tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap);
 
+/**
+ * tw_bitmap_not() - inverse all bits and zeroes in the bitmap
+ * @bitmap: bitmap to inverse
+ *
+ * Return: NULL if failed, pointer to bitmap otherwise.
+ */
+struct tw_bitmap *
+tw_bitmap_not(struct tw_bitmap *bitmap);
+
+/**
+ * tw_bitmap_equal() - verify if bitmaps are equal
+ * @a: first bitmap to check
+ * @b: second bitmap to check
+ *
+ * Return: true if equal, false otherwise
+ */
+bool
+tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b);
+
+/**
+ * tw_bitmap_union() - compute the union of src and dst into dst
+ * @src: source bitmap to union
+ * @dst: destionation bitmap to union
+ *
+ * Return: NULL if failed, otherwise pointer to dst.
+ *
+ * Only works on bitmap of the same size.
+ */
+struct tw_bitmap *
+tw_bitmap_union(const struct tw_bitmap *src, struct tw_bitmap *dst);
+
+/**
+ * tw_bitmap_intersection() - compute the intersection of src and dst into dst
+ * @src: source bitmap to intersect
+ * @dst: destionation bitmap to intersect
+ *
+ * Return: NULL if failed, otherwise pointer to dst.
+ *
+ * Only works on bitmap of the same size.
+ */
+struct tw_bitmap *
+tw_bitmap_intersection(const struct tw_bitmap *src, struct tw_bitmap *dst);
+
+/**
+ * tw_bitmap_xor() - compute the symetric difference of src and dst into dst
+ * @src: source bitmap to xor
+ * @dst: destionation bitmap to xor
+ *
+ * Return: NULL if failed, otherwise pointer to dst.
+ *
+ * Only works on bitmap of the same size.
+ */
+struct tw_bitmap *
+tw_bitmap_xor(const struct tw_bitmap *src, struct tw_bitmap *dst);
+
 #endif /* LIBTWIDDLE_BITMAP_H */

@@ -206,6 +206,53 @@ START_TEST(test_bitmap_report)
 }
 END_TEST
 
+START_TEST(test_bitmap_set_operations)
+{
+  DESCRIBE_TEST;
+  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 1<<17};
+  const int32_t offsets[] = {-1, 0, 1};
+
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap *src = tw_bitmap_new(nbits);
+      struct tw_bitmap *dst = tw_bitmap_new(nbits);
+
+      tw_bitmap_fill(src);
+      tw_bitmap_not(src);
+      ck_assert(tw_bitmap_empty(src));
+
+      tw_bitmap_not(src);
+      ck_assert(tw_bitmap_full(src));
+
+      /* remove first and last bits */
+      tw_bitmap_clear(src, 0);
+      tw_bitmap_clear(src, nbits-1);
+
+      tw_bitmap_union(src, dst);
+      ck_assert(tw_bitmap_equal(src, dst));
+      /* X ^ X = X */
+      ck_assert(tw_bitmap_equal(src, tw_bitmap_intersection(src, dst)));
+      /* X xor X = 0 */
+      ck_assert(tw_bitmap_empty(tw_bitmap_xor(dst, dst)));
+      /* X | ~X = U */
+      ck_assert(tw_bitmap_full(tw_bitmap_union(src, tw_bitmap_not(dst))));
+
+      /* dst = src */
+      tw_bitmap_intersection(src, dst);
+      /* src.count = dst.count */
+      tw_bitmap_clear(src, nbits/2);
+      tw_bitmap_clear(dst, nbits/2 + 1);
+      /* differs by one bit */
+      ck_assert(!tw_bitmap_equal(src, dst));
+
+      tw_bitmap_free(dst);
+      tw_bitmap_free(src);
+    }
+  }
+}
+END_TEST
+
 int run_tests() {
   int number_failed;
 
@@ -217,6 +264,7 @@ int run_tests() {
   tcase_add_test(tc, test_bitmap_copy);
   tcase_add_test(tc, test_bitmap_zero_and_fill);
   tcase_add_test(tc, test_bitmap_find_first);
+  tcase_add_test(tc, test_bitmap_set_operations);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

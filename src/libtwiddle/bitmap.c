@@ -9,9 +9,10 @@ static __always_inline
 void
 tw_bitmap_clear_extra_bits(struct tw_bitmap* bitmap)
 {
-  int32_t rest = bitmap->info.size % TW_BITS_PER_BITMAP;
+  const int32_t size = bitmap->info.size;
+  const int32_t rest = size % TW_BITS_PER_BITMAP;
   if (rest) {
-    bitmap->data[bitmap->info.size / TW_BITS_PER_BITMAP] ^= ~0UL << rest;
+    bitmap->data[size / TW_BITS_PER_BITMAP] ^= ~0UL << rest;
   }
 }
 

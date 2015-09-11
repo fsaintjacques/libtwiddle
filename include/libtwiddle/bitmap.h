@@ -33,10 +33,11 @@ struct tw_bitmap_info {
 #define tw_bitmap_info_init(nbits) (struct tw_bitmap_info) {.size = nbits, .count = 0U}
 #define tw_bitmap_info_copy(src, dst) \
   dst = (struct tw_bitmap_info) {.size = src.size, .count = src.count}
-#define tw_bitmap_info_count(info) (info.count)
+#define tw_bitmap_info_count(info)   (info.count)
+#define tw_bitmap_info_size(info)    (info.size)
 #define tw_bitmap_info_density(info) (info.count / (1.0 * info.size))
-#define tw_bitmap_info_empty(info) (info.count == 0U)
-#define tw_bitmap_info_full(info)  (info.count == info.size)
+#define tw_bitmap_info_empty(info)   (info.count == 0U)
+#define tw_bitmap_info_full(info)    (info.count == info.size)
 
 /**
  * struct tw_bitmap - bitmap data structure

@@ -5,6 +5,16 @@
 #include <libtwiddle/bitmap.h>
 #include <libtwiddle/internal/bitops.h>
 
+static __always_inline
+void
+tw_bitmap_clear_extra_bits(struct tw_bitmap* bitmap)
+{
+  int32_t rest = bitmap->info.size % TW_BITS_PER_BITMAP;
+  if (rest) {
+    bitmap->data[bitmap->info.size / TW_BITS_PER_BITMAP] ^= ~0UL << rest;
+  }
+}
+
 struct tw_bitmap *
 tw_bitmap_new(uint32_t nbits)
 {
@@ -116,7 +126,7 @@ tw_bitmap_density(const struct tw_bitmap *bitmap)
   return tw_bitmap_info_density(bitmap->info);
 }
 
-void
+struct tw_bitmap *
 tw_bitmap_zero(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
@@ -124,16 +134,22 @@ tw_bitmap_zero(struct tw_bitmap *bitmap)
     bitmap->data[i] = 0UL;
 
   bitmap->info.count = 0U;
+
+  return bitmap;
 }
 
-void
+struct tw_bitmap *
 tw_bitmap_fill(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i)
     bitmap->data[i] = ~0UL;
 
+  tw_bitmap_clear_extra_bits(bitmap);
+
   bitmap->info.count = bitmap->info.size;
+
+  return bitmap;
 }
 
 int64_t

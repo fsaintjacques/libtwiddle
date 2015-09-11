@@ -131,7 +131,8 @@ START_TEST(test_bitmap_zero_and_fill)
 END_TEST
 
 START_TEST(test_bitmap_find_first)
- DESCRIBE_TEST;
+{
+  DESCRIBE_TEST;
 
   const int32_t sizes[] = {1024, 2048, 4096};
   const int32_t offsets[] = {-1, 0, 1};
@@ -177,9 +178,11 @@ START_TEST(test_bitmap_find_first)
 
     }
   }
+}
 END_TEST
 
 START_TEST(test_bitmap_report)
+{
   DESCRIBE_TEST;
   struct tw_bitmap *bitmap = tw_bitmap_new(4);
 
@@ -200,6 +203,7 @@ START_TEST(test_bitmap_report)
   ck_assert(!tw_bitmap_empty(bitmap));
   ck_assert(tw_bitmap_full(bitmap));
   ck_assert(tw_bitmap_density(bitmap) == 1.0);
+}
 END_TEST
 
 int run_tests() {

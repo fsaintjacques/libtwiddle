@@ -1,0 +1,51 @@
+language: c++
+os: linux
+sudo: false
+
+matrix:
+  include:
+    - env: GCC_VERSION=4.8
+      addons: &gcc48
+        apt:
+          packages:
+            - gcc-4.8
+            - g++-4.8
+            - valgrind
+            - libboost-all-dev
+            - check
+            - pkg-config
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - env: GCC_VERSION=4.9
+      addons: &gcc49
+        apt:
+          packages:
+            - gcc-4.9
+            - g++-4.9
+            - valgrind
+            - libboost-all-dev
+            - check
+            - pkg-config
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - env: GCC_VERSION=5
+      addons: &gcc50
+        apt:
+          packages:
+            - gcc-5
+            - g++-5
+            - valgrind
+            - libboost-all-dev
+            - check
+            - pkg-config
+          sources:
+            - ubuntu-toolchain-r-test
+
+install:
+  - cd ${TRAVIS_BUILD_DIR} && tools/travis/deps
+script:
+  - cd ${TRAVIS_BUILD_DIR} && tools/travis/test
+# after_success:
+#   - cd ${TRAVIS_BUILD_DIR} && tools/coverage

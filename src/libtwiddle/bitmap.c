@@ -196,3 +196,90 @@ tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
 
   return -1;
 }
+
+struct tw_bitmap *
+tw_bitmap_not(struct tw_bitmap *bitmap)
+{
+  assert(bitmap);
+
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i)
+    bitmap->data[i] ^= ~0UL;
+
+  tw_bitmap_clear_extra_bits(bitmap);
+
+  bitmap->info.count = bitmap->info.size - bitmap->info.count;
+
+  return bitmap;
+}
+
+bool
+tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
+{
+  assert(a && b);
+
+  if (a->info.size != b->info.size || a->info.count != b->info.count)
+    return false;
+
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(a->info.size); ++i)
+    if (a->data[i] != b->data[i])
+      return false;
+
+  return true;
+}
+
+struct tw_bitmap *
+tw_bitmap_union(const struct tw_bitmap *src, struct tw_bitmap *dst)
+{
+  assert(src && dst);
+
+  if (src->info.size != dst->info.size)
+    return NULL;
+
+  uint32_t count = 0;
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
+    dst->data[i] |= src->data[i];
+    count += tw_popcountl(dst->data[i]);
+  }
+
+  dst->info.count = count;
+
+  return dst;
+}
+
+struct tw_bitmap *
+tw_bitmap_intersection(const struct tw_bitmap *src, struct tw_bitmap *dst)
+{
+  assert(src && dst);
+
+  if (src->info.size != dst->info.size)
+    return NULL;
+
+  uint32_t count = 0;
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
+    dst->data[i] &= src->data[i];
+    count += tw_popcountl(dst->data[i]);
+  }
+
+  dst->info.count = count;
+
+  return dst;
+}
+
+struct tw_bitmap *
+tw_bitmap_xor(const struct tw_bitmap *src, struct tw_bitmap *dst)
+{
+  assert(src && dst);
+
+  if (src->info.size != dst->info.size)
+    return NULL;
+
+  uint32_t count = 0;
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
+    dst->data[i] ^= src->data[i];
+    count += tw_popcountl(dst->data[i]);
+  }
+
+  dst->info.count = count;
+
+  return dst;
+}

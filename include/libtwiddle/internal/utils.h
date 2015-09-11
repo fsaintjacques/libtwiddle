@@ -14,5 +14,6 @@
 
 #define tw_ffsl(x) __builtin_ffsl(x)
 #define tw_ffzl(x) __builtin_ffsl(~x)
+#define tw_popcountl(x) __builtin_popcountl(x)
 
 #endif /* LIBTWIDDLE_INTERNAL_UTILS_H */

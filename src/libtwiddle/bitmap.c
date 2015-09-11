@@ -60,6 +60,18 @@ tw_bitmap_copy(const struct tw_bitmap *src, struct tw_bitmap *dst)
   return dst;
 }
 
+struct tw_bitmap *
+tw_bitmap_clone(const struct tw_bitmap *bitmap)
+{
+  assert(bitmap);
+
+  struct tw_bitmap *new = tw_bitmap_new(bitmap->info.size);
+  if (!new)
+    return NULL;
+
+  return tw_bitmap_copy(bitmap, new);
+}
+
 void __always_inline
 tw_bitmap_set(struct tw_bitmap *bitmap, uint32_t pos)
 {

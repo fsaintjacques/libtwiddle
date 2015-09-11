@@ -59,7 +59,7 @@ START_TEST(test_bitmap_basic)
 }
 END_TEST
 
-START_TEST(test_bitmap_copy)
+START_TEST(test_bitmap_copy_and_clone)
 {
   DESCRIBE_TEST;
 
@@ -78,9 +78,13 @@ START_TEST(test_bitmap_copy)
 
       ck_assert(tw_bitmap_copy(src, dst) != NULL);
 
+      struct tw_bitmap *tmp = tw_bitmap_clone(src);
+
       for (uint32_t k = 0; k < nbits; ++k)
-        if (k % 2)
-          tw_bitmap_test(dst, k);
+        if (k % 2) {
+          ck_assert(tw_bitmap_test(dst, k));
+          ck_assert(tw_bitmap_test(tmp, k));
+        }
 
       tw_bitmap_free(src);
       tw_bitmap_free(dst);
@@ -261,7 +265,7 @@ int run_tests() {
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_bitmap_basic);
   tcase_add_test(tc, test_bitmap_report);
-  tcase_add_test(tc, test_bitmap_copy);
+  tcase_add_test(tc, test_bitmap_copy_and_clone);
   tcase_add_test(tc, test_bitmap_zero_and_fill);
   tcase_add_test(tc, test_bitmap_find_first);
   tcase_add_test(tc, test_bitmap_set_operations);

@@ -86,6 +86,17 @@ struct tw_bitmap *
 tw_bitmap_copy(const struct tw_bitmap *src, struct tw_bitmap *dst);
 
 /**
+ * tw_bitmap_clone() - clone a bitmap into a new allocated bitmap
+ * @bitmap: bitmap to clone
+ *
+ * Return: NULL if failed, otherwise a newly allocated bitmap initialized from
+ * the requests bitmap. The caller is responsible to deallocated the bitmap
+ * with tw_bitmap_free.
+ */
+struct tw_bitmap *
+tw_bitmap_clone(const struct tw_bitmap *bitmap);
+
+/**
  * tw_bitmap_set() - set position in bitmap
  * @bitmap: bitmap affected
  * @pos:    position of the bit to set

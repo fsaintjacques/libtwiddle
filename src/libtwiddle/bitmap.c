@@ -17,12 +17,12 @@ tw_bitmap_clear_extra_bits(struct tw_bitmap* bitmap)
 }
 
 struct tw_bitmap *
-tw_bitmap_new(uint32_t nbits)
+tw_bitmap_new(uint32_t size)
 {
   const size_t alloc_size = sizeof(struct tw_bitmap_info) +
-                            TW_BITMAP_PER_BITS(nbits) * TW_BYTES_PER_BITMAP;
+                            TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP;
   struct tw_bitmap *bitmap = calloc(1, alloc_size);
-  bitmap->info = tw_bitmap_info_init(nbits);
+  bitmap->info = tw_bitmap_info_init(size);
   return bitmap;
 }
 

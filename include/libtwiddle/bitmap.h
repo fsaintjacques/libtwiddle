@@ -58,17 +58,17 @@ struct tw_bitmap {
 
 /**
  * tw_bitmap_new() - allocates a bitmap
- * @nbits: number of bits the bitmap should hold
+ * @size: number of bits the bitmap should hold
  *
  * Return: NULL if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_bitmap`.
  */
 struct tw_bitmap *
-tw_bitmap_new(uint32_t nbits);
+tw_bitmap_new(uint32_t size);
 
 /**
  * tw_bitmap_free() - free a bitmap
- * @bitmap: pointer to bitmap to free
+ * @bitmap: bitmap to free
  */
 void
 tw_bitmap_free(struct tw_bitmap *bitmap);
@@ -163,6 +163,8 @@ tw_bitmap_full(const struct tw_bitmap *bitmap);
 /**
  * tw_bitmap_count() - count the number of active bits
  * @bitmap: bitmap to count
+ *
+ * Return: number of active bits
  */
 uint32_t
 tw_bitmap_count(const struct tw_bitmap *bitmap);
@@ -170,6 +172,8 @@ tw_bitmap_count(const struct tw_bitmap *bitmap);
 /**
  * tw_bitmap_density() - count the percentage of active bits
  * @bitmap: bitmap to count the density
+ *
+ * Return: the portion of active bits (count / size)
  */
 float
 tw_bitmap_density(const struct tw_bitmap *bitmap);

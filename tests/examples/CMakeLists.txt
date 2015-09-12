@@ -12,5 +12,5 @@
 # Build the test cases
 
 # Add calls to make_test for each .c test case in the tests/ directory.
-add_c_test(bitmap)
-add_c_test(bloomfilter)
+add_c_test(example-bitmap)
+add_c_test(example-bloomfilter)

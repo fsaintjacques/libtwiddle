@@ -1,4 +1,4 @@
-language: c++
+language: c
 os: linux
 sudo: false
 
@@ -11,7 +11,6 @@ matrix:
             - gcc-4.8
             - g++-4.8
             - valgrind
-            - libboost-all-dev
             - check
             - pkg-config
           sources:
@@ -24,7 +23,6 @@ matrix:
             - gcc-4.9
             - g++-4.9
             - valgrind
-            - libboost-all-dev
             - check
             - pkg-config
           sources:
@@ -37,7 +35,6 @@ matrix:
             - gcc-5
             - g++-5
             - valgrind
-            - libboost-all-dev
             - check
             - pkg-config
           sources:

@@ -4,6 +4,7 @@ sudo: false
 
 matrix:
   include:
+
     - env: GCC_VERSION=4.8
       addons: &gcc48
         apt:

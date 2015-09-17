@@ -67,16 +67,15 @@ tw_bloomfilter_set(struct tw_bloomfilter *bf,
                    size_t size, const char* buf)
 {
   assert(bf && size > 0 && buf);
-  uint32_t hash1, hash2;
-  murmur3_x86_32(buf, size, TW_BF_SEED1, &hash1);
-  murmur3_x86_32(buf, size, TW_BF_SEED2, &hash2);
+  uint64_t hash[2];
+  murmur3_x64_128(buf, size, TW_BF_SEED1, hash);
 
   const uint32_t k = bf->info.k;
   struct tw_bitmap *bitmap = bf->bitmap;
   const uint32_t b_size = bitmap->info.size;
 
   for (int i = 0; i < k; ++i) {
-    tw_bitmap_set(bitmap, (hash1+i*hash2) % b_size);
+    tw_bitmap_set(bitmap, (hash[0] + i * hash[0]) % b_size);
   }
 }
 
@@ -85,16 +84,15 @@ tw_bloomfilter_test(const struct tw_bloomfilter *bf,
                     size_t size, const char* buf)
 {
   assert(bf && size > 0 && buf);
-  uint32_t hash1, hash2;
-  murmur3_x86_32(buf, size, TW_BF_SEED1, &hash1);
-  murmur3_x86_32(buf, size, TW_BF_SEED2, &hash2);
+  uint64_t hash[2];
+  murmur3_x64_128(buf, size, TW_BF_SEED1, hash);
 
   const uint32_t k = bf->info.k;
   const struct tw_bitmap *bitmap = bf->bitmap;
   const uint32_t b_size = bitmap->info.size;
 
   for (int i = 0; i < k; ++i) {
-    if(!tw_bitmap_test(bitmap, (hash1+i*hash2) % b_size))
+    if (!tw_bitmap_test(bitmap, (hash[0] + i * hash[0]) % b_size))
       return false;
   }
 

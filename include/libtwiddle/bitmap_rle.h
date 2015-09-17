@@ -7,7 +7,8 @@
 
 /**
  * Run Length Encoding (RLE) bitmaps are compressed bitmaps. Depending on the
- * density of actives bits, it can compress considerably.
+ * density of actives bits, it can compress considerably. This implementation
+ * is semi mutable as you can only add increasing positions.
  */
 
 struct tw_bitmap_rle_word {
@@ -17,6 +18,11 @@ struct tw_bitmap_rle_word {
 
 #define TW_BITMAP_RLE_WORD_PER_CACHELINE \
   (TW_CACHELINE / sizeof(struct tw_bitmap_rle_word))
+
+#define tw_bitmap_rle_word_zero \
+  (struct tw_bitmap_rle_word) {.pos = 0, .count = 0}
+#define tw_bitmap_rle_word_full(nbits) \
+  (struct tw_bitmap_rle_word) {.pos = 0, .count = nbits}
 
 /**
  * struct tw_bitmap_rle - rle-bitmap data structure
@@ -44,6 +50,9 @@ tw_bitmap_rle_free(struct tw_bitmap_rle *bitmap);
 
 struct tw_bitmap_rle *
 tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst);
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap);
 
 void
 tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos);

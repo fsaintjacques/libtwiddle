@@ -7,13 +7,12 @@
 
 #include "include/helpers.h"
 
+static const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 32768};
+static const int32_t offsets[] = {-1, 0, 1};
+
 START_TEST(test_bitmap_rle_basic)
 {
   DESCRIBE_TEST;
-
-  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 1 << 16};
-  const int32_t offsets[] = {-1, 0, 1};
-
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
       const int32_t nbits = sizes[i] + offsets[j];
@@ -41,9 +40,6 @@ END_TEST
 START_TEST(test_bitmap_rle_range)
 {
   DESCRIBE_TEST;
-  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096};
-  const int32_t offsets[] = {-1, 0, 1};
-
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
       const int32_t nbits = sizes[i] + offsets[j];
@@ -64,6 +60,40 @@ START_TEST(test_bitmap_rle_range)
 }
 END_TEST
 
+START_TEST(test_bitmap_rle_copy_and_clone)
+{
+  DESCRIBE_TEST;
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap_rle *src = tw_bitmap_rle_new(nbits);
+      struct tw_bitmap_rle *dst = tw_bitmap_rle_new(nbits);
+
+      struct tw_bitmap_rle_word word = {.pos = 0, .count = nbits/2 };
+      tw_bitmap_rle_set_word(src, &word);
+      tw_bitmap_rle_set_range(src, nbits/2 + 1, nbits - 1);
+
+      ck_assert(tw_bitmap_rle_copy(src, dst) != NULL);
+
+      /* free original to catch potential dangling pointers */
+      tw_bitmap_rle_free(src);
+
+      struct tw_bitmap_rle *tmp = tw_bitmap_rle_clone(dst);
+
+      const uint32_t positions[] = {0, nbits/2 - 1, nbits/2 + 1, nbits - 1};
+      for (size_t k = 0; k < TW_ARRAY_SIZE(positions); ++k) {
+        const uint32_t pos = positions[k];
+        ck_assert(tw_bitmap_rle_test(dst, pos));
+        ck_assert(tw_bitmap_rle_test(tmp, pos));
+      }
+
+      tw_bitmap_rle_free(tmp);
+      tw_bitmap_rle_free(dst);
+    }
+  }
+}
+END_TEST
+
 int run_tests() {
   int number_failed;
 
@@ -72,6 +102,7 @@ int run_tests() {
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_bitmap_rle_basic);
   tcase_add_test(tc, test_bitmap_rle_range);
+  tcase_add_test(tc, test_bitmap_rle_copy_and_clone);
   tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);

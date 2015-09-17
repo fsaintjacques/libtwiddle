@@ -90,6 +90,7 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst)
 
   const uint32_t alloc_word = src->alloc_word;
   const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
+  dst->cur_word = src->cur_word;
   dst->alloc_word = alloc_word;
   dst->data = calloc(1, alloc_size);
 
@@ -98,7 +99,19 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst)
 
   memcpy(dst->data, src->data, alloc_size);
 
-  return NULL;
+  return dst;
+}
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  struct tw_bitmap_rle *dst = tw_bitmap_rle_new(bitmap->info.size);
+
+  if (tw_unlikely(!dst))
+    return NULL;
+
+  return tw_bitmap_rle_copy(bitmap, dst);
 }
 
 void

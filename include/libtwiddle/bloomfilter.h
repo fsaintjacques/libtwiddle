@@ -25,16 +25,20 @@ struct tw_bloomfilter_info {
 
 /**
  * struct tw_bloomfilter - bloomfilter
- * @info:  header information
- * bitmap: bitmap holding the bits
+ * @info:      header information
+ * @hash_seed: seed used in hashing function
+ * @bitmap:    bitmap holding the bits
  *
  * This bloomfilter is static and does not support automatic resizing. The
  * underlaying storage is struct tw_bitmap.
  */
 struct tw_bloomfilter {
   struct tw_bloomfilter_info info;
+  uint32_t hash_seed;
   struct tw_bitmap *bitmap;
 };
+
+#define TW_BF_DEFAULT_HASH 3781869495L
 
 /**
  * tw_bloomfilter_new() - allocates a bloomfilter

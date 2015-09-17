@@ -22,6 +22,7 @@ tw_bloomfilter_new(uint32_t size, uint32_t k)
   }
 
   bf->info = tw_bloomfilter_info_init(size, k);
+  bf->hash_seed = TW_BF_DEFAULT_HASH;
 
   return bf;
 }
@@ -68,7 +69,7 @@ tw_bloomfilter_set(struct tw_bloomfilter *bf,
 {
   assert(bf && size > 0 && buf);
   uint64_t hash[2];
-  murmur3_x64_128(buf, size, TW_BF_SEED1, hash);
+  murmur3_x64_128(buf, size, bf->hash_seed, hash);
 
   const uint32_t k = bf->info.k;
   struct tw_bitmap *bitmap = bf->bitmap;
@@ -85,7 +86,7 @@ tw_bloomfilter_test(const struct tw_bloomfilter *bf,
 {
   assert(bf && size > 0 && buf);
   uint64_t hash[2];
-  murmur3_x64_128(buf, size, TW_BF_SEED1, hash);
+  murmur3_x64_128(buf, size, bf->hash_seed, hash);
 
   const uint32_t k = bf->info.k;
   const struct tw_bitmap *bitmap = bf->bitmap;

@@ -41,11 +41,14 @@ struct tw_bitmap_rle_word *
 tw_bitmap_rle_get_next_word(struct tw_bitmap_rle *bitmap)
 {
   if (bitmap->alloc_word == bitmap->cur_word) {
+    const uint32_t alloc_word = bitmap->alloc_word * 2;
+    const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
     struct tw_bitmap_rle_word *new_word =
       realloc(bitmap->data,
-              bitmap->alloc_word * 2 * sizeof(struct tw_bitmap_rle_word));
+              alloc_size);
     assert(new_word);
     bitmap->data = new_word;
+    bitmap->alloc_word = alloc_word;
   }
 
   return &(bitmap->data[++(bitmap->cur_word)]);

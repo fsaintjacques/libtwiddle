@@ -45,6 +45,7 @@ int run_tests() {
   SRunner *runner = srunner_create(s);
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_bitmap_rle_basic);
+  tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

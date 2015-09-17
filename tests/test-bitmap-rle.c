@@ -38,6 +38,32 @@ START_TEST(test_bitmap_rle_basic)
 }
 END_TEST
 
+START_TEST(test_bitmap_rle_range)
+{
+  DESCRIBE_TEST;
+  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096};
+  const int32_t offsets[] = {-1, 0, 1};
+
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
+
+      struct tw_bitmap_rle_word word = {.pos = 0, .count = nbits/2 };
+      tw_bitmap_rle_set_word(bitmap, &word);
+      tw_bitmap_rle_set_range(bitmap, nbits/2 + 1, nbits - 1);
+
+      ck_assert(tw_bitmap_rle_test(bitmap, 0));
+      ck_assert(tw_bitmap_rle_test(bitmap, nbits/2 - 1));
+      ck_assert(tw_bitmap_rle_test(bitmap, nbits/2 + 1));
+      ck_assert(tw_bitmap_rle_test(bitmap, nbits - 1));
+
+      tw_bitmap_rle_free(bitmap);
+    }
+  }
+}
+END_TEST
+
 int run_tests() {
   int number_failed;
 
@@ -45,6 +71,7 @@ int run_tests() {
   SRunner *runner = srunner_create(s);
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_bitmap_rle_basic);
+  tcase_add_test(tc, test_bitmap_rle_range);
   tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);

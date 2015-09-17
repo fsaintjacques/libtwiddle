@@ -95,6 +95,7 @@ bool
 tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
+  assert(bitmap->info.count < UINT32_MAX);
   bool val = __test_and_set_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
   if(!val)
     bitmap->info.count++;

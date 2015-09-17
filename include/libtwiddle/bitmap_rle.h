@@ -36,25 +36,6 @@ struct tw_bitmap_rle {
   struct tw_bitmap_rle_word *data;
 };
 
-static inline
-struct tw_bitmap_rle_word *
-tw_bitmap_rle_get_next_word(struct tw_bitmap_rle *bitmap)
-{
-  if (bitmap->alloc_word == bitmap->cur_word) {
-    const uint32_t alloc_word = bitmap->alloc_word * 2;
-    const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
-    struct tw_bitmap_rle_word *new_word =
-      realloc(bitmap->data,
-              alloc_size);
-    assert(new_word);
-    bitmap->data = new_word;
-    bitmap->alloc_word = alloc_word;
-  }
-
-  return &(bitmap->data[++(bitmap->cur_word)]);
-}
-
-
 struct tw_bitmap_rle *
 tw_bitmap_rle_new(uint32_t nbits);
 
@@ -66,6 +47,15 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst);
 
 void
 tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos);
+
+void
+tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
+                       const struct tw_bitmap_rle_word *word);
+
+void
+tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
+                        uint32_t start,
+                        uint32_t end);
 
 bool
 tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos);

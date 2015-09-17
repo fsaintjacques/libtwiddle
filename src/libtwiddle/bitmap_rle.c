@@ -5,24 +5,67 @@
 #include <libtwiddle/bitmap_rle.h>
 #include <libtwiddle/internal/utils.h>
 
+static __always_inline
+struct tw_bitmap_rle_word *
+tw_bitmap_rle_word_alloc(struct tw_bitmap_rle *bitmap)
+{
+  const uint32_t alloc_word = TW_BITMAP_RLE_WORD_PER_CACHELINE * 4;
+  const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
+  struct tw_bitmap_rle_word *data = calloc(1, alloc_size);
+
+  if (!data) {
+    return NULL;
+  }
+
+  bitmap->alloc_word = alloc_word;
+  bitmap->data = data;
+
+  return data;
+}
+
+static __always_inline
+struct tw_bitmap_rle_word *
+tw_bitmap_rle_word_grow(struct tw_bitmap_rle *bitmap)
+{
+  const uint32_t alloc_word = bitmap->alloc_word * 2;
+  const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
+  struct tw_bitmap_rle_word *new_word = realloc(bitmap->data, alloc_size);
+
+  if (!new_word) {
+    return NULL;
+  }
+
+  bitmap->data = new_word;
+  bitmap->alloc_word = alloc_word;
+
+  return new_word;
+}
+
+static __always_inline
+struct tw_bitmap_rle_word *
+tw_bitmap_rle_get_next_word(struct tw_bitmap_rle *bitmap)
+{
+  if (bitmap->alloc_word == bitmap->cur_word ) {
+    if (!tw_bitmap_rle_word_grow(bitmap)) {
+      return NULL;
+    }
+  }
+
+  return &(bitmap->data[++(bitmap->cur_word)]);
+}
+
 struct tw_bitmap_rle *
 tw_bitmap_rle_new(uint32_t nbits)
 {
   struct tw_bitmap_rle *bitmap = calloc(1, sizeof(struct tw_bitmap_rle));
   if (!bitmap)
     return NULL;
+  bitmap->info = tw_bitmap_info_init(nbits);
 
-  const uint32_t alloc_word = TW_BITMAP_RLE_WORD_PER_CACHELINE * 4;
-  const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
-  struct tw_bitmap_rle_word *data = calloc(1, alloc_size);
-  if (!data) {
+  if (!tw_bitmap_rle_word_alloc(bitmap)) {
     free(bitmap);
     return NULL;
   }
-
-  bitmap->info = tw_bitmap_info_init(nbits);
-  bitmap->alloc_word = alloc_word;
-  bitmap->data = data;
 
   return bitmap;
 }
@@ -61,17 +104,18 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst)
 void
 tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos)
 {
+  assert(bitmap &&
+         bitmap->last_pos < pos &&
+         bitmap->info.count < UINT32_MAX);
+
   uint32_t gap = pos - bitmap->last_pos;
-
-  assert(gap >= 0);
-
   struct tw_bitmap_rle_word *word = &bitmap->data[bitmap->cur_word];
 
   if (bitmap->info.count == 0) {
     word->pos = pos;
     word->count = 1;
-  } else if (gap == 1 && word->count < UINT32_MAX) {
-    word->count++;
+  } else if (gap == 1) {
+      word->count++;
   } else {
     word = tw_bitmap_rle_get_next_word(bitmap);
     word->pos = pos;
@@ -80,6 +124,41 @@ tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos)
 
   bitmap->info.count++;
   bitmap->last_pos = pos;
+}
+
+void
+tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
+                       const struct tw_bitmap_rle_word *word)
+{
+  assert(bitmap && word &&
+         (!(bitmap->last_pos) || bitmap->last_pos < word->pos) &&
+         (bitmap->info.count + word->count) < UINT32_MAX);
+
+  uint32_t gap = word->pos - bitmap->last_pos;
+  struct tw_bitmap_rle_word *cur_word = &bitmap->data[bitmap->cur_word];
+
+  if (bitmap->info.count == 0) {
+    cur_word->pos = word->pos;
+    cur_word->count = word->count;
+  } else if (gap == 1) {
+    cur_word->count += word-> count;
+  } else {
+    cur_word = tw_bitmap_rle_get_next_word(bitmap);
+    cur_word->pos = word->pos;
+    cur_word->count = word->count;
+  }
+
+  bitmap->info.count += word->count;
+  bitmap->last_pos = (word->pos + word->count - 1);
+}
+
+void
+tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
+                        uint32_t start,
+                        uint32_t end)
+{
+  struct tw_bitmap_rle_word word = {.pos = start, .count = end - start + 1};
+  tw_bitmap_rle_set_word(bitmap, &word);
 }
 
 bool

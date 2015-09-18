@@ -87,4 +87,10 @@ tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap);
 struct tw_bitmap_rle *
 tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap);
 
+int64_t
+tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
+
+int64_t
+tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
+
 #endif /* LIBTWIDDLE_BITMAP_RLE_H */

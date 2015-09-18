@@ -142,6 +142,47 @@ START_TEST(test_bitmap_rle_zero_and_fill)
 }
 END_TEST
 
+START_TEST(test_bitmap_rle_find_first)
+{
+  DESCRIBE_TEST;
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
+
+      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 0);
+      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == -1);
+
+      tw_bitmap_rle_set(bitmap, 0);
+      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 1);
+      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+
+      tw_bitmap_rle_set(bitmap, 1);
+      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 2);
+      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+
+      tw_bitmap_rle_set(bitmap, 3);
+      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 2);
+      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+
+      tw_bitmap_rle_fill(bitmap);
+      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == -1);
+      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+
+      tw_bitmap_rle_zero(bitmap);
+      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 0);
+      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == -1);
+
+      tw_bitmap_rle_set(bitmap, nbits - 1);
+      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 0);
+      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == nbits - 1);
+
+      tw_bitmap_rle_free(bitmap);
+    }
+  }
+}
+END_TEST
+
 int run_tests() {
   int number_failed;
 
@@ -152,6 +193,7 @@ int run_tests() {
   tcase_add_test(tc, test_bitmap_rle_range);
   tcase_add_test(tc, test_bitmap_rle_copy_and_clone);
   tcase_add_test(tc, test_bitmap_rle_zero_and_fill);
+  tcase_add_test(tc, test_bitmap_rle_find_first);
   tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);

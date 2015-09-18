@@ -118,7 +118,7 @@ void
 tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos)
 {
   assert(bitmap &&
-         bitmap->last_pos < pos &&
+         (!(bitmap->info.count) || bitmap->last_pos < pos) &&
          bitmap->info.count < UINT32_MAX);
 
   const uint32_t gap = pos - bitmap->last_pos;
@@ -144,7 +144,7 @@ tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
                        const struct tw_bitmap_rle_word *word)
 {
   assert(bitmap && word &&
-         (!(bitmap->last_pos) || bitmap->last_pos < word->pos) &&
+         (!(bitmap->info.count) || bitmap->last_pos < word->pos) &&
          (bitmap->info.count + word->count) < UINT32_MAX);
 
   const uint32_t gap = word->pos - bitmap->last_pos;
@@ -262,4 +262,30 @@ tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap)
   bitmap->last_pos = size - 1;
 
   return bitmap;
+}
+
+int64_t
+tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  if (tw_bitmap_rle_full(bitmap)) {
+    return -1;
+  }
+
+  const struct tw_bitmap_rle_word word = bitmap->data[0];
+  return (word.pos != 0) ? 0 : word.pos + word.count;
+  /**    ^^^^^^^^^^^^^^^       ^^^^^^^^^^^^^^^^^^^^^
+   *     bit at zero?          handles empty bitmap since 0 + 0 = 0
+   */
+}
+
+int64_t
+tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  if (tw_bitmap_rle_empty(bitmap)) {
+    return -1;
+  }
+
+  return bitmap->data[0].pos;
 }

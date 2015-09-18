@@ -20,19 +20,18 @@ find_package(CTargets)
 #-----------------------------------------------------------------------
 # Retrieve the current version number
 
-# execute_process(
-#     COMMAND git describe
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-#     RESULT_VARIABLE VERSION_RESULT
-#     OUTPUT_VARIABLE VERSION
-#     OUTPUT_STRIP_TRAILING_WHITESPACE
-# )
-# if(VERSION_RESULT)
-#     message(FATAL_ERROR
-#             "Cannot determine version number: " ${VERSION_RESULT})
-# endif(VERSION_RESULT)
-set(VERSION 0.0.0)
-message(STATUS "Current version: " ${VERSION})
+execute_process(
+    COMMAND git describe
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE VERSION_RESULT
+    OUTPUT_VARIABLE VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if(VERSION_RESULT)
+    message(FATAL_ERROR
+            "Cannot determine version number: " ${VERSION_RESULT})
+endif(VERSION_RESULT)
+message(STATUS "Current version: " ${VERSION_RESULT})
 
 string(REGEX REPLACE "-dev.*" "-dev" BASE_VERSION "${VERSION}")
 

@@ -19,15 +19,17 @@ START_TEST(test_bitmap_rle_basic)
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
 
       for (uint32_t pos = 0; pos < nbits; ++pos) {
-        if (pos % 4)
+        if (pos % 4) {
           tw_bitmap_rle_set(bitmap, pos);
+        }
       }
 
       for (uint32_t pos = 0; pos < nbits; ++pos) {
-        if (pos % 4)
+        if (pos % 4) {
           ck_assert(tw_bitmap_rle_test(bitmap, pos));
-        else
+        } else {
           ck_assert(!tw_bitmap_rle_test(bitmap, pos));
+        }
       }
 
       tw_bitmap_rle_free(bitmap);

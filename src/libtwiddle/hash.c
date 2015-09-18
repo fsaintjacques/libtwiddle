@@ -90,7 +90,7 @@ murmur3_x86_32(const void *key, size_t len, uint32_t seed, void *out)
 
   uint32_t k1 = 0;
 
-  switch(len & 3) {
+  switch (len & 3) {
   case 3: k1 ^= tail[2] << 16;
   case 2: k1 ^= tail[1] << 8;
   case 1: k1 ^= tail[0];
@@ -153,7 +153,7 @@ murmur3_x86_128(const void *key, size_t len, uint32_t seed, void *out)
   uint32_t k3 = 0;
   uint32_t k4 = 0;
 
-  switch(len & 15) {
+  switch (len & 15) {
   case 15: k4 ^= tail[14] << 16;
   case 14: k4 ^= tail[13] << 8;
   case 13: k4 ^= tail[12] << 0;

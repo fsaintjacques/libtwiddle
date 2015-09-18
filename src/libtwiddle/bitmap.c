@@ -50,8 +50,9 @@ tw_bitmap_copy(const struct tw_bitmap *src, struct tw_bitmap *dst)
    * No memory leaks are involved since calls to tw_bitmap_free don't depends
    * on bitmap->info.size;
    */
-  if (tw_unlikely(dst->info.size != src->info.size))
+  if (tw_unlikely(dst->info.size != src->info.size)) {
     return NULL;
+  }
 
   tw_bitmap_info_copy(src->info, dst->info);
   memcpy(dst->data, src->data,
@@ -66,8 +67,9 @@ tw_bitmap_clone(const struct tw_bitmap *bitmap)
   assert(bitmap);
 
   struct tw_bitmap *new = tw_bitmap_new(bitmap->info.size);
-  if (!new)
+  if (!new) {
     return NULL;
+  }
 
   return tw_bitmap_copy(bitmap, new);
 }
@@ -96,9 +98,12 @@ tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
   assert(bitmap->info.count < UINT32_MAX);
+
   bool val = __test_and_set_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
-  if(!val)
+  if (!val) {
     bitmap->info.count++;
+  }
+
   return val;
 }
 
@@ -106,9 +111,12 @@ bool
 tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
+
   bool val = __test_and_clear_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
-  if(val)
+  if (val) {
     bitmap->info.count--;
+  }
+
   return val;
 }
 
@@ -144,9 +152,10 @@ struct tw_bitmap *
 tw_bitmap_zero(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i)
-    bitmap->data[i] = 0UL;
 
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
+    bitmap->data[i] = 0UL;
+  }
   bitmap->info.count = 0U;
 
   return bitmap;
@@ -156,11 +165,11 @@ struct tw_bitmap *
 tw_bitmap_fill(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i)
+
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
     bitmap->data[i] = ~0UL;
-
+  }
   tw_bitmap_clear_extra_bits(bitmap);
-
   bitmap->info.count = bitmap->info.size;
 
   return bitmap;
@@ -176,13 +185,15 @@ tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap)
    * Thus if bitmap.size is not aligned on 64 bits, a full bitmap
    * would incorrectly report nbits+1 as the position of the first zero.
    */
-  if (tw_unlikely(tw_bitmap_full(bitmap)))
+  if (tw_unlikely(tw_bitmap_full(bitmap))) {
     return -1;
+  }
 
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
     const int pos = tw_ffzl(bitmap->data[i]);
-    if(pos)
+    if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos-1);
+    }
   }
 
   return -1;
@@ -199,13 +210,15 @@ tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
    * filled with tw_bitmap_fill and then cleared manually with tw_bitmap_clear,
    * could report the first bit to be greater than nbits.
    */
-  if (tw_unlikely(tw_bitmap_empty(bitmap)))
+  if (tw_unlikely(tw_bitmap_empty(bitmap))) {
     return -1;
+  }
 
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
     const uint64_t pos = tw_ffsl(bitmap->data[i]);
-    if(pos)
+    if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos-1);
+    }
   }
 
   return -1;
@@ -216,8 +229,9 @@ tw_bitmap_not(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i)
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
     bitmap->data[i] ^= ~0UL;
+  }
 
   tw_bitmap_clear_extra_bits(bitmap);
 
@@ -231,12 +245,15 @@ tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
 {
   assert(a && b);
 
-  if (a->info.size != b->info.size || a->info.count != b->info.count)
+  if (a->info.size != b->info.size || a->info.count != b->info.count) {
     return false;
+  }
 
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(a->info.size); ++i)
-    if (a->data[i] != b->data[i])
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(a->info.size); ++i) {
+    if (a->data[i] != b->data[i]) {
       return false;
+    }
+  }
 
   return true;
 }
@@ -246,8 +263,9 @@ tw_bitmap_union(const struct tw_bitmap *src, struct tw_bitmap *dst)
 {
   assert(src && dst);
 
-  if (src->info.size != dst->info.size)
+  if (src->info.size != dst->info.size) {
     return NULL;
+  }
 
   uint32_t count = 0;
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
@@ -265,8 +283,9 @@ tw_bitmap_intersection(const struct tw_bitmap *src, struct tw_bitmap *dst)
 {
   assert(src && dst);
 
-  if (src->info.size != dst->info.size)
+  if (src->info.size != dst->info.size) {
     return NULL;
+  }
 
   uint32_t count = 0;
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
@@ -284,8 +303,9 @@ tw_bitmap_xor(const struct tw_bitmap *src, struct tw_bitmap *dst)
 {
   assert(src && dst);
 
-  if (src->info.size != dst->info.size)
+  if (src->info.size != dst->info.size) {
     return NULL;
+  }
 
   uint32_t count = 0;
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {

@@ -12,11 +12,12 @@ tw_bloomfilter_new(uint32_t size, uint32_t k)
 {
   assert(size > 0 && k > 0);
   struct tw_bloomfilter *bf = calloc(1, sizeof(struct tw_bloomfilter));
-  if(!bf)
+  if (!bf) {
     return NULL;
+  }
 
   bf->bitmap = tw_bitmap_new(size);
-  if(!(bf->bitmap)) {
+  if (!(bf->bitmap)) {
     free(bf);
     return NULL;
   }
@@ -41,12 +42,14 @@ tw_bloomfilter_copy(const struct tw_bloomfilter *src,
 {
   assert(src && dst);
 
-  if (dst->info.size != src->info.size)
+  if (dst->info.size != src->info.size) {
     return NULL;
+  }
 
   tw_bloomfilter_info_copy(src->info, dst->info);
-  if (!tw_bitmap_copy(src->bitmap, dst->bitmap))
+  if (!tw_bitmap_copy(src->bitmap, dst->bitmap)) {
     return NULL;
+  }
 
   return dst;
 }
@@ -57,8 +60,9 @@ tw_bloomfilter_clone(const struct tw_bloomfilter *bf)
   assert(bf);
 
   struct tw_bloomfilter *new = tw_bloomfilter_new(bf->info.size, bf->info.k);
-  if (!new)
+  if (!new) {
     return NULL;
+  }
 
   return tw_bloomfilter_copy(bf, new);
 }
@@ -93,8 +97,9 @@ tw_bloomfilter_test(const struct tw_bloomfilter *bf,
   const uint32_t b_size = bitmap->info.size;
 
   for (int i = 0; i < k; ++i) {
-    if (!tw_bitmap_test(bitmap, (hash[0] + i * hash[0]) % b_size))
+    if (!tw_bitmap_test(bitmap, (hash[0] + i * hash[0]) % b_size)) {
       return false;
+    }
   }
 
   return true;
@@ -156,8 +161,9 @@ tw_bloomfilter_equal(const struct tw_bloomfilter *a,
 {
   assert(a && b);
 
-  if (!tw_bloomfilter_info_equal(a->info, b->info))
+  if (!tw_bloomfilter_info_equal(a->info, b->info)) {
     return false;
+  }
 
   return tw_bitmap_equal(a->bitmap, b->bitmap);
 }
@@ -169,8 +175,9 @@ tw_bloomfilter_union(const struct tw_bloomfilter *src,
 {
   assert(src && dst);
 
-  if (!tw_bloomfilter_info_equal(src->info, dst->info))
+  if (!tw_bloomfilter_info_equal(src->info, dst->info)) {
     return NULL;
+  }
 
   return (tw_bitmap_union(src->bitmap, dst->bitmap)) ? dst : NULL;
 }
@@ -182,8 +189,9 @@ tw_bloomfilter_intersection(const struct tw_bloomfilter *src,
 {
   assert(src && dst);
 
-  if (!tw_bloomfilter_info_equal(src->info, dst->info))
+  if (!tw_bloomfilter_info_equal(src->info, dst->info)) {
     return NULL;
+  }
 
   return (tw_bitmap_intersection(src->bitmap, dst->bitmap)) ? dst : NULL;
 }
@@ -195,8 +203,9 @@ tw_bloomfilter_xor(const struct tw_bloomfilter *src,
 {
   assert(src && dst);
 
-  if (!tw_bloomfilter_info_equal(src->info, dst->info))
+  if (!tw_bloomfilter_info_equal(src->info, dst->info)) {
     return NULL;
+  }
 
   return (tw_bitmap_xor(src->bitmap, dst->bitmap)) ? dst : NULL;
 }

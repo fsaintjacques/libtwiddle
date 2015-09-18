@@ -72,19 +72,22 @@ START_TEST(test_bitmap_copy_and_clone)
       struct tw_bitmap *src = tw_bitmap_new(nbits);
       struct tw_bitmap *dst = tw_bitmap_new(nbits);
 
-      for (uint32_t k = 0; k < nbits; ++k)
-        if (k % 2)
+      for (uint32_t k = 0; k < nbits; ++k) {
+        if (k % 2) {
           tw_bitmap_set(src, k);
+        }
+      }
 
       ck_assert(tw_bitmap_copy(src, dst) != NULL);
 
       struct tw_bitmap *tmp = tw_bitmap_clone(src);
 
-      for (uint32_t k = 0; k < nbits; ++k)
+      for (uint32_t k = 0; k < nbits; ++k) {
         if (k % 2) {
           ck_assert(tw_bitmap_test(dst, k));
           ck_assert(tw_bitmap_test(tmp, k));
         }
+      }
 
       tw_bitmap_free(tmp);
       tw_bitmap_free(src);
@@ -113,8 +116,9 @@ START_TEST(test_bitmap_zero_and_fill)
 
       tw_bitmap_fill(bitmap);
 
-      for (uint32_t pos = 0; pos < nbits; ++pos)
+      for (uint32_t pos = 0; pos < nbits; ++pos) {
         ck_assert(tw_bitmap_test(bitmap, pos));
+      }
 
       ck_assert(tw_bitmap_full(bitmap));
       ck_assert(tw_bitmap_density(bitmap) == 1.0);
@@ -122,8 +126,9 @@ START_TEST(test_bitmap_zero_and_fill)
 
       tw_bitmap_zero(bitmap);
 
-      for (uint32_t pos = 0; pos < nbits; ++pos)
+      for (uint32_t pos = 0; pos < nbits; ++pos) {
         ck_assert(!tw_bitmap_test(bitmap, pos));
+      }
 
       ck_assert(tw_bitmap_empty(bitmap));
       ck_assert(!tw_bitmap_full(bitmap));

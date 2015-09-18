@@ -15,7 +15,8 @@ int main(int argc, char* argv[]) {
 
   assert(tw_bitmap_rle_test(bitmap, start));
   assert(tw_bitmap_rle_test(bitmap, end));
-  assert(tw_bitmap_rle_find_first_bit(bitmap) == start);
+  assert(tw_bitmap_rle_find_first_bit(bitmap)  == start);
+  assert(tw_bitmap_rle_find_first_zero(bitmap) == end + 1);
 
   return 0;
 }

@@ -40,6 +40,7 @@ add_c_library(
     VERSION 0.0.0
     SOURCES
         libtwiddle/bitmap.c
+        libtwiddle/bitmap_rle.c
         libtwiddle/bloomfilter.c
         libtwiddle/hash.c
    #LIBRARIES

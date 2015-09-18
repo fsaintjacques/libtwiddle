@@ -50,7 +50,7 @@ tw_bitmap_copy(const struct tw_bitmap *src, struct tw_bitmap *dst)
    * No memory leaks are involved since calls to tw_bitmap_free don't depends
    * on bitmap->info.size;
    */
-  if (dst->info.size != src->info.size)
+  if (tw_unlikely(dst->info.size != src->info.size))
     return NULL;
 
   tw_bitmap_info_copy(src->info, dst->info);
@@ -95,6 +95,7 @@ bool
 tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
+  assert(bitmap->info.count < UINT32_MAX);
   bool val = __test_and_set_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
   if(!val)
     bitmap->info.count++;

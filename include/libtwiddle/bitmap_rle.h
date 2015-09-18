@@ -69,4 +69,22 @@ tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
 bool
 tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos);
 
+bool
+tw_bitmap_rle_empty(const struct tw_bitmap_rle *bitmap);
+
+bool
+tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap);
+
+uint32_t
+tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap);
+
+float
+tw_bitmap_rle_density(const struct tw_bitmap_rle *bitmap);
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap);
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap);
+
 #endif /* LIBTWIDDLE_BITMAP_RLE_H */

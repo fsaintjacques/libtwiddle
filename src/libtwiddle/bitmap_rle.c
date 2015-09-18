@@ -170,6 +170,7 @@ tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
                         uint32_t start,
                         uint32_t end)
 {
+  assert(bitmap);
   struct tw_bitmap_rle_word word = {.pos = start, .count = end - start + 1};
   tw_bitmap_rle_set_word(bitmap, &word);
 }
@@ -177,8 +178,15 @@ tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
 bool
 tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos)
 {
-  if (bitmap->last_pos < pos)
+  assert(bitmap);
+  if (bitmap->last_pos < pos || (bitmap->info.count == 0)) {
+  /**                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+   *                            Requires a special handling because
+   *                            tw_bitmap_rle_zero() may trick the following
+   *                            loop.
+   */
     return false;
+  }
 
   const uint32_t cur_word = bitmap->cur_word;
   /**
@@ -191,4 +199,66 @@ tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos)
   }
 
   return false;
+}
+
+bool
+tw_bitmap_rle_empty(const struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  return tw_bitmap_info_empty(bitmap->info);
+}
+
+bool
+tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  return tw_bitmap_info_full(bitmap->info);
+}
+
+uint32_t
+tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  return tw_bitmap_info_count(bitmap->info);
+}
+
+float
+tw_bitmap_rle_density(const struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  return tw_bitmap_info_density(bitmap->info);
+}
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  const uint32_t cur_word = bitmap->cur_word;
+  for (uint32_t i = 0; i <= cur_word; ++i) {
+    bitmap->data[i] = tw_bitmap_rle_word_zero;
+  }
+
+  bitmap->cur_word = 0U;
+  bitmap->info.count = 0U;
+  bitmap->last_pos = 0U;
+
+  return bitmap;
+}
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap)
+{
+  assert(bitmap);
+  const uint32_t cur_word = bitmap->cur_word;
+  for (uint32_t i = 0; i <= cur_word; ++i) {
+    bitmap->data[i] = tw_bitmap_rle_word_zero;
+  }
+
+  const uint32_t size = bitmap->info.size;
+  bitmap->data[0] = tw_bitmap_rle_word_full(size);
+  bitmap->cur_word = 0U;
+  bitmap->info.count = size;
+  bitmap->last_pos = size - 1;
+
+  return bitmap;
 }

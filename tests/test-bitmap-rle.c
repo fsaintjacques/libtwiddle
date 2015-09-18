@@ -94,6 +94,54 @@ START_TEST(test_bitmap_rle_copy_and_clone)
 }
 END_TEST
 
+/**
+ * This test is not fully representative because tw_bitmap_rle should be
+ * constructed in an iterative way and then immutable. Thus swapping from
+ * fill/zero/fill breaks this assumption.
+ */
+START_TEST(test_bitmap_rle_zero_and_fill)
+{
+  DESCRIBE_TEST;
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap_rle *bitmap= tw_bitmap_rle_new(nbits);
+
+      ck_assert(tw_bitmap_rle_empty(bitmap));
+      ck_assert(tw_bitmap_rle_density(bitmap) == 0.0);
+      ck_assert(!tw_bitmap_rle_full(bitmap));
+
+      tw_bitmap_rle_fill(bitmap);
+
+      const uint32_t positions[] = {0, nbits/2 - 1, nbits/2 + 1, nbits - 1};
+      for (size_t k = 0; k < TW_ARRAY_SIZE(positions); ++k) {
+        ck_assert(tw_bitmap_rle_test(bitmap, positions[k]));
+      }
+
+      ck_assert(tw_bitmap_rle_full(bitmap));
+      ck_assert(tw_bitmap_rle_density(bitmap) == 1.0);
+      ck_assert(!tw_bitmap_rle_empty(bitmap));
+
+      tw_bitmap_rle_zero(bitmap);
+
+      for (size_t k = 0; k < TW_ARRAY_SIZE(positions); ++k) {
+        ck_assert(!tw_bitmap_rle_test(bitmap, positions[k]));
+      }
+
+      ck_assert(tw_bitmap_rle_empty(bitmap));
+      ck_assert(!tw_bitmap_rle_full(bitmap));
+
+      tw_bitmap_rle_set_range(bitmap, nbits/2 + 1, nbits - 1);
+      ck_assert(tw_bitmap_rle_test(bitmap, nbits - 1));
+      ck_assert(!tw_bitmap_rle_empty(bitmap));
+      ck_assert(!tw_bitmap_rle_full(bitmap));
+
+      tw_bitmap_rle_free(bitmap);
+    }
+  }
+}
+END_TEST
+
 int run_tests() {
   int number_failed;
 
@@ -103,6 +151,7 @@ int run_tests() {
   tcase_add_test(tc, test_bitmap_rle_basic);
   tcase_add_test(tc, test_bitmap_rle_range);
   tcase_add_test(tc, test_bitmap_rle_copy_and_clone);
+  tcase_add_test(tc, test_bitmap_rle_zero_and_fill);
   tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);

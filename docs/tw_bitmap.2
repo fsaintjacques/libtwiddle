@@ -1,0 +1,26 @@
+.TH "tw_bitmap" "2" "2015-09-03" "libtwiddle" "libtwiddle\ documentation"
+.SH NAME
+.PP
+tw_bitmap \[en] libtwiddle basic bitmap implementation
+.SH SYNOPSIS
+.IP
+.nf
+\f[C]
+#include\ <libtwiddle/bitmap.h>
+
+struct\ tw_bitmap\ *\ tw_bitmap_new(uint32_t\ nbits);
+void\ tw_bitmap_free(struct\ tw_bitmap\ *bitmap);
+
+void\ tw_bitmap_set(struct\ tw_bitmap\ *bitmap,\ uint32_t\ pos);
+void\ tw_bitmap_clear(struct\ tw_bitmap\ *bitmap,\ uint32_t\ pos);
+
+bool\ tw_bitmap_test(struct\ tw_bitmap\ *bitmap,\ uint32_t\ pos);
+\f[]
+.fi
+.SH DESCRIPTION
+.PP
+\f[B]tw_bitmap\f[] is a simple struct
+.SH RETURN VALUE
+.SH SEE ALSO
+.SH AUTHORS
+François Saint\-Jacques.

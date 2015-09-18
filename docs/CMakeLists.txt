@@ -20,7 +20,7 @@ set(MAN_FOOTER "libtwiddle")
 # called foo.5.md.
 
 set(MAN_PAGES
-  bitmap.2
+  tw_bitmap.2
 )
 
 #-----------------------------------------------------------------------

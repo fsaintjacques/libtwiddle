@@ -31,8 +31,7 @@ if(VERSION_RESULT)
     message(FATAL_ERROR
             "Cannot determine version number: " ${VERSION_RESULT})
 endif(VERSION_RESULT)
-set(VERSION 0.0.0)
-message(STATUS "Current version: " ${VERSION})
+message(STATUS "Current version: " ${VERSION_RESULT})
 
 string(REGEX REPLACE "-dev.*" "-dev" BASE_VERSION "${VERSION}")
 
@@ -85,9 +84,9 @@ set(CMAKE_INSTALL_LIBDIR lib CACHE STRING
     "The base name of the installation directory for libraries")
 
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    add_definitions(-Wall -Werror -Wpedantic)
+    add_definitions(-Wall -Werror -pedantic)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    add_definitions(-Wall -Werror -Wpedantic)
+    add_definitions(-Wall -Werror -pedantic)
 elseif(CMAKE_C_COMPILER_ID STREQUAL "Intel")
     add_definitions(-Wall -Werror)
 endif(CMAKE_C_COMPILER_ID STREQUAL "GNU")

@@ -121,7 +121,7 @@ tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos)
          bitmap->last_pos < pos &&
          bitmap->info.count < UINT32_MAX);
 
-  uint32_t gap = pos - bitmap->last_pos;
+  const uint32_t gap = pos - bitmap->last_pos;
   struct tw_bitmap_rle_word *word = &bitmap->data[bitmap->cur_word];
 
   if (bitmap->info.count == 0) {
@@ -147,7 +147,7 @@ tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
          (!(bitmap->last_pos) || bitmap->last_pos < word->pos) &&
          (bitmap->info.count + word->count) < UINT32_MAX);
 
-  uint32_t gap = word->pos - bitmap->last_pos;
+  const uint32_t gap = word->pos - bitmap->last_pos;
   struct tw_bitmap_rle_word *cur_word = &bitmap->data[bitmap->cur_word];
 
   if (bitmap->info.count == 0) {
@@ -171,7 +171,8 @@ tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
                         uint32_t end)
 {
   assert(bitmap);
-  struct tw_bitmap_rle_word word = {.pos = start, .count = end - start + 1};
+  const struct tw_bitmap_rle_word word = { .pos = start,
+                                           .count = end - start + 1 };
   tw_bitmap_rle_set_word(bitmap, &word);
 }
 
@@ -189,11 +190,11 @@ tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos)
   }
 
   const uint32_t cur_word = bitmap->cur_word;
-  /**
-   * The inclusive equality is important because the current word is valid!
-   */
   for (uint32_t i = 0; i <= cur_word; ++i) {
-    struct tw_bitmap_rle_word word = bitmap->data[i];
+    /**                  ^^
+     * The inclusive equality is important because the current word is valid
+     */
+    const struct tw_bitmap_rle_word word = bitmap->data[i];
     if (word.pos <= pos && pos <= word.pos + word.count - 1)
       return true;
   }

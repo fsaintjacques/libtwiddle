@@ -58,8 +58,9 @@ struct tw_bitmap_rle *
 tw_bitmap_rle_new(uint32_t nbits)
 {
   struct tw_bitmap_rle *bitmap = calloc(1, sizeof(struct tw_bitmap_rle));
-  if (!bitmap)
+  if (!bitmap) {
     return NULL;
+  }
   bitmap->info = tw_bitmap_info_init(nbits);
 
   if (!tw_bitmap_rle_word_alloc(bitmap)) {
@@ -82,8 +83,9 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst)
 {
   assert(src && dst);
 
-  if (tw_likely(dst->data != NULL))
+  if (tw_likely(dst->data != NULL)) {
     free(dst->data);
+  }
 
   dst->info = src->info;
   dst->last_pos = src->last_pos;
@@ -94,8 +96,9 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst)
   dst->alloc_word = alloc_word;
   dst->data = calloc(1, alloc_size);
 
-  if (tw_unlikely(!dst->data))
+  if (tw_unlikely(!dst->data)) {
     return NULL;
+  }
 
   memcpy(dst->data, src->data, alloc_size);
 
@@ -108,8 +111,9 @@ tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap)
   assert(bitmap);
   struct tw_bitmap_rle *dst = tw_bitmap_rle_new(bitmap->info.size);
 
-  if (tw_unlikely(!dst))
+  if (tw_unlikely(!dst)) {
     return NULL;
+  }
 
   return tw_bitmap_rle_copy(bitmap, dst);
 }
@@ -195,8 +199,9 @@ tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos)
      * The inclusive equality is important because the current word is valid
      */
     const struct tw_bitmap_rle_word word = bitmap->data[i];
-    if (word.pos <= pos && pos <= word.pos + word.count - 1)
+    if (word.pos <= pos && pos <= word.pos + word.count - 1) {
       return true;
+    }
   }
 
   return false;

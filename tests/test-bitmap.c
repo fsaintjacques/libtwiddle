@@ -86,6 +86,7 @@ START_TEST(test_bitmap_copy_and_clone)
           ck_assert(tw_bitmap_test(tmp, k));
         }
 
+      tw_bitmap_free(tmp);
       tw_bitmap_free(src);
       tw_bitmap_free(dst);
     }

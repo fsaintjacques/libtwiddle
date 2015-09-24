@@ -358,6 +358,12 @@ tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
     return false;
   }
 
+  /**
+   * This assumes that bitmaps were manipulated with methods
+   * tw_bitmap_rle_set_* because it merges concurrent words, e.g.
+   * [(0, 2), (2, 1)] -> [(0, 3)]. While both reprensentations are equivalent,
+   * the following loop works only on the minimal-compact form.
+   */
   for (size_t i = 0; i <= a->cur_word; ++i) {
     if (!tw_bitmap_rle_word_equal(a->data[i], b->data[i])) {
       return false;

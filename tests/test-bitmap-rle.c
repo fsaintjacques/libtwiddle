@@ -218,10 +218,10 @@ START_TEST(test_bitmap_rle_not)
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
       const int32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
-      struct tw_bitmap_rle *dst = NULL;
+      struct tw_bitmap_rle *dst = tw_bitmap_rle_clone(bitmap);
 
       /* basic negation */
-      dst = tw_bitmap_rle_not(bitmap, NULL);
+      dst = tw_bitmap_rle_not(bitmap, dst);
       ck_assert(tw_bitmap_rle_full(dst));
       dst = tw_bitmap_rle_not(tw_bitmap_rle_fill(bitmap), dst);
       ck_assert(tw_bitmap_rle_empty(dst));
@@ -269,7 +269,8 @@ START_TEST(test_bitmap_rle_not)
       for (int k = 1; k < blocks; ++k) {
         tw_bitmap_rle_set(bitmap, k * 16);
       }
-      struct tw_bitmap_rle *tmp = tw_bitmap_rle_not(bitmap, NULL);
+      struct tw_bitmap_rle *tmp = tw_bitmap_rle_new(nbits);
+      tmp = tw_bitmap_rle_not(bitmap, tmp);
       dst = tw_bitmap_rle_not(tmp, dst);
       ck_assert(tw_bitmap_rle_equal(bitmap, dst));
 

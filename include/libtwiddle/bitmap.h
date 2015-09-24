@@ -230,7 +230,7 @@ tw_bitmap_not(struct tw_bitmap *bitmap);
  * @a: first bitmap to check
  * @b: second bitmap to check
  *
- * Return: true if equal, false otherwise
+ * Return: true if a and b are equal, false otherwise
  */
 bool
 tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b);

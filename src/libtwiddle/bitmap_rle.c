@@ -307,17 +307,13 @@ struct tw_bitmap_rle *
 tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
                   struct tw_bitmap_rle *dst)
 {
-  assert(bitmap);
+  assert(bitmap && dst);
 
-  uint32_t size = bitmap->info.size;
-  if (dst != NULL) {
-    tw_bitmap_rle_zero(dst);
-  } else {
-    dst = tw_bitmap_rle_new(size);
-    if (dst == NULL) {
-      return NULL;
-    }
+  const uint32_t size = bitmap->info.size;
+  if (size != dst->info.size) {
+    return NULL;
   }
+  tw_bitmap_rle_zero(dst);
 
   /**
    * Negating a set of intervals embedded in a strict one [0, nbits-1] might

@@ -204,10 +204,28 @@ tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
 int64_t
 tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
 
+/**
+ * tw_bitmap_rle_not() - inverse all bits and zeroes in the bitmap
+ * @bitmap: bitmap to inverse
+ * @dst:    user provided destination bitmap
+ *
+ * Compute the set negation operation on the bitmap, the result will be stored
+ * in `dst`. It is assumed that both provided pointers are non-null and
+ * bitmaps of the same size.
+ *
+ * Return: NULL if failed, pointer to dst otherwise.
+ */
 struct tw_bitmap_rle *
 tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
                   struct tw_bitmap_rle *dst);
 
+/**
+ * tw_bitmap_rle_equal() - verify if bitmaps are equal
+ * @a: first bitmap to check
+ * @b: second bitmap to check
+ *
+ * Return: true if equal, false otherwise
+ */
 bool
 tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
                     const struct tw_bitmap_rle *b);

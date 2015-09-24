@@ -185,19 +185,122 @@ START_TEST(test_bitmap_rle_find_first)
 }
 END_TEST
 
+START_TEST(test_bitmap_rle_equal)
+{
+  DESCRIBE_TEST;
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap_rle *a = tw_bitmap_rle_new(nbits);
+      struct tw_bitmap_rle *b = tw_bitmap_rle_clone(a);
+
+      ck_assert(tw_bitmap_rle_equal(a, b));
+
+      int lim = 16;
+      for (int k = 0; k <= lim; ++k) {
+        tw_bitmap_rle_set(a, k);
+      }
+      tw_bitmap_rle_set_range(b, 0, lim);
+
+      ck_assert(tw_bitmap_rle_equal(a, b));
+
+      tw_bitmap_rle_free(b);
+      tw_bitmap_rle_free(a);
+    }
+  }
+}
+END_TEST
+
+START_TEST(test_bitmap_rle_not)
+{
+  DESCRIBE_TEST;
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
+      const int32_t nbits = sizes[i] + offsets[j];
+      struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
+      struct tw_bitmap_rle *dst = NULL;
+
+      /* basic negation */
+      dst = tw_bitmap_rle_not(bitmap, NULL);
+      ck_assert(tw_bitmap_rle_full(dst));
+      dst = tw_bitmap_rle_not(tw_bitmap_rle_fill(bitmap), dst);
+      ck_assert(tw_bitmap_rle_empty(dst));
+
+      /* first and last word overflows */
+      tw_bitmap_rle_zero(bitmap);
+      tw_bitmap_rle_set_range(bitmap, 1, nbits - 2);
+      dst = tw_bitmap_rle_not(bitmap, dst);
+      ck_assert(tw_bitmap_rle_test(dst, 0));
+      ck_assert(!tw_bitmap_rle_test(dst, 1));
+      ck_assert(!tw_bitmap_rle_test(dst, nbits - 2));
+      ck_assert(tw_bitmap_rle_test(dst, nbits - 1));
+
+      /* last overflows */
+      tw_bitmap_rle_zero(bitmap);
+      tw_bitmap_rle_set_range(bitmap, 0, nbits - 2);
+      dst = tw_bitmap_rle_not(bitmap, dst);
+      ck_assert(!tw_bitmap_rle_test(dst, 0));
+      ck_assert(!tw_bitmap_rle_test(dst, 1));
+      ck_assert(!tw_bitmap_rle_test(dst, nbits - 2));
+      ck_assert(tw_bitmap_rle_test(dst, nbits - 1));
+
+      /* first overflows */
+      tw_bitmap_rle_zero(bitmap);
+      tw_bitmap_rle_set_range(bitmap, 1, nbits - 1);
+      dst = tw_bitmap_rle_not(bitmap, dst);
+      ck_assert(tw_bitmap_rle_test(dst, 0));
+      ck_assert(!tw_bitmap_rle_test(dst, 1));
+      ck_assert(!tw_bitmap_rle_test(dst, nbits - 2));
+      ck_assert(!tw_bitmap_rle_test(dst, nbits - 1));
+
+      /* none overflows */
+      tw_bitmap_rle_zero(bitmap);
+      tw_bitmap_rle_set(bitmap, 0);
+      tw_bitmap_rle_set(bitmap, nbits - 1);
+      dst = tw_bitmap_rle_not(bitmap, dst);
+      ck_assert(!tw_bitmap_rle_test(dst, 0));
+      ck_assert(tw_bitmap_rle_test(dst, 1));
+      ck_assert(tw_bitmap_rle_test(dst, nbits - 2));
+      ck_assert(!tw_bitmap_rle_test(dst, nbits - 1));
+
+      /* not(not(a)) == a */
+      tw_bitmap_rle_zero(bitmap);
+      int blocks = nbits / 16;
+      for (int k = 1; k < blocks; ++k) {
+        tw_bitmap_rle_set(bitmap, k * 16);
+      }
+      struct tw_bitmap_rle *tmp = tw_bitmap_rle_not(bitmap, NULL);
+      dst = tw_bitmap_rle_not(tmp, dst);
+      ck_assert(tw_bitmap_rle_equal(bitmap, dst));
+
+      tw_bitmap_rle_free(tmp);
+      tw_bitmap_rle_free(dst);
+      tw_bitmap_rle_free(bitmap);
+    }
+  }
+}
+END_TEST
+
 int run_tests() {
   int number_failed;
 
   Suite  *s = suite_create("bitmap-rle");
   SRunner *runner = srunner_create(s);
-  TCase *tc = tcase_create("basic");
-  tcase_add_test(tc, test_bitmap_rle_basic);
-  tcase_add_test(tc, test_bitmap_rle_range);
-  tcase_add_test(tc, test_bitmap_rle_copy_and_clone);
-  tcase_add_test(tc, test_bitmap_rle_zero_and_fill);
-  tcase_add_test(tc, test_bitmap_rle_find_first);
-  tcase_set_timeout(tc, 15);
-  suite_add_tcase(s, tc);
+
+  TCase *basic = tcase_create("basic");
+  tcase_add_test(basic, test_bitmap_rle_basic);
+  tcase_add_test(basic, test_bitmap_rle_range);
+  tcase_add_test(basic, test_bitmap_rle_copy_and_clone);
+  tcase_add_test(basic, test_bitmap_rle_zero_and_fill);
+  tcase_add_test(basic, test_bitmap_rle_find_first);
+  tcase_set_timeout(basic, 15);
+  suite_add_tcase(s, basic);
+
+  TCase *ops = tcase_create("set-ops");
+  tcase_add_test(ops, test_bitmap_rle_equal);
+  tcase_add_test(ops, test_bitmap_rle_not);
+  suite_add_tcase(s, ops);
+
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);
   srunner_free(runner);

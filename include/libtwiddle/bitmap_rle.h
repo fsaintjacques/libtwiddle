@@ -23,6 +23,8 @@ struct tw_bitmap_rle_word {
   (struct tw_bitmap_rle_word) {.pos = 0, .count = 0}
 #define tw_bitmap_rle_word_full(nbits) \
   (struct tw_bitmap_rle_word) {.pos = 0, .count = nbits}
+#define tw_bitmap_rle_word_equal(a, b) \
+  (a.pos == b.pos && a.count == b.count)
 
 /**
  * struct tw_bitmap_rle - rle-bitmap data structure
@@ -201,5 +203,13 @@ tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
  */
 int64_t
 tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
+                  struct tw_bitmap_rle *dst);
+
+bool
+tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
+                    const struct tw_bitmap_rle *b);
 
 #endif /* LIBTWIDDLE_BITMAP_RLE_H */

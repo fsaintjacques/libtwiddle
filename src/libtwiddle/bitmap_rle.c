@@ -7,27 +7,30 @@
 
 static __always_inline
 struct tw_bitmap_rle_word *
-tw_bitmap_rle_word_alloc(struct tw_bitmap_rle *bitmap)
+tw_bitmap_rle_word_alloc_(struct tw_bitmap_rle *bitmap, uint32_t n_words)
 {
-  const uint32_t alloc_word = TW_BITMAP_RLE_WORD_PER_CACHELINE * 4;
-  const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
+  const uint32_t alloc_size = n_words * sizeof(struct tw_bitmap_rle_word);
   struct tw_bitmap_rle_word *data = calloc(1, alloc_size);
 
   if (!data) {
     return NULL;
   }
 
-  bitmap->alloc_word = alloc_word;
+  bitmap->alloc_word = n_words;
   bitmap->data = data;
 
   return data;
 }
 
+/* default rle words = 4 cachelines */
+#define tw_bitmap_rle_word_alloc(bitmap) \
+  tw_bitmap_rle_word_alloc_(bitmap, TW_BITMAP_RLE_WORD_PER_CACHELINE * 4)
+
 static __always_inline
 struct tw_bitmap_rle_word *
-tw_bitmap_rle_word_grow(struct tw_bitmap_rle *bitmap)
+tw_bitmap_rle_word_grow_(struct tw_bitmap_rle *bitmap, uint32_t words)
 {
-  const uint32_t alloc_word = bitmap->alloc_word * 2;
+  const uint32_t alloc_word = bitmap->alloc_word + words;
   const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
   struct tw_bitmap_rle_word *new_word = realloc(bitmap->data, alloc_size);
 
@@ -40,6 +43,10 @@ tw_bitmap_rle_word_grow(struct tw_bitmap_rle *bitmap)
 
   return new_word;
 }
+
+/* double size by default */
+#define tw_bitmap_rle_word_grow(bitmap) \
+  tw_bitmap_rle_word_grow_(bitmap, bitmap->alloc_word)
 
 static __always_inline
 struct tw_bitmap_rle_word *
@@ -123,6 +130,7 @@ tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos)
 {
   assert(bitmap &&
          (!(bitmap->info.count) || bitmap->last_pos < pos) &&
+         pos < bitmap->info.size &&
          bitmap->info.count < UINT32_MAX);
 
   const uint32_t gap = pos - bitmap->last_pos;
@@ -293,4 +301,72 @@ tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap)
   }
 
   return bitmap->data[0].pos;
+}
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
+                  struct tw_bitmap_rle *dst)
+{
+  assert(bitmap);
+
+  uint32_t size = bitmap->info.size;
+  if (dst != NULL) {
+    tw_bitmap_rle_zero(dst);
+  } else {
+    dst = tw_bitmap_rle_new(size);
+    if (dst == NULL) {
+      return NULL;
+    }
+  }
+
+  /**
+   * Negating a set of intervals embedded in a strict one [0, nbits-1] might
+   * have 3 different outcomes, i.e. if S = |intervals| then we might have
+   * S-1, S, or S+1 intervals. The following code treat the first and last as
+   * specials.
+   */
+
+  /* maybe first interval */
+  const struct tw_bitmap_rle_word first = bitmap->data[0];
+  if (first.pos != 0) {
+    struct tw_bitmap_rle_word word = {.pos = 0, .count = first.pos};
+    tw_bitmap_rle_set_word(dst, &word);
+  }
+
+  uint32_t i = 0;
+  struct tw_bitmap_rle_word cur_word = first;
+  while (i < bitmap->cur_word) {
+    struct tw_bitmap_rle_word next = bitmap->data[i + 1];
+    tw_bitmap_rle_set_range(dst, (cur_word.pos + cur_word.count), next.pos - 1);
+    cur_word = next;
+    ++i;
+  }
+
+  /* maybe last interval */
+  const struct tw_bitmap_rle_word last = bitmap->data[bitmap->cur_word];
+  const uint32_t last_zero = last.pos + last.count;
+  if (last_zero < size) {
+    tw_bitmap_rle_set_range(dst, last_zero, size - 1);
+  }
+
+  return dst;
+}
+
+bool
+tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
+                    const struct tw_bitmap_rle *b)
+{
+  assert(a && b);
+
+  if (a->info.size != b->info.size || a->info.count != b->info.count) {
+    return false;
+  }
+
+  for (size_t i = 0; i <= a->cur_word; ++i) {
+    if (!tw_bitmap_rle_word_equal(a->data[i], b->data[i])) {
+      return false;
+    }
+  }
+
+  return true;
 }

@@ -60,6 +60,8 @@ struct tw_bitmap {
  * tw_bitmap_new() - allocates a bitmap
  * @size: number of bits the bitmap should hold
  *
+ * Bitmaps are static and do not grow in size.
+ *
  * Return: NULL if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_bitmap`.
  */
@@ -117,7 +119,7 @@ tw_bitmap_clear(struct tw_bitmap *bitmap, uint32_t pos);
  * @bitmap: bitmap targetted
  * @pos:    position of the bit to test
  *
- * Return: value of the bitmap
+ * Return: value pos in the bitmap
  */
 bool
 tw_bitmap_test(const struct tw_bitmap *bitmap, uint32_t pos);
@@ -146,7 +148,7 @@ tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos);
  * tw_bitmap_empty() - verify if bitmap is empty
  * @bitmap: bitmap to verify
  *
- * Return: true if the bitmap is empty, false otherwise.
+ * Return: indicator if the bitmap is empty.
  */
 bool
 tw_bitmap_empty(const struct tw_bitmap *bitmap);
@@ -155,7 +157,7 @@ tw_bitmap_empty(const struct tw_bitmap *bitmap);
  * tw_bitmap_full() - verify if bitmap is full
  * @bitmap: bitmap to verify
  *
- * Return: true if the bitmap is full, false otherwise.
+ * Return: indicator if the bitmap is full.
  */
 bool
 tw_bitmap_full(const struct tw_bitmap *bitmap);

@@ -305,7 +305,7 @@ tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap)
 
 struct tw_bitmap_rle *
 tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
-                  struct tw_bitmap_rle *dst)
+                        struct tw_bitmap_rle *dst)
 {
   assert(bitmap && dst);
 
@@ -317,16 +317,15 @@ tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
 
   /**
    * Negating a set of intervals embedded in a strict one [0, nbits-1] might
-   * have 3 different outcomes, i.e. if S = |intervals| then we might have
-   * S-1, S, or S+1 intervals. The following code treat the first and last as
-   * specials.
+   * have 3 different outcomes, i.e. if S = |intervals| then we might witness
+   * outcomes with S-1, S, or S+1 intervals. The following code treat the
+   * first and last as special cases.
    */
 
   /* maybe first interval */
   const struct tw_bitmap_rle_word first = bitmap->data[0];
   if (first.pos != 0) {
-    struct tw_bitmap_rle_word word = {.pos = 0, .count = first.pos};
-    tw_bitmap_rle_set_word(dst, &word);
+    tw_bitmap_rle_set_range(dst, 0, first.pos - 1);
   }
 
   uint32_t i = 0;

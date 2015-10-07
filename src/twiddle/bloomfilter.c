@@ -4,9 +4,6 @@
 #include <twiddle/bloomfilter.h>
 #include <twiddle/hash.h>
 
-#define TW_BF_SEED1 0xDEADBEEF
-#define TW_BF_SEED2 0xCAFECAFE
-
 struct tw_bloomfilter *
 tw_bloomfilter_new(uint32_t size, uint32_t k)
 {
@@ -23,7 +20,7 @@ tw_bloomfilter_new(uint32_t size, uint32_t k)
   }
 
   bf->info = tw_bloomfilter_info_init(size, k);
-  bf->hash_seed = TW_BF_DEFAULT_HASH;
+  bf->hash_seed = TW_BF_DEFAULT_SEED;
 
   return bf;
 }

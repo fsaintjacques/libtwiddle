@@ -38,7 +38,7 @@ struct tw_bloomfilter {
   struct tw_bitmap *bitmap;
 };
 
-#define TW_BF_DEFAULT_HASH 3781869495L
+#define TW_BF_DEFAULT_SEED 3781869495L
 
 /**
  * tw_bloomfilter_new() - allocates a bloomfilter

@@ -445,3 +445,56 @@ tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
 
   return dst;
 }
+
+struct tw_bitmap_rle *
+tw_bitmap_rle_intersection(const struct tw_bitmap_rle *a,
+                           const struct tw_bitmap_rle *b,
+                                 struct tw_bitmap_rle *dst)
+{
+  assert(a && b && dst);
+
+  const uint32_t size = a->info.size;
+  if (size != b->info.size && size != dst->info.size) {
+    return NULL;
+  }
+  tw_bitmap_rle_zero(dst);
+
+  if (tw_bitmap_rle_empty(a)) {
+    return dst;
+  }
+
+  if (tw_bitmap_rle_empty(b)) {
+    return dst;
+  }
+
+  const uint32_t a_last_idx = a->last_word_idx + 1,
+                 b_last_idx = b->last_word_idx + 1;
+  uint32_t a_idx = 0, b_idx = 0;
+  struct tw_bitmap_rle_word *a_word = &(a->data[0]), *b_word = &(b->data[0]);
+
+  /* Drain both rle_word lists until one is empty */
+  while (a_idx < a_last_idx && b_idx < b_last_idx) {
+    const uint32_t a_start = a_word->pos,
+                   b_start = b_word->pos;
+    const uint32_t a_end = tw_bitmap_rle_word_end((*a_word)),
+                   b_end = tw_bitmap_rle_word_end((*b_word));
+    /** let intervals a = [a_0, a_1] and b = [b_0, b_1] then
+     *  (a intersect b) <=> (max(a_0, b_0) <= min(a_1, b_1))
+     */
+    const uint32_t start_pos = (a_start <= b_start) ? b_start : a_start;
+    const uint32_t end_pos = (a_end <= b_end) ? a_end : b_end;
+
+    if (start_pos <= end_pos) {
+      tw_bitmap_rle_set_range(dst, start_pos, end_pos);
+    }
+
+    /** Advance word with the smallest end position */
+    if (a_end <= b_end) {
+      a_word = &(a->data[++a_idx]);
+    } else {
+      b_word = &(b->data[++b_idx]);
+    }
+  }
+
+  return dst;
+}

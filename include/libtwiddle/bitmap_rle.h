@@ -238,7 +238,7 @@ tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
  * tw_bitmap_rle_union() - union 2 bitmaps into a third
  * @a:   first bitmap to union
  * @b:   second bitmap to union
- * @dst: destination bitmap to store the result of (a U b)
+ * @dst: destination bitmap to store the result of (a ∪ b)
  *
  * Return: dst if operation successful, NULL otherwise.
  */
@@ -247,4 +247,16 @@ tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
                     const struct tw_bitmap_rle *b,
                           struct tw_bitmap_rle *dst);
 
+/**
+ * tw_bitmap_rle_intersection() - intersect 2 bitmaps into a third
+ * @a:   first bitmap to intersect
+ * @b:   second bitmap to intersect
+ * @dst: destination bitmap to store the result of (a ∩ b)
+ *
+ * Return: dst if operation successful, NULL otherwise.
+ */
+struct tw_bitmap_rle *
+tw_bitmap_rle_intersection(const struct tw_bitmap_rle *a,
+                           const struct tw_bitmap_rle *b,
+                                 struct tw_bitmap_rle *dst);
 #endif /* LIBTWIDDLE_BITMAP_RLE_H */

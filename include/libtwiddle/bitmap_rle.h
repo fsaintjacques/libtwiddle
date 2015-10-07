@@ -25,6 +25,10 @@ struct tw_bitmap_rle_word {
   (struct tw_bitmap_rle_word) {.pos = 0, .count = nbits}
 #define tw_bitmap_rle_word_equal(a, b) \
   (a.pos == b.pos && a.count == b.count)
+#define tw_bitmap_rle_word_end(a) (a.pos + a.count - 1)
+
+#define tw_bitmap_rle_word_min_ref(a, b) \
+  ((a_word->pos <= b_word->pos) ? &a : &b)
 
 /**
  * struct tw_bitmap_rle - rle-bitmap data structure
@@ -229,5 +233,18 @@ tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
 bool
 tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
                     const struct tw_bitmap_rle *b);
+
+/**
+ * tw_bitmap_rle_union() - union 2 bitmaps into a third
+ * @a:   first bitmap to union
+ * @b:   second bitmap to union
+ * @dst: destination bitmap to store the result of (a U b)
+ *
+ * Return: dst if operation successful, NULL otherwise.
+ */
+struct tw_bitmap_rle *
+tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
+                    const struct tw_bitmap_rle *b,
+                          struct tw_bitmap_rle *dst);
 
 #endif /* LIBTWIDDLE_BITMAP_RLE_H */

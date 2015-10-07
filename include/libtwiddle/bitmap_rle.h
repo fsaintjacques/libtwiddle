@@ -32,17 +32,17 @@ struct tw_bitmap_rle_word {
 
 /**
  * struct tw_bitmap_rle - rle-bitmap data structure
- * @info:       bitmap info header
- * @last_pos:   position of the last set bit
- * @cur_word:   index of the current bitmap_t in @data
- * @alloc_size: allocated size (in bitmap_t) of @data
- * @data:       buffer holding the bits
+ * @info:          bitmap info header
+ * @last_pos:      position of the last set bit
+ * @last_word_idx: index of the current bitmap_t in @data
+ * @alloc_size:    allocated size (in bitmap_t) of @data
+ * @data:          buffer holding the bits
  */
 struct tw_bitmap_rle {
   struct tw_bitmap_info info;
 
   uint32_t last_pos;
-  uint32_t cur_word;
+  uint32_t last_word_idx;
   uint32_t alloc_word;
 
   struct tw_bitmap_rle_word *data;

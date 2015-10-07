@@ -52,13 +52,13 @@ static __always_inline
 struct tw_bitmap_rle_word *
 tw_bitmap_rle_get_next_word(struct tw_bitmap_rle *bitmap)
 {
-  if (bitmap->alloc_word == bitmap->cur_word ) {
+  if (bitmap->alloc_word == bitmap->last_word_idx) {
     if (!tw_bitmap_rle_word_grow(bitmap)) {
       return NULL;
     }
   }
 
-  return &(bitmap->data[++(bitmap->cur_word)]);
+  return &(bitmap->data[++(bitmap->last_word_idx)]);
 }
 
 struct tw_bitmap_rle *
@@ -99,7 +99,7 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst)
 
   const uint32_t alloc_word = src->alloc_word;
   const uint32_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
-  dst->cur_word = src->cur_word;
+  dst->last_word_idx = src->last_word_idx;
   dst->alloc_word = alloc_word;
   dst->data = calloc(1, alloc_size);
 
@@ -134,7 +134,7 @@ tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos)
          bitmap->info.count < UINT32_MAX);
 
   const uint32_t gap = pos - bitmap->last_pos;
-  struct tw_bitmap_rle_word *word = &bitmap->data[bitmap->cur_word];
+  struct tw_bitmap_rle_word *word = &bitmap->data[bitmap->last_word_idx];
 
   if (bitmap->info.count == 0) {
     word->pos = pos;
@@ -160,17 +160,17 @@ tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
          (bitmap->info.count + word->count) < UINT32_MAX);
 
   const uint32_t gap = word->pos - bitmap->last_pos;
-  struct tw_bitmap_rle_word *cur_word = &bitmap->data[bitmap->cur_word];
+  struct tw_bitmap_rle_word *last_word = &bitmap->data[bitmap->last_word_idx];
 
   if (bitmap->info.count == 0) {
-    cur_word->pos = word->pos;
-    cur_word->count = word->count;
+    last_word->pos = word->pos;
+    last_word->count = word->count;
   } else if (gap == 1) {
-    cur_word->count += word->count;
+    last_word->count += word->count;
   } else {
-    cur_word = tw_bitmap_rle_get_next_word(bitmap);
-    cur_word->pos = word->pos;
-    cur_word->count = word->count;
+    last_word = tw_bitmap_rle_get_next_word(bitmap);
+    last_word->pos = word->pos;
+    last_word->count = word->count;
   }
 
   bitmap->info.count += word->count;
@@ -201,8 +201,8 @@ tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos)
     return false;
   }
 
-  const uint32_t cur_word = bitmap->cur_word;
-  for (uint32_t i = 0; i <= cur_word; ++i) {
+  const uint32_t last_word_idx = bitmap->last_word_idx;
+  for (uint32_t i = 0; i <= last_word_idx ; ++i) {
     /**                  ^^
      * The inclusive equality is important because the current word is valid
      */
@@ -247,12 +247,12 @@ struct tw_bitmap_rle *
 tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap)
 {
   assert(bitmap);
-  const uint32_t cur_word = bitmap->cur_word;
-  for (uint32_t i = 0; i <= cur_word; ++i) {
+  const uint32_t last_word_idx = bitmap->last_word_idx;
+  for (uint32_t i = 0; i <= last_word_idx; ++i) {
     bitmap->data[i] = tw_bitmap_rle_word_zero;
   }
 
-  bitmap->cur_word = 0U;
+  bitmap->last_word_idx = 0U;
   bitmap->info.count = 0U;
   bitmap->last_pos = 0U;
 
@@ -263,14 +263,14 @@ struct tw_bitmap_rle *
 tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap)
 {
   assert(bitmap);
-  const uint32_t cur_word = bitmap->cur_word;
-  for (uint32_t i = 0; i <= cur_word; ++i) {
+  const uint32_t last_word_idx = bitmap->last_word_idx;
+  for (uint32_t i = 0; i <= last_word_idx; ++i) {
     bitmap->data[i] = tw_bitmap_rle_word_zero;
   }
 
   const uint32_t size = bitmap->info.size;
   bitmap->data[0] = tw_bitmap_rle_word_full(size);
-  bitmap->cur_word = 0U;
+  bitmap->last_word_idx = 0U;
   bitmap->info.count = size;
   bitmap->last_pos = size - 1;
 
@@ -323,23 +323,23 @@ tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
    */
 
   /* maybe first interval */
-  const struct tw_bitmap_rle_word first = bitmap->data[0];
-  if (first.pos != 0) {
-    tw_bitmap_rle_set_range(dst, 0, first.pos - 1);
+  const struct tw_bitmap_rle_word first_word = bitmap->data[0];
+  if (first_word.pos != 0) {
+    tw_bitmap_rle_set_range(dst, 0, first_word.pos - 1);
   }
 
   uint32_t i = 0;
-  struct tw_bitmap_rle_word cur_word = first;
-  while (i < bitmap->cur_word) {
+  struct tw_bitmap_rle_word word = first_word;
+  while (i < bitmap->last_word_idx) {
     struct tw_bitmap_rle_word next = bitmap->data[i + 1];
-    tw_bitmap_rle_set_range(dst, (cur_word.pos + cur_word.count), next.pos - 1);
-    cur_word = next;
+    tw_bitmap_rle_set_range(dst, (word.pos + word.count), next.pos - 1);
+    word = next;
     ++i;
   }
 
   /* maybe last interval */
-  const struct tw_bitmap_rle_word last = bitmap->data[bitmap->cur_word];
-  const uint32_t last_zero = last.pos + last.count;
+  const struct tw_bitmap_rle_word last_word = bitmap->data[bitmap->last_word_idx];
+  const uint32_t last_zero = last_word.pos + last_word.count;
   if (last_zero < size) {
     tw_bitmap_rle_set_range(dst, last_zero, size - 1);
   }
@@ -363,7 +363,7 @@ tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
    * [(0, 2), (2, 1)] -> [(0, 3)]. While both reprensentations are equivalent,
    * the following loop works only on the minimal-compact form.
    */
-  for (size_t i = 0; i <= a->cur_word; ++i) {
+  for (size_t i = 0; i <= a->last_word_idx; ++i) {
     if (!tw_bitmap_rle_word_equal(a->data[i], b->data[i])) {
       return false;
     }
@@ -417,8 +417,9 @@ tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
     return tw_bitmap_rle_copy(a, dst);
   }
 
-  const uint32_t a_last_idx = a->cur_word + 1, b_last_idx = b->cur_word + 1;
-  uint32_t       a_idx = 0,                    b_idx = 0;
+  const uint32_t a_last_idx = a->last_word_idx + 1,
+                 b_last_idx = b->last_word_idx + 1;
+  uint32_t a_idx = 0, b_idx = 0;
   struct tw_bitmap_rle_word *a_word = &(a->data[0]), *b_word = &(b->data[0]);
 
   /* Drain both rle_word lists until one is empty */

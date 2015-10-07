@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <libtwiddle/bitmap_rle.h>
+#include <twiddle/bitmap_rle.h>
 
 int main(int argc, char* argv[]) {
   /** allocate a bitmap containing 2 billions bits */

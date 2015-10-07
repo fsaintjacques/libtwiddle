@@ -1,10 +1,10 @@
-#ifndef LIBTWIDDLE_BLOOMFILTER_H
-#define LIBTWIDDLE_BLOOMFILTER_H
+#ifndef TWIDDLE_BLOOMFILTER_H
+#define TWIDDLE_BLOOMFILTER_H
 
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <libtwiddle/bitmap.h>
+#include <twiddle/bitmap.h>
 
 /**
  * struct tw_bloomfilter_info - bloomfilter header
@@ -222,4 +222,4 @@ struct tw_bloomfilter *
 tw_bloomfilter_xor(const struct tw_bloomfilter *src,
                          struct tw_bloomfilter *dst);
 
-#endif /* LIBTWIDDLE_BLOOMFILTER_H */
+#endif /* TWIDDLE_BLOOMFILTER_H */

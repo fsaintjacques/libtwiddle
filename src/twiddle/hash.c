@@ -8,7 +8,7 @@
  * non-native version will be less than optimal.
  */
 
-#include <libtwiddle/hash.h>
+#include <twiddle/hash.h>
 
 static __always_inline
 uint32_t rotl32(uint32_t x, int8_t r)

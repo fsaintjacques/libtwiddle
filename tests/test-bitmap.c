@@ -2,8 +2,8 @@
 
 #include <check.h>
 
-#include <libtwiddle/bitmap.h>
-#include <libtwiddle/internal/utils.h>
+#include <twiddle/bitmap.h>
+#include <twiddle/internal/utils.h>
 
 #include "include/helpers.h"
 

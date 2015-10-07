@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <libtwiddle/bitmap_rle.h>
-#include <libtwiddle/internal/utils.h>
+#include <twiddle/bitmap_rle.h>
+#include <twiddle/internal/utils.h>
 
 static __always_inline
 struct tw_bitmap_rle_word *

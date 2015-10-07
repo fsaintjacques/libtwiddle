@@ -1,11 +1,11 @@
-#ifndef LIBTWIDDLE_BITMAP_H
-#define LIBTWIDDLE_BITMAP_H
+#ifndef TWIDDLE_BITMAP_H
+#define TWIDDLE_BITMAP_H
 
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <libtwiddle/internal/utils.h>
+#include <twiddle/internal/utils.h>
 
 /**
  * We define the bitmap to be a 64 bits block.
@@ -271,4 +271,4 @@ tw_bitmap_intersection(const struct tw_bitmap *src, struct tw_bitmap *dst);
 struct tw_bitmap *
 tw_bitmap_xor(const struct tw_bitmap *src, struct tw_bitmap *dst);
 
-#endif /* LIBTWIDDLE_BITMAP_H */
+#endif /* TWIDDLE_BITMAP_H */

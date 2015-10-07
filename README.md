@@ -15,7 +15,7 @@ bitmap
 
 ```C
 #include <assert.h>
-#include <libtwiddle/bitmap.h>
+#include <twiddle/bitmap.h>
 
 int main(int argc, char* argv[]) {
   const uint32_t nbits = 1024;
@@ -39,7 +39,7 @@ bitmap-rle
 
 ```C
 #include <assert.h>
-#include <libtwiddle/bitmap_rle.h>
+#include <twiddle/bitmap_rle.h>
 
 int main(int argc, char* argv[]) {
   /** allocate a bitmap containing 2 billions bits */
@@ -77,7 +77,7 @@ bloomfilter
 #include <assert.h>
 #include <string.h>
 
-#include <libtwiddle/bloomfilter.h>
+#include <twiddle/bloomfilter.h>
 
 int main(int argc, char *argv[]) {
   const uint32_t nbits = 1024;

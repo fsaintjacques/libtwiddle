@@ -39,10 +39,10 @@ add_c_library(
     PKGCONFIG_NAME libtwiddle
     VERSION 0.0.0
     SOURCES
-        libtwiddle/bitmap.c
-        libtwiddle/bitmap_rle.c
-        libtwiddle/bloomfilter.c
-        libtwiddle/hash.c
+        twiddle/bitmap.c
+        twiddle/bitmap_rle.c
+        twiddle/bloomfilter.c
+        twiddle/hash.c
    #LIBRARIES
        #libcork
 )

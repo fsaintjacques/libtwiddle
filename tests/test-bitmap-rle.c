@@ -2,8 +2,8 @@
 
 #include <check.h>
 
-#include <libtwiddle/bitmap_rle.h>
-#include <libtwiddle/internal/utils.h>
+#include <twiddle/bitmap_rle.h>
+#include <twiddle/internal/utils.h>
 
 #include "include/helpers.h"
 

@@ -1,9 +1,9 @@
-#ifndef LIBTWIDDLE_BITMAP_RLE_H
-#define LIBTWIDDLE_BITMAP_RLE_H
+#ifndef TWIDDLE_BITMAP_RLE_H
+#define TWIDDLE_BITMAP_RLE_H
 
 #include <assert.h>
 
-#include <libtwiddle/bitmap.h>
+#include <twiddle/bitmap.h>
 
 /**
  * Run Length Encoding (RLE) bitmaps are compressed bitmaps. Depending on the
@@ -259,4 +259,4 @@ struct tw_bitmap_rle *
 tw_bitmap_rle_intersection(const struct tw_bitmap_rle *a,
                            const struct tw_bitmap_rle *b,
                                  struct tw_bitmap_rle *dst);
-#endif /* LIBTWIDDLE_BITMAP_RLE_H */
+#endif /* TWIDDLE_BITMAP_RLE_H */

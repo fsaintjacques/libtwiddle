@@ -1,5 +1,5 @@
-#ifndef LIBTWIDDLE_INTERNAL_UTILS_H
-#define LIBTWIDDLE_INTERNAL_UTILS_H
+#ifndef TWIDDLE_INTERNAL_UTILS_H
+#define TWIDDLE_INTERNAL_UTILS_H
 
 #define TW_CACHELINE 64
 
@@ -18,4 +18,4 @@
 #define tw_ffzl(x) __builtin_ffsl(~x)
 #define tw_popcountl(x) __builtin_popcountl(x)
 
-#endif /* LIBTWIDDLE_INTERNAL_UTILS_H */
+#endif /* TWIDDLE_INTERNAL_UTILS_H */

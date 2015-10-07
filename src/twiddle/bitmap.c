@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libtwiddle/bitmap.h>
-#include <libtwiddle/internal/bitops.h>
+#include <twiddle/bitmap.h>
+#include <twiddle/internal/bitops.h>
 
 static __always_inline
 void

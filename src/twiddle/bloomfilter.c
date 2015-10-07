@@ -1,8 +1,8 @@
 #include <assert.h>
 
-#include <libtwiddle/bitmap.h>
-#include <libtwiddle/bloomfilter.h>
-#include <libtwiddle/hash.h>
+#include <twiddle/bitmap.h>
+#include <twiddle/bloomfilter.h>
+#include <twiddle/hash.h>
 
 #define TW_BF_SEED1 0xDEADBEEF
 #define TW_BF_SEED2 0xCAFECAFE

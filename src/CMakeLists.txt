@@ -43,6 +43,5 @@ add_c_library(
         twiddle/bitmap_rle.c
         twiddle/bloomfilter.c
         twiddle/hash.c
-   #LIBRARIES
-       #libcork
+        twiddle/hyperloglog.c
 )

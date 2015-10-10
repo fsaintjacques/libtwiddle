@@ -20,6 +20,9 @@ set(ENABLE_STATIC YES CACHE BOOL "Whether to build a static library")
 # Library, with options to build both shared and static versions
 
 function(target_add_shared_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
+    foreach(lib ${LOCAL_LIBRARIES})
+        target_link_libraries(${TARGET_NAME} ${lib}-shared)
+    endforeach(lib)
     foreach(lib ${LIBRARIES})
         string(REPLACE "-" "_" lib ${lib})
         string(TOUPPER ${lib} upperlib)
@@ -28,12 +31,12 @@ function(target_add_shared_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
             ${${upperlib}_LDFLAGS}
         )
     endforeach(lib)
-    foreach(lib ${LOCAL_LIBRARIES})
-        target_link_libraries(${TARGET_NAME} ${lib}-shared)
-    endforeach(lib)
 endfunction(target_add_shared_libraries)
 
 function(target_add_static_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
+    foreach(lib ${LOCAL_LIBRARIES})
+        target_link_libraries(${TARGET_NAME} ${lib}-static)
+    endforeach(lib)
     foreach(lib ${LIBRARIES})
         string(REPLACE "-" "_" lib ${lib})
         string(TOUPPER ${lib} upperlib)
@@ -41,9 +44,6 @@ function(target_add_static_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
             ${TARGET_NAME}
             ${${upperlib}_STATIC_LDFLAGS}
         )
-    endforeach(lib)
-    foreach(lib ${LOCAL_LIBRARIES})
-        target_link_libraries(${TARGET_NAME} ${lib}-static)
     endforeach(lib)
 endfunction(target_add_static_libraries)
 
@@ -208,7 +208,7 @@ function(add_c_test TEST_NAME)
         SKIP_INSTALL
         OUTPUT_NAME ${TEST_NAME}
         SOURCES ${TEST_NAME}.c
-        LIBRARIES check
+        LIBRARIES check m
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
     add_test(${TEST_NAME} ${TEST_NAME})

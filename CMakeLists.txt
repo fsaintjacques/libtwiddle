@@ -95,6 +95,7 @@ endif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 # Check for prerequisite libraries
 
 #pkgconfig_prereq(libcork>=0.14.0)
+library_prereq(m)
 
 #-----------------------------------------------------------------------
 # Include our subdirectories

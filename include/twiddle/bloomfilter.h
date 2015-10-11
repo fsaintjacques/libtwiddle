@@ -14,14 +14,17 @@
 struct tw_bloomfilter_info {
   uint32_t size;
   uint32_t k;
+  uint32_t hash_seed;
 };
 
-#define tw_bloomfilter_info_init(size,k) \
-  (struct tw_bloomfilter_info) {.size = size, .k = k }
+#define tw_bloomfilter_info_init(s,k,h) \
+  (struct tw_bloomfilter_info) {.size = s, .k = k, .hash_seed = h}
 #define tw_bloomfilter_info_copy(src, dst) \
-  dst = (struct tw_bloomfilter_info) {.size = src.size, .k = src.k}
+  dst = (struct tw_bloomfilter_info) {.size = src.size, .k = src.k, .hash_seed = src.hash_seed}
 #define tw_bloomfilter_info_equal(src, dst) \
-  (src.size == dst.size && src.k == dst.k)
+  (src.size == dst.size && src.k == dst.k && src.hash_seed == dst.hash_seed)
+
+#define TW_BF_DEFAULT_SEED 3781869495U
 
 /**
  * struct tw_bloomfilter - bloomfilter
@@ -34,11 +37,8 @@ struct tw_bloomfilter_info {
  */
 struct tw_bloomfilter {
   struct tw_bloomfilter_info info;
-  uint32_t hash_seed;
   struct tw_bitmap *bitmap;
 };
-
-#define TW_BF_DEFAULT_SEED 3781869495L
 
 /**
  * tw_bloomfilter_new() - allocates a bloomfilter

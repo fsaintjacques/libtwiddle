@@ -95,6 +95,8 @@ endif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 # Check for prerequisite libraries
 
 #pkgconfig_prereq(libcork>=0.14.0)
+
+# HACK: forces travis to apply '-lm' linking.
 library_prereq(m)
 
 #-----------------------------------------------------------------------

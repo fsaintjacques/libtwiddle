@@ -13,9 +13,6 @@
 
 # Add calls to make_test for each .c test case in the tests/ directory.
 
-# we require -lm linking
-library_prereq(m)
-
 add_c_test(test-bitmap)
 add_c_test(test-bitmap-rle)
 add_c_test(test-bloomfilter)

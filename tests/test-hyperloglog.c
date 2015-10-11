@@ -25,37 +25,70 @@ START_TEST(test_hyperloglog_basic)
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t n_buckets = sizes[i] + offsets[j];
-      struct tw_hyperloglog *hll = tw_hyperloglog_new(n_buckets);
+      const int32_t n_registers = sizes[i] + offsets[j];
+      struct tw_hyperloglog *hll = tw_hyperloglog_new(n_registers);
 
       double n_elems = 0.0;
 
       /** test linear_count */
-      for (size_t k = 0; k < n_buckets; ++k) {
+      for (size_t k = 0; k < n_registers; ++k) {
         if (k % 2) {
           tw_hyperloglog_add(hll, sizeof(k), (const char *) &k);
           n_elems += 1.0;
         }
       }
-      bool within_error = estimate_within_error(tw_hyperloglog_estimate(hll),
+      bool within_error = estimate_within_error(tw_hyperloglog_count(hll),
                                                 n_elems,
-                                                TW_HLL_ERROR_FOR_REG(n_buckets));
+                                                TW_HLL_ERROR_FOR_REG(n_registers));
       ck_assert(within_error);
 
       /** test loglog */
       n_elems = 0;
-      for (size_t k = 0; k < 10 * n_buckets; ++k) {
+      for (size_t k = 0; k < 10 * n_registers; ++k) {
         if (k % 2) {
           tw_hyperloglog_add(hll, sizeof(k), (const char *) &k);
           n_elems += 1.0;
         }
       }
-      within_error = estimate_within_error(tw_hyperloglog_estimate(hll),
+      within_error = estimate_within_error(tw_hyperloglog_count(hll),
                                            n_elems,
-                                           TW_HLL_ERROR_FOR_REG(n_buckets));
+                                           TW_HLL_ERROR_FOR_REG(n_registers));
       ck_assert(within_error);
       tw_hyperloglog_free(hll);
     }
+  }
+
+}
+END_TEST
+
+START_TEST(test_hyperloglog_copy_and_clone)
+{
+  DESCRIBE_TEST;
+
+  const int32_t sizes[] = {256, 1024, 4096, 1 << 17};
+
+  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+    const int32_t n_registers = sizes[i];
+    struct tw_hyperloglog *hll = tw_hyperloglog_new(n_registers);
+    struct tw_hyperloglog *copy = tw_hyperloglog_new(n_registers);
+
+    /** test linear_count */
+    for (size_t k = 0; k < n_registers; ++k) {
+      if (k % 2) {
+        tw_hyperloglog_add(hll, sizeof(k), (const char *) &k);
+      }
+    }
+
+    ck_assert(tw_hyperloglog_copy(hll, copy) != NULL);
+    ck_assert(tw_hyperloglog_count(hll) == tw_hyperloglog_count(copy));
+
+    struct tw_hyperloglog *clone = tw_hyperloglog_clone(copy);
+    ck_assert(clone != NULL);
+    ck_assert(tw_hyperloglog_count(hll) == tw_hyperloglog_count(clone));
+
+    tw_hyperloglog_free(clone);
+    tw_hyperloglog_free(copy);
+    tw_hyperloglog_free(hll);
   }
 
 }
@@ -68,6 +101,7 @@ int run_tests() {
   SRunner *runner = srunner_create(s);
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_hyperloglog_basic);
+  tcase_add_test(tc, test_hyperloglog_copy_and_clone);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

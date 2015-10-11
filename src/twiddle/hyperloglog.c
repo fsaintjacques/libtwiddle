@@ -10,13 +10,13 @@ struct tw_hyperloglog *
 tw_hyperloglog_new(uint32_t size)
 {
   assert(size > 0);
+
   struct tw_hyperloglog *hll = calloc(1, sizeof(struct tw_hyperloglog) + size);
   if (!hll) {
     return NULL;
   }
 
-  hll->size = size;
-  hll->hash_seed = TW_HLL_DEFAULT_SEED;
+  hll->info = (struct tw_hyperloglog_info) {.size = size, .hash_seed = TW_HLL_DEFAULT_SEED };
 
   return hll;
 }
@@ -28,11 +28,44 @@ tw_hyperloglog_free(struct tw_hyperloglog *hll)
   free(hll);
 }
 
+struct tw_hyperloglog *
+tw_hyperloglog_copy(const struct tw_hyperloglog *src,
+                          struct tw_hyperloglog *dst)
+{
+  assert(src && dst);
+
+  const uint32_t size = src->info.size;
+  if (size != dst->info.size) {
+    return NULL;
+  }
+
+  tw_hyperloglog_info_copy(src->info, dst->info);
+
+  for (int i = 0; i < size; ++i) {
+    dst->registers[i] = src->registers[i];
+  }
+
+  return dst;
+}
+
+struct tw_hyperloglog *
+tw_hyperloglog_clone(const struct tw_hyperloglog *src)
+{
+  assert(src);
+
+  struct tw_hyperloglog * dst = tw_hyperloglog_new(src->info.size);
+  if (dst == NULL) {
+    return NULL;
+  }
+
+  return tw_hyperloglog_copy(src, dst);
+}
+
 void
 tw_hyperloglog_add_hashed(struct tw_hyperloglog *hll, uint64_t hash)
 {
   assert(hll);
-  uint32_t bucket_idx = hash % hll->size;
+  uint32_t bucket_idx = hash % hll->info.size;
   uint8_t leading_zeros = tw_ffsl(hash),
           old_val = hll->registers[bucket_idx];
   hll->registers[bucket_idx] = (leading_zeros > old_val) ? leading_zeros : old_val;
@@ -44,7 +77,7 @@ tw_hyperloglog_add(struct tw_hyperloglog *hll,
 {
   assert(hll && key_size > 0 && key_buf);
   uint64_t hash[2];
-  murmur3_x64_128(key_buf, key_size, hll->hash_seed, hash);
+  murmur3_x64_128(key_buf, key_size, hll->info.hash_seed, hash);
 
   tw_hyperloglog_add_hashed(hll, hash[0]);
 }
@@ -68,11 +101,11 @@ estimate(uint32_t n_registers, double inverse_sum)
 
 
 double
-tw_hyperloglog_estimate(const struct tw_hyperloglog *hll)
+tw_hyperloglog_count(const struct tw_hyperloglog *hll)
 {
   assert(hll);
 
-  const uint32_t n_registers = hll->size;
+  const uint32_t n_registers = hll->info.size;
   uint32_t n_zeros = 0;
   double inverse_sum = 0.0;
 

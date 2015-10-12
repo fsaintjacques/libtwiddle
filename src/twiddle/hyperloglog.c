@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <math.h>
-#include <stdlib.h>
 
 #include <twiddle/hyperloglog.h>
 #include <twiddle/hash.h>
@@ -9,7 +8,9 @@
 struct tw_hyperloglog *
 tw_hyperloglog_new(uint32_t precision)
 {
-  assert(precision > 3);
+  if (precision < TW_HLL_MIN_PRECISION || precision > TW_HLL_MAX_PRECISION) {
+    return NULL;
+  }
 
   struct tw_hyperloglog *hll = calloc(1, sizeof(struct tw_hyperloglog) + (1 << precision));
   if (!hll) {
@@ -84,36 +85,9 @@ tw_hyperloglog_add(struct tw_hyperloglog *hll,
   tw_hyperloglog_add_hashed(hll, hash[0]);
 }
 
-static
+extern
 double
-linear_count(uint32_t n_registers, uint32_t n_zeros)
-{
-  return -1.0 * n_registers * log((double)n_zeros / (double)n_registers);
-}
-
-static
-double
-alpha(uint32_t n_registers, uint32_t precision)
-{
-  switch (precision) {
-    case 4:
-      return 0.673;
-    case 5:
-      return 0.697;
-    case 6:
-      return 0.709;
-    default:
-      return 0.7213 / (1 + 1.079 / n_registers);
-  }
-}
-
-static
-double
-estimate(uint32_t n_registers, uint32_t precision, double inverse_sum)
-{
-  const double multi = alpha(n_registers, precision) * n_registers * n_registers;
-  return multi * (1.0 / inverse_sum);
-}
+estimate(uint32_t precision, uint32_t n_zeros, double inverse_sum);
 
 double
 tw_hyperloglog_count(const struct tw_hyperloglog *hll)
@@ -133,8 +107,7 @@ tw_hyperloglog_count(const struct tw_hyperloglog *hll)
     }
   }
 
-  return (n_zeros) ? linear_count(n_registers, n_zeros) :
-                     estimate(n_registers, precision, inverse_sum);
+  return estimate(precision, n_zeros, inverse_sum);
 }
 
 struct tw_hyperloglog *

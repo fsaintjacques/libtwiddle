@@ -13,67 +13,55 @@ estimate_within_error(double estimate, double real, double error)
 {
   const double diff = abs(estimate - real);
   const double margin = real * error;
-  return diff < 6 * margin;
+  return diff < 5.5 * margin;
 }
 
 START_TEST(test_hyperloglog_basic)
 {
   DESCRIBE_TEST;
+  for (size_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
+    const uint32_t n_registers = 1 << p;
+    struct tw_hyperloglog *hll = tw_hyperloglog_new(p);
+    ck_assert(hll != NULL);
 
-  const int32_t precisions[] = {5, 8, 12, 16};
-  const int32_t offsets[] = {-1, 0, 1};
+    double n_elems = 0.0;
 
-  for (size_t i = 0; i < TW_ARRAY_SIZE(precisions); ++i) {
-    for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const uint32_t precision = precisions[i] + offsets[j];
-      const uint32_t n_registers = 1 << precision;
-      struct tw_hyperloglog *hll = tw_hyperloglog_new(precision);
-      ck_assert(hll != NULL);
-
-      double n_elems = 0.0;
-
-      /** test linear_count */
-      for (size_t k = 0; k < n_registers; ++k) {
-        if (k % 2) {
-          tw_hyperloglog_add(hll, sizeof(k), (const char *) &k);
-          n_elems += 1.0;
-        }
+    /** test linear_count */
+    for (size_t k = 0; k < n_registers; ++k) {
+      if (k % 2) {
+        tw_hyperloglog_add(hll, sizeof(k), (const char *) &k);
+        n_elems += 1.0;
       }
-      bool within_error = estimate_within_error(tw_hyperloglog_count(hll),
-                                                n_elems,
-                                                TW_HLL_ERROR_FOR_REG(n_registers));
-      ck_assert(within_error);
-
-      /** test loglog */
-      n_elems = 0;
-      for (size_t k = 0; k < 10 * n_registers; ++k) {
-        if (k % 2) {
-          tw_hyperloglog_add(hll, sizeof(k), (const char *) &k);
-          n_elems += 1.0;
-        }
-      }
-      within_error = estimate_within_error(tw_hyperloglog_count(hll),
-                                           n_elems,
-                                           TW_HLL_ERROR_FOR_REG(n_registers));
-      ck_assert(within_error);
-      tw_hyperloglog_free(hll);
     }
-  }
+    bool within_error = estimate_within_error(tw_hyperloglog_count(hll),
+        n_elems,
+        TW_HLL_ERROR_FOR_REG(n_registers));
+    ck_assert(within_error);
 
+    /** test loglog */
+    n_elems = 0;
+    for (size_t k = 0; k < 10 * n_registers; ++k) {
+      if (k % 2) {
+        tw_hyperloglog_add(hll, sizeof(k), (const char *) &k);
+        n_elems += 1.0;
+      }
+    }
+    within_error = estimate_within_error(tw_hyperloglog_count(hll),
+                                         n_elems,
+                                         TW_HLL_ERROR_FOR_REG(n_registers));
+    ck_assert_msg(within_error, "estimate %f not within bounds", tw_hyperloglog_count(hll));
+    tw_hyperloglog_free(hll);
+  }
 }
 END_TEST
 
 START_TEST(test_hyperloglog_copy_and_clone)
 {
   DESCRIBE_TEST;
-
-  const int32_t precisions[] = {5, 8, 12, 16};
-
-  for (size_t i = 0; i < TW_ARRAY_SIZE(precisions); ++i) {
-    const int32_t precision = precisions[i];
-    const int32_t n_registers = 1 << precision;
-    struct tw_hyperloglog *hll = tw_hyperloglog_new(precision);
-    struct tw_hyperloglog *copy = tw_hyperloglog_new(precision);
+  for (size_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
+    const int32_t n_registers = 1 << p;
+    struct tw_hyperloglog *hll = tw_hyperloglog_new(p);
+    struct tw_hyperloglog *copy = tw_hyperloglog_new(p);
 
     /** test linear_count */
     for (size_t k = 0; k < n_registers; ++k) {
@@ -100,14 +88,10 @@ END_TEST
 START_TEST(test_hyperloglog_merge)
 {
   DESCRIBE_TEST;
-
-  const int32_t precisions[] = {5, 8, 12, 16};
-
-  for (size_t i = 0; i < TW_ARRAY_SIZE(precisions); ++i) {
-    const uint32_t precision = precisions[i];
-    const uint32_t n_registers = 1 << precision;
-    struct tw_hyperloglog *src = tw_hyperloglog_new(precision);
-    struct tw_hyperloglog *dst = tw_hyperloglog_new(precision);
+  for (size_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
+    const uint32_t n_registers = 1 << p;
+    struct tw_hyperloglog *src = tw_hyperloglog_new(p);
+    struct tw_hyperloglog *dst = tw_hyperloglog_new(p);
 
 
     const int times = 100;
@@ -122,11 +106,12 @@ START_TEST(test_hyperloglog_merge)
 
     ck_assert(tw_hyperloglog_merge(src, dst) != NULL);
 
-    bool within_bound = estimate_within_error(tw_hyperloglog_count(dst),
+    double estimate = tw_hyperloglog_count(dst);
+    bool within_bound = estimate_within_error(estimate,
                                               (double) times * n_registers,
                                               TW_HLL_ERROR_FOR_REG(n_registers));
 
-    ck_assert(within_bound);
+    ck_assert_msg(within_bound, "%d not within bounds", tw_hyperloglog_count(dst));
 
     tw_hyperloglog_free(dst);
     tw_hyperloglog_free(src);

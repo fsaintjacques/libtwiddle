@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #define hll_t uint8_t
 #define TW_BYTES_PER_HLL    sizeof(hll_t)
@@ -12,6 +13,9 @@
 
 #define TW_HLL_ERROR_FOR_REG(reg)     (1.04  /sqrt((double) (reg)))
 #define TW_HLL_REG_FOR_ERROR(err)     (1.0816/((err)*(err)))
+
+#define TW_HLL_MIN_PRECISION 4
+#define TW_HLL_MAX_PRECISION 18
 
 #define tw_hyperloglog_info_copy(src, dst) \
   dst = (struct tw_hyperloglog_info) {.precision= src.precision, .hash_seed = src.hash_seed}
@@ -132,4 +136,4 @@ tw_hyperloglog_count(const struct tw_hyperloglog *hll);
 struct tw_hyperloglog *
 tw_hyperloglog_merge(const struct tw_hyperloglog *src,
                            struct tw_hyperloglog *dst);
-#endif /* TWIDDLE_hyperloglog_H */
+#endif /* TWIDDLE_HYPERLOGLOG_H */

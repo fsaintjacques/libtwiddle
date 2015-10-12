@@ -44,4 +44,5 @@ add_c_library(
         twiddle/bloomfilter.c
         twiddle/hash.c
         twiddle/hyperloglog.c
+        twiddle/hyperloglog_bias.c
 )

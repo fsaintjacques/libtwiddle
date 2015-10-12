@@ -118,4 +118,18 @@ tw_hyperloglog_add(struct tw_hyperloglog *hll,
  */
 double
 tw_hyperloglog_count(const struct tw_hyperloglog *hll);
+
+/**
+ * tw_hyperloglog_merge() - merge src into dst
+ * @src: hyperloglog to merge from
+ * @dst: hyperloglog to merge to
+ *
+ * Return: pointer to merged hyperloglog structure dst, NULL if failed.
+ *
+ * Merged hll must have the same header (precision, hash_seed). Otherwise
+ * merging is refused.
+ */
+struct tw_hyperloglog *
+tw_hyperloglog_merge(const struct tw_hyperloglog *src,
+                           struct tw_hyperloglog *dst);
 #endif /* TWIDDLE_hyperloglog_H */

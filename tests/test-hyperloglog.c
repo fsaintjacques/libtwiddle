@@ -97,6 +97,44 @@ START_TEST(test_hyperloglog_copy_and_clone)
 }
 END_TEST
 
+START_TEST(test_hyperloglog_merge)
+{
+  DESCRIBE_TEST;
+
+  const int32_t precisions[] = {5, 8, 12, 16};
+
+  for (size_t i = 0; i < TW_ARRAY_SIZE(precisions); ++i) {
+    const uint32_t precision = precisions[i];
+    const uint32_t n_registers = 1 << precision;
+    struct tw_hyperloglog *src = tw_hyperloglog_new(precision);
+    struct tw_hyperloglog *dst = tw_hyperloglog_new(precision);
+
+
+    const int times = 100;
+    /** test linear_count */
+    for (size_t k = 0; k < times * n_registers; ++k) {
+      if (k % 2) {
+        tw_hyperloglog_add(src, sizeof(k), (const char *) &k);
+      } else {
+        tw_hyperloglog_add(dst, sizeof(k), (const char *) &k);
+      }
+    }
+
+    ck_assert(tw_hyperloglog_merge(src, dst) != NULL);
+
+    bool within_bound = estimate_within_error(tw_hyperloglog_count(dst),
+                                              (double) times * n_registers,
+                                              TW_HLL_ERROR_FOR_REG(n_registers));
+
+    ck_assert(within_bound);
+
+    tw_hyperloglog_free(dst);
+    tw_hyperloglog_free(src);
+  }
+
+}
+END_TEST
+
 int run_tests() {
   int number_failed;
 
@@ -105,6 +143,7 @@ int run_tests() {
   TCase *tc = tcase_create("basic");
   tcase_add_test(tc, test_hyperloglog_basic);
   tcase_add_test(tc, test_hyperloglog_copy_and_clone);
+  tcase_add_test(tc, test_hyperloglog_merge);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

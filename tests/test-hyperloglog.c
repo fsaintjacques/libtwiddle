@@ -12,7 +12,7 @@ bool
 estimate_within_error(double estimate, double real, double error)
 {
   const double diff = abs(estimate - real);
-  const double margin = real * error;
+  const double margin = real * 0.1;
   return diff < 10 * margin;
 }
 

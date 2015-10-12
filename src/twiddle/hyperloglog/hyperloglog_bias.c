@@ -1,6 +1,5 @@
 #include <math.h>
-
-#include <twiddle/hyperloglog.h>
+#include <stdint.h>
 
 uint8_t sizes[15] = {79, 159, 200, 200, 200, 201, 200, 201, 201, 200, 201, 201, 200, 201, 200};
 

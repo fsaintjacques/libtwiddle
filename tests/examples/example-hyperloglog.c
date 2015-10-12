@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include <twiddle/hyperloglog.h>
+#include <twiddle/hyperloglog/hyperloglog.h>
 
 int main(int argc, char *argv[]) {
   const uint32_t precision = 16;

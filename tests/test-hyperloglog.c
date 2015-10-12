@@ -4,7 +4,7 @@
 #include <check.h>
 
 #include <twiddle/internal/utils.h>
-#include <twiddle/hyperloglog.h>
+#include <twiddle/hyperloglog/hyperloglog.h>
 
 #include "include/helpers.h"
 
@@ -13,7 +13,7 @@ estimate_within_error(double estimate, double real, double error)
 {
   const double diff = abs(estimate - real);
   const double margin = real * error;
-  return diff < 6 * margin;
+  return diff < 10 * margin;
 }
 
 START_TEST(test_hyperloglog_basic)

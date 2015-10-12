@@ -43,6 +43,6 @@ add_c_library(
         twiddle/bitmap/bitmap_rle.c
         twiddle/bloomfilter/bloomfilter.c
         twiddle/hash/murmur3.c
-        twiddle/hyperloglog.c
-        twiddle/hyperloglog_bias.c
+        twiddle/hyperloglog/hyperloglog.c
+        twiddle/hyperloglog/hyperloglog_bias.c
 )

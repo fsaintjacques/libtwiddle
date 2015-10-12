@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include <twiddle/hyperloglog.h>
+#include <twiddle/hyperloglog/hyperloglog.h>
 #include <twiddle/hash/murmur3.h>
 #include <twiddle/internal/utils.h>
 

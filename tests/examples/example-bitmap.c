@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <twiddle/bitmap.h>
+#include <twiddle/bitmap/bitmap.h>
 
 int main(int argc, char* argv[]) {
   const uint32_t nbits = 1024;

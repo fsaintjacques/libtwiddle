@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <twiddle/bitmap.h>
+#include <twiddle/bitmap/bitmap.h>
 
 /**
  * struct tw_bloomfilter_info - bloomfilter header

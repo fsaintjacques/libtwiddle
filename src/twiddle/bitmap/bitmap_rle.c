@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <twiddle/bitmap_rle.h>
+#include <twiddle/bitmap/bitmap_rle.h>
 #include <twiddle/internal/utils.h>
 
 static __always_inline

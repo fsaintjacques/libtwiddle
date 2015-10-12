@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include <twiddle/bitmap.h>
+#include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bloomfilter.h>
 #include <twiddle/hash/murmur3.h>
 

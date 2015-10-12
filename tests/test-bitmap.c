@@ -2,7 +2,7 @@
 
 #include <check.h>
 
-#include <twiddle/bitmap.h>
+#include <twiddle/bitmap/bitmap.h>
 #include <twiddle/internal/utils.h>
 
 #include "include/helpers.h"

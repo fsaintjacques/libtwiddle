@@ -39,8 +39,8 @@ add_c_library(
     PKGCONFIG_NAME libtwiddle
     VERSION 0.0.0
     SOURCES
-        twiddle/bitmap.c
-        twiddle/bitmap_rle.c
+        twiddle/bitmap/bitmap.c
+        twiddle/bitmap/bitmap_rle.c
         twiddle/bloomfilter.c
         twiddle/hash/murmur3.c
         twiddle/hyperloglog.c

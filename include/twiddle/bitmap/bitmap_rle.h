@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-#include <twiddle/bitmap.h>
+#include <twiddle/bitmap/bitmap.h>
 
 /**
  * Run Length Encoding (RLE) bitmaps are compressed bitmaps. Depending on the

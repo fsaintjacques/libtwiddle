@@ -14,12 +14,12 @@
 #define TW_HLL_REG_FOR_ERROR(err)     (1.0816/((err)*(err)))
 
 #define tw_hyperloglog_info_copy(src, dst) \
-  dst = (struct tw_hyperloglog_info) {.size = src.size, .hash_seed = src.hash_seed}
+  dst = (struct tw_hyperloglog_info) {.precision= src.precision, .hash_seed = src.hash_seed}
 #define tw_hyperloglog_info_equal(a,b) \
-  (a.size == b.size && a.hash_seed == b.hash_seed)
+  (a.precision == b.precision && a.hash_seed == b.hash_seed)
 
 struct tw_hyperloglog_info {
-  uint32_t size;
+  uint32_t precision;
   uint32_t hash_seed;
 };
 
@@ -28,17 +28,17 @@ struct tw_hyperloglog {
   uint8_t registers[];
 };
 
-#define TW_HLL_DEFAULT_SEED 646086642L
+#define TW_HLL_DEFAULT_SEED 646086642U
 
 /**
  * tw_hyperloglog_new() - allocates a hyperloglog data structure
- * @size: number of 8-bit counters the hyperloglog should hold
+ * @precision: precision hyperloglog should use
  *
  * Return: NULL if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_hyperloglog`.
  */
 struct tw_hyperloglog *
-tw_hyperloglog_new(uint32_t size);
+tw_hyperloglog_new(uint32_t precision);
 
 /**
  * tw_hyperloglog_free() - free a hyperloglog
@@ -48,19 +48,28 @@ void
 tw_hyperloglog_free(struct tw_hyperloglog *hll);
 
 /**
- * tw_hyperloglog_copy() - free a hyperloglog
- * @hll: hyperloglog to free
+ * tw_hyperloglog_copy() - copy src hyperloglog into dst
+ * @src: hyperloglog to copy from
+ * @dst: hyperloglog to copy to
+ *
+ * Precision of hyperloglogs must be equals.
+ *
+ * Return: NULL if copy failed, otherwise a pointer to dst.
  */
 struct tw_hyperloglog *
 tw_hyperloglog_copy(const struct tw_hyperloglog *src,
                           struct tw_hyperloglog *dst);
 
 /**
- * tw_hyperloglog_clone() - free a hyperloglog
- * @hll: hyperloglog to free
+ * tw_hyperloglog_clone() - clone a hyperloglog into a newly allocated one
+ * @hll: hyperloglog to clone
+ *
+ * Return: NULL if failed, otherwise a newly allocated hyperloglog initialized
+ * from the requested hyperloglog. The caller is responsible to deallocate
+ * with tw_hyperloglog_free.
  */
 struct tw_hyperloglog *
-tw_hyperloglog_clone(const struct tw_hyperloglog *src);
+tw_hyperloglog_clone(const struct tw_hyperloglog *hll);
 
 /**
  * tw_hyperloglog_add_hashed() - add an element in a hyperloglog structure

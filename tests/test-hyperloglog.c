@@ -13,20 +13,22 @@ estimate_within_error(double estimate, double real, double error)
 {
   const double diff = abs(estimate - real);
   const double margin = real * error;
-  return diff < 3 * margin;
+  return diff < 6 * margin;
 }
 
 START_TEST(test_hyperloglog_basic)
 {
   DESCRIBE_TEST;
 
-  const int32_t sizes[] = {128, 256, 512, 1024, 2048, 4096, 1 << 17};
+  const int32_t precisions[] = {5, 8, 12, 16};
   const int32_t offsets[] = {-1, 0, 1};
 
-  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
+  for (size_t i = 0; i < TW_ARRAY_SIZE(precisions); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t n_registers = sizes[i] + offsets[j];
-      struct tw_hyperloglog *hll = tw_hyperloglog_new(n_registers);
+      const uint32_t precision = precisions[i] + offsets[j];
+      const uint32_t n_registers = 1 << precision;
+      struct tw_hyperloglog *hll = tw_hyperloglog_new(precision);
+      ck_assert(hll != NULL);
 
       double n_elems = 0.0;
 
@@ -65,12 +67,13 @@ START_TEST(test_hyperloglog_copy_and_clone)
 {
   DESCRIBE_TEST;
 
-  const int32_t sizes[] = {256, 1024, 4096, 1 << 17};
+  const int32_t precisions[] = {5, 8, 12, 16};
 
-  for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
-    const int32_t n_registers = sizes[i];
-    struct tw_hyperloglog *hll = tw_hyperloglog_new(n_registers);
-    struct tw_hyperloglog *copy = tw_hyperloglog_new(n_registers);
+  for (size_t i = 0; i < TW_ARRAY_SIZE(precisions); ++i) {
+    const int32_t precision = precisions[i];
+    const int32_t n_registers = 1 << precision;
+    struct tw_hyperloglog *hll = tw_hyperloglog_new(precision);
+    struct tw_hyperloglog *copy = tw_hyperloglog_new(precision);
 
     /** test linear_count */
     for (size_t k = 0; k < n_registers; ++k) {

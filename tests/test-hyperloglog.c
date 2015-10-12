@@ -13,7 +13,7 @@ estimate_within_error(double estimate, double real, double error)
 {
   const double diff = abs(estimate - real);
   const double margin = real * error;
-  return diff < 5.5 * margin;
+  return diff < 6 * margin;
 }
 
 START_TEST(test_hyperloglog_basic)

@@ -2,7 +2,7 @@
 
 #include <twiddle/bitmap.h>
 #include <twiddle/bloomfilter.h>
-#include <twiddle/hash.h>
+#include <twiddle/hash/murmur3.h>
 
 struct tw_bloomfilter *
 tw_bloomfilter_new(uint32_t size, uint32_t k)

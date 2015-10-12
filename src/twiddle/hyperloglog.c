@@ -2,7 +2,7 @@
 #include <math.h>
 
 #include <twiddle/hyperloglog.h>
-#include <twiddle/hash.h>
+#include <twiddle/hash/murmur3.h>
 #include <twiddle/internal/utils.h>
 
 struct tw_hyperloglog *

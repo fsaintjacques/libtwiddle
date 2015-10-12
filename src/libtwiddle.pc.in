@@ -8,5 +8,5 @@ Name: libtwiddle
 Description: library to help you twiddle bits.
 Version: @VERSION@
 URL: https://github.com/fsaintjacques/libtwiddle
-Libs: -L${libdir} -ltwiddle
+Libs: -L${libdir} -ltwiddle -lm
 Cflags: -I${includedir}

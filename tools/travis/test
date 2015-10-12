@@ -28,4 +28,4 @@ function prepare_build_dir {
 
 set_travis_compiler
 prepare_build_dir
-make all test
+make all test VERBOSE=1

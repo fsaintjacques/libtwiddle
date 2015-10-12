@@ -15,3 +15,4 @@
 add_c_test(example-bitmap)
 add_c_test(example-bitmap-rle)
 add_c_test(example-bloomfilter)
+add_c_test(example-hyperloglog)

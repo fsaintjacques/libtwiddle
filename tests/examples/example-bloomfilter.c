@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include <twiddle/bloomfilter.h>
+#include <twiddle/bloomfilter/bloomfilter.h>
 
 int main(int argc, char *argv[]) {
   const uint32_t nbits = 1024;

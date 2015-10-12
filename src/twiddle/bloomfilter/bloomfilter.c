@@ -1,7 +1,7 @@
 #include <assert.h>
 
 #include <twiddle/bitmap/bitmap.h>
-#include <twiddle/bloomfilter.h>
+#include <twiddle/bloomfilter/bloomfilter.h>
 #include <twiddle/hash/murmur3.h>
 
 struct tw_bloomfilter *

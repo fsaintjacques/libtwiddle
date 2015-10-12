@@ -2,7 +2,7 @@
 
 #include <check.h>
 
-#include <twiddle/bloomfilter.h>
+#include <twiddle/bloomfilter/bloomfilter.h>
 
 #include "include/helpers.h"
 

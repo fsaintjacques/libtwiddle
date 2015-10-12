@@ -41,7 +41,7 @@ add_c_library(
     SOURCES
         twiddle/bitmap/bitmap.c
         twiddle/bitmap/bitmap_rle.c
-        twiddle/bloomfilter.c
+        twiddle/bloomfilter/bloomfilter.c
         twiddle/hash/murmur3.c
         twiddle/hyperloglog.c
         twiddle/hyperloglog_bias.c

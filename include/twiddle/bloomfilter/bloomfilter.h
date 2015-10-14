@@ -14,7 +14,7 @@
 struct tw_bloomfilter_info {
   uint32_t size;
   uint32_t k;
-  uint32_t hash_seed;
+  uint64_t hash_seed;
 };
 
 #define tw_bloomfilter_info_init(s,k,h) \
@@ -24,7 +24,7 @@ struct tw_bloomfilter_info {
 #define tw_bloomfilter_info_equal(src, dst) \
   (src.size == dst.size && src.k == dst.k && src.hash_seed == dst.hash_seed)
 
-#define TW_BF_DEFAULT_SEED 3781869495U
+#define TW_BF_DEFAULT_SEED 3781869495ULL
 
 /**
  * struct tw_bloomfilter - bloomfilter

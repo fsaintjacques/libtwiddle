@@ -32,7 +32,7 @@
  */
 struct tw_hyperloglog_info {
   uint8_t  precision;
-  uint32_t hash_seed;
+  uint64_t hash_seed;
 };
 
 /**
@@ -53,7 +53,7 @@ struct tw_hyperloglog {
   uint8_t registers[];
 };
 
-#define TW_HLL_DEFAULT_SEED 646086642U
+#define TW_HLL_DEFAULT_SEED 646086642ULL
 
 /**
  * tw_hyperloglog_new() - allocates a hyperloglog data structure

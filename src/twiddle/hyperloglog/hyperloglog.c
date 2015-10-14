@@ -6,7 +6,7 @@
 #include <twiddle/internal/utils.h>
 
 struct tw_hyperloglog *
-tw_hyperloglog_new(uint32_t precision)
+tw_hyperloglog_new(uint8_t precision)
 {
   if (precision < TW_HLL_MIN_PRECISION || precision > TW_HLL_MAX_PRECISION) {
     return NULL;
@@ -35,14 +35,14 @@ tw_hyperloglog_copy(const struct tw_hyperloglog *src,
 {
   assert(src && dst);
 
-  const uint32_t precision = src->info.precision;
+  const uint8_t precision = src->info.precision;
   if (precision != dst->info.precision) {
     return NULL;
   }
 
   tw_hyperloglog_info_copy(src->info, dst->info);
 
-  const int n_registers = 1 << precision;
+  const uint32_t n_registers = 1 << precision;
   for (int i = 0; i < n_registers; ++i) {
     dst->registers[i] = src->registers[i];
   }
@@ -67,7 +67,7 @@ void
 tw_hyperloglog_add_hashed(struct tw_hyperloglog *hll, uint64_t hash)
 {
   assert(hll);
-  const uint32_t precision = hll->info.precision;
+  const uint8_t precision = hll->info.precision;
   const uint32_t bucket_idx = hash >> (64 - precision);
   const uint8_t leading_zeros = (__builtin_clzll(hash << precision | (1 << (precision -1))) + 1),
           old_val = hll->registers[bucket_idx];
@@ -87,14 +87,14 @@ tw_hyperloglog_add(struct tw_hyperloglog *hll,
 
 extern
 double
-estimate(uint32_t precision, uint32_t n_zeros, double inverse_sum);
+estimate(uint8_t precision, uint32_t n_zeros, double inverse_sum);
 
 double
 tw_hyperloglog_count(const struct tw_hyperloglog *hll)
 {
   assert(hll);
 
-  const uint32_t precision = hll->info.precision;
+  const uint8_t precision = hll->info.precision;
   const uint32_t n_registers = 1 << precision;
   uint32_t n_zeros = 0;
   double inverse_sum = 0.0;

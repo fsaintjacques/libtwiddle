@@ -31,7 +31,7 @@
  * in the original paper and makes it easier to follow the code.
  */
 struct tw_hyperloglog_info {
-  uint32_t precision;
+  uint8_t  precision;
   uint32_t hash_seed;
 };
 
@@ -63,7 +63,7 @@ struct tw_hyperloglog {
  *         allocated `struct tw_hyperloglog`.
  */
 struct tw_hyperloglog *
-tw_hyperloglog_new(uint32_t precision);
+tw_hyperloglog_new(uint8_t precision);
 
 /**
  * tw_hyperloglog_free() - free a hyperloglog

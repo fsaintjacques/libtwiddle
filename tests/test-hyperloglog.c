@@ -19,7 +19,7 @@ estimate_within_error(double estimate, double real, double error)
 START_TEST(test_hyperloglog_basic)
 {
   DESCRIBE_TEST;
-  for (size_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
+  for (uint8_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
     const uint32_t n_registers = 1 << p;
     struct tw_hyperloglog *hll = tw_hyperloglog_new(p);
     ck_assert(hll != NULL);
@@ -58,7 +58,7 @@ END_TEST
 START_TEST(test_hyperloglog_copy_and_clone)
 {
   DESCRIBE_TEST;
-  for (size_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
+  for (uint8_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
     const int32_t n_registers = 1 << p;
     struct tw_hyperloglog *hll = tw_hyperloglog_new(p);
     struct tw_hyperloglog *copy = tw_hyperloglog_new(p);
@@ -88,7 +88,7 @@ END_TEST
 START_TEST(test_hyperloglog_merge)
 {
   DESCRIBE_TEST;
-  for (size_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
+  for (uint8_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
     const uint32_t n_registers = 1 << p;
     struct tw_hyperloglog *src = tw_hyperloglog_new(p);
     struct tw_hyperloglog *dst = tw_hyperloglog_new(p);

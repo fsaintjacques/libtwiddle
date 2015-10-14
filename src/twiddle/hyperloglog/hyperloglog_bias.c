@@ -81,7 +81,7 @@ linear_count(uint32_t n_registers, uint32_t n_zeros)
 }
 
 double
-estimate_bias(uint32_t precision, double estimate)
+estimate_bias(uint8_t precision, double estimate)
 {
   const uint8_t idx  = precision - 4;
   const uint8_t size = sizes[idx];
@@ -102,7 +102,7 @@ estimate_bias(uint32_t precision, double estimate)
 }
 
 double
-alpha(uint32_t n_registers, uint32_t precision)
+alpha(uint32_t n_registers, uint8_t precision)
 {
   switch (precision) {
     case 4:
@@ -117,7 +117,7 @@ alpha(uint32_t n_registers, uint32_t precision)
 }
 
 double
-estimate(uint32_t precision, uint32_t n_zeros, double inverse_sum)
+estimate(uint8_t precision, uint32_t n_zeros, double inverse_sum)
 {
   const uint32_t n_registers = 1 << precision;
   const double e   = alpha(n_registers, precision) * n_registers * n_registers * (1.0 / inverse_sum);

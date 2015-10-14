@@ -4,7 +4,7 @@
 #include <twiddle/hyperloglog/hyperloglog.h>
 
 int main(int argc, char *argv[]) {
-  const uint32_t precision = 16;
+  const uint8_t precision = 16;
   struct tw_hyperloglog *hll = tw_hyperloglog_new(precision);
   assert(hll);
 

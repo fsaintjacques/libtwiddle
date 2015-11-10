@@ -11,8 +11,11 @@ matrix:
             - valgrind
             - check
             - pkg-config
+            - cmake
+            - cmake-data
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
 
     - env: GCC_VERSION=4.9
       addons: &gcc49
@@ -23,8 +26,11 @@ matrix:
             - valgrind
             - check
             - pkg-config
+            - cmake
+            - cmake-data
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
 
     - env: GCC_VERSION=5
       addons: &gcc50
@@ -35,11 +41,12 @@ matrix:
             - valgrind
             - check
             - pkg-config
+            - cmake
+            - cmake-data
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
 
-install:
-  - cd ${TRAVIS_BUILD_DIR} && tools/travis/deps
 script:
   - cd ${TRAVIS_BUILD_DIR} && tools/travis/test
 # after_success:

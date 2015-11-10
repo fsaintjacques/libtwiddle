@@ -9,8 +9,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void murmur3_x86_32(const void *key, size_t len, uint32_t seed, void *out);
-void murmur3_x86_128(const void *key, size_t len, uint32_t seed, void *out);
-void murmur3_x64_128(const void *key, size_t len, uint32_t seed, void *out);
+#include <twiddle/hash/hash.h>
+
+uint32_t
+tw_murmur3_32(uint32_t seed, const void *key, size_t key_len);
+
+uint64_t
+tw_murmur3_64(uint64_t seed, const void *key, size_t key_len);
+
+tw_uint128_t
+tw_murmur3_128(tw_uint128_t seed, const void *key, size_t key_len);
 
 #endif /* TWIDDLE_HASH_MURMUR3_H */

@@ -79,10 +79,8 @@ tw_hyperloglog_add(struct tw_hyperloglog *hll,
                    size_t key_size, const char* key_buf)
 {
   assert(hll && key_size > 0 && key_buf);
-  uint64_t hash[2];
-  murmur3_x64_128(key_buf, key_size, hll->info.hash_seed, hash);
-
-  tw_hyperloglog_add_hashed(hll, hash[0]);
+  const uint64_t hash = tw_murmur3_64(hll->info.hash_seed, key_buf, key_size);
+  tw_hyperloglog_add_hashed(hll, hash);
 }
 
 extern

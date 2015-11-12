@@ -13,6 +13,7 @@ matrix:
             - pkg-config
             - cmake
             - cmake-data
+            - python-virtualenv
           sources:
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
@@ -28,6 +29,7 @@ matrix:
             - pkg-config
             - cmake
             - cmake-data
+            - python-virtualenv
           sources:
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
@@ -43,11 +45,12 @@ matrix:
             - pkg-config
             - cmake
             - cmake-data
+            - python-virtualenv
           sources:
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
 
 script:
-  - cd ${TRAVIS_BUILD_DIR} && tools/travis/test
+  - cd ${TRAVIS_BUILD_DIR} && tools/travis/test && tools/travis/python-test
 # after_success:
 #   - cd ${TRAVIS_BUILD_DIR} && tools/coverage

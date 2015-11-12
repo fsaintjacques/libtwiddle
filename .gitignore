@@ -1,6 +1,10 @@
 /build/
 /.build/
 /tmp/
+/python/.venv/
+/python/.hypothesis/
+/python/.cache/
+
 
 libtwiddle.pc
 
@@ -11,3 +15,4 @@ libtwiddle.pc
 *.os
 *.so
 *.dylib
+*.pyc

@@ -213,5 +213,8 @@ libtwiddle.tw_hyperloglog_add.restype  = None
 libtwiddle.tw_hyperloglog_count.argtypes = [c_void_p]
 libtwiddle.tw_hyperloglog_count.restype  = c_double
 
+libtwiddle.tw_hyperloglog_equal.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_hyperloglog_equal.restype  = c_bool
+
 libtwiddle.tw_hyperloglog_merge.argtypes = [c_void_p, c_void_p]
 libtwiddle.tw_hyperloglog_merge.restype  = c_void_p

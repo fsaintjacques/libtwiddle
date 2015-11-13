@@ -108,6 +108,28 @@ tw_hyperloglog_count(const struct tw_hyperloglog *hll)
   return estimate(precision, n_zeros, inverse_sum);
 }
 
+bool
+tw_hyperloglog_equal(const struct tw_hyperloglog *a,
+                     const struct tw_hyperloglog *b)
+{
+  assert(a && b);
+
+  if (!tw_hyperloglog_info_equal(a->info, b->info)) {
+    return false;
+  }
+
+  const uint8_t precision = a->info.precision;
+  const uint32_t n_registers = 1 << precision;
+
+  for (int i = 0; i < n_registers; ++i) {
+    if (a->registers[i] != b->registers[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 struct tw_hyperloglog *
 tw_hyperloglog_merge(const struct tw_hyperloglog *src,
                            struct tw_hyperloglog *dst)

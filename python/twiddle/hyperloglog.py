@@ -36,11 +36,11 @@ class HyperLogLog(object):
     libtwiddle.tw_hyperloglog_add(self.hyperloglog, 8, h)
 
 
-  #def __eq__(self, other):
-  #  if not isinstance(other, HyperLogLog):
-  #    return False
+  def __eq__(self, other):
+    if not isinstance(other, HyperLogLog):
+      return False
 
-  #  return libtwiddle.tw_hyperloglog_equal(self.hyperloglog, other.hyperloglog)
+    return libtwiddle.tw_hyperloglog_equal(self.hyperloglog, other.hyperloglog)
 
 
   def __op(self, other, func, copy=lambda x: HyperLogLog.copy(x)):

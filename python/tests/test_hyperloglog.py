@@ -13,6 +13,8 @@ class TestHyperLogLog(TestCase):
 
     # tests __or__
     z = x | y
+    assert(x != z)
 
     # tests __ior__
     x |= y
+    assert(x == z)

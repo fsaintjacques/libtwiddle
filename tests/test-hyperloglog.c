@@ -75,6 +75,7 @@ START_TEST(test_hyperloglog_copy_and_clone)
 
     struct tw_hyperloglog *clone = tw_hyperloglog_clone(copy);
     ck_assert(clone != NULL);
+    ck_assert(tw_hyperloglog_equal(hll, clone));
     ck_assert(tw_hyperloglog_count(hll) == tw_hyperloglog_count(clone));
 
     tw_hyperloglog_free(clone);

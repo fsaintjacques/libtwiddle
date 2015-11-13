@@ -124,6 +124,19 @@ double
 tw_hyperloglog_count(const struct tw_hyperloglog *hll);
 
 /**
+ * tw_hyperloglog_equal() - verify if hyperloglog are equal
+ * @a: first hyperloglog to check
+ * @b: second hyperloglog to check
+ *
+ * Return: true if equal, false otherwise
+ *
+ * In order to be comparable, hyperloglogs must have the same precision.
+ */
+bool
+tw_hyperloglog_equal(const struct tw_hyperloglog *a,
+                     const struct tw_hyperloglog *b);
+
+/**
  * tw_hyperloglog_merge() - merge src into dst
  * @src: hyperloglog to merge from
  * @dst: hyperloglog to merge to

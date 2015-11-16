@@ -19,3 +19,5 @@ add_c_test(test-bloomfilter)
 add_c_test(test-hyperloglog)
 
 add_subdirectory(examples)
+
+

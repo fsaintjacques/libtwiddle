@@ -2,7 +2,7 @@
 #include <twiddle/bitmap/bitmap.h>
 
 int main(int argc, char* argv[]) {
-  const uint32_t nbits = 1024;
+  const uint64_t nbits = 1024;
   struct tw_bitmap* bitmap = tw_bitmap_new(nbits);
 
   assert(bitmap);

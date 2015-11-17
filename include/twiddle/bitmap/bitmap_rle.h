@@ -12,17 +12,17 @@
  */
 
 struct tw_bitmap_rle_word {
-  uint32_t pos;
-  uint32_t count;
+  uint64_t pos;
+  uint64_t count;
 };
 
 #define TW_BITMAP_RLE_WORD_PER_CACHELINE \
   (TW_CACHELINE / sizeof(struct tw_bitmap_rle_word))
 
 #define tw_bitmap_rle_word_zero \
-  (struct tw_bitmap_rle_word) {.pos = 0, .count = 0}
+  (struct tw_bitmap_rle_word) {.pos = 0UL, .count = 0UL}
 #define tw_bitmap_rle_word_full(nbits) \
-  (struct tw_bitmap_rle_word) {.pos = 0, .count = nbits}
+  (struct tw_bitmap_rle_word) {.pos = 0UL, .count = nbits}
 #define tw_bitmap_rle_word_equal(a, b) \
   (a.pos == b.pos && a.count == b.count)
 #define tw_bitmap_rle_word_end(a) (a.pos + a.count - 1)
@@ -41,9 +41,9 @@ struct tw_bitmap_rle_word {
 struct tw_bitmap_rle {
   struct tw_bitmap_info info;
 
-  uint32_t last_pos;
-  uint32_t last_word_idx;
-  uint32_t alloc_word;
+  uint64_t last_pos;
+  uint64_t last_word_idx;
+  uint64_t alloc_word;
 
   struct tw_bitmap_rle_word *data;
 };
@@ -58,7 +58,7 @@ struct tw_bitmap_rle {
  *         allocated `struct tw_bitmap_rle`.
  */
 struct tw_bitmap_rle *
-tw_bitmap_rle_new(uint32_t nbits);
+tw_bitmap_rle_new(uint64_t nbits);
 
 /**
  * tw_bitmap_rle_free() - free a bitmap
@@ -99,7 +99,7 @@ tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap);
  * argument.
  */
 void
-tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint32_t pos);
+tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint64_t pos);
 
 /**
  * tw_bitmap_rle_set_word() - set bitmap_rle_word in bitmap
@@ -123,8 +123,8 @@ tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
  */
 void
 tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
-                        uint32_t start,
-                        uint32_t end);
+                        uint64_t start,
+                        uint64_t end);
 
 /**
  * tw_bitmap_rle_test() - test postition in bitmap
@@ -134,7 +134,7 @@ tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
  * Return: value of pos in the bitmap
  */
 bool
-tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint32_t pos);
+tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint64_t pos);
 
 /**
  * tw_bitmap_rle_empty() - verify if bitmap is empty
@@ -160,7 +160,7 @@ tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap);
  *
  * Return: number of active bits
  */
-uint32_t
+uint64_t
 tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap);
 
 /**

@@ -18,7 +18,7 @@ bitmap
 #include <twiddle/bitmap/bitmap.h>
 
 int main(int argc, char* argv[]) {
-  const uint32_t nbits = 1024;
+  const uint64_t nbits = 1024;
   struct tw_bitmap* bitmap = tw_bitmap_new(nbits);
 
   assert(bitmap);
@@ -43,14 +43,14 @@ bitmap-rle
 
 int main(int argc, char* argv[]) {
   /** allocate a bitmap containing 2 billions bits */
-  const uint32_t nbits = 1UL << 31;
+  const uint64_t nbits = 1UL << 31;
   struct tw_bitmap_rle* bitmap = tw_bitmap_rle_new(nbits);
 
   assert(bitmap);
 
   /** fill 1 billion bits */
-  const uint32_t start = 0UL;
-  const uint32_t end = 1UL << 30;
+  const uint64_t start = 0UL;
+  const uint64_t end = 1UL << 30;
   tw_bitmap_rle_set_range(bitmap, start, end);
 
   /**
@@ -80,8 +80,8 @@ bloomfilter
 #include <twiddle/bloomfilter/bloomfilter.h>
 
 int main(int argc, char *argv[]) {
-  const uint32_t nbits = 1024;
-  const uint32_t k = 7;
+  const uint64_t nbits = 1024;
+  const uint16_t k = 7;
   struct tw_bloomfilter *bf = tw_bloomfilter_new(nbits, k);
   assert(bf);
 

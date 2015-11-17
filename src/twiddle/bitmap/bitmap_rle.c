@@ -32,16 +32,16 @@ tw_bitmap_rle_word_grow_(struct tw_bitmap_rle *bitmap, uint64_t words)
 {
   const uint64_t alloc_word = bitmap->alloc_word + words;
   const uint64_t alloc_size = alloc_word * sizeof(struct tw_bitmap_rle_word);
-  struct tw_bitmap_rle_word *new_word = realloc(bitmap->data, alloc_size);
+  struct tw_bitmap_rle_word *data = realloc(bitmap->data, alloc_size);
 
-  if (!new_word) {
+  if (!data) {
     return NULL;
   }
 
-  bitmap->data = new_word;
   bitmap->alloc_word = alloc_word;
+  bitmap->data = data;
 
-  return new_word;
+  return data;
 }
 
 /* double size by default */
@@ -52,13 +52,13 @@ static __always_inline
 struct tw_bitmap_rle_word *
 tw_bitmap_rle_get_next_word(struct tw_bitmap_rle *bitmap)
 {
-  if (bitmap->alloc_word == bitmap->last_word_idx) {
+  if (bitmap->alloc_word == ++(bitmap->last_word_idx)) {
     if (!tw_bitmap_rle_word_grow(bitmap)) {
       return NULL;
     }
   }
 
-  return &(bitmap->data[++(bitmap->last_word_idx)]);
+  return &(bitmap->data[bitmap->last_word_idx]);
 }
 
 struct tw_bitmap_rle *
@@ -129,27 +129,8 @@ tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap)
 void
 tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint64_t pos)
 {
-  assert(bitmap &&
-         (!(bitmap->info.count) || bitmap->last_pos < pos) &&
-         pos < bitmap->info.size &&
-         bitmap->info.count < UINT32_MAX);
-
-  const uint64_t gap = pos - bitmap->last_pos;
-  struct tw_bitmap_rle_word *word = &bitmap->data[bitmap->last_word_idx];
-
-  if (bitmap->info.count == 0) {
-    word->pos = pos;
-    word->count = 1;
-  } else if (gap == 1) {
-      word->count++;
-  } else {
-    word = tw_bitmap_rle_get_next_word(bitmap);
-    word->pos = pos;
-    word->count = 1;
-  }
-
-  bitmap->info.count++;
-  bitmap->last_pos = pos;
+  const struct tw_bitmap_rle_word word = {.pos = pos, .count = 1};
+  tw_bitmap_rle_set_word(bitmap, &word);
 }
 
 void
@@ -158,7 +139,7 @@ tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
 {
   assert(bitmap && word &&
          (!(bitmap->info.count) || bitmap->last_pos < word->pos) &&
-         (bitmap->info.count + word->count) < UINT32_MAX);
+         (bitmap->info.count + word->count) < TW_BITMAP_MAX_BITS);
 
   const uint64_t gap = word->pos - bitmap->last_pos;
   struct tw_bitmap_rle_word *last_word = &bitmap->data[bitmap->last_word_idx];

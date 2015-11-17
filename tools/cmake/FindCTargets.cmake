@@ -213,3 +213,15 @@ function(add_c_test TEST_NAME)
     )
     add_test(${TEST_NAME} ${TEST_NAME})
 endfunction(add_c_test)
+
+function(add_c_example EXAMPLE_NAME)
+    get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
+    add_c_executable(
+        ${EXAMPLE_NAME}
+        SKIP_INSTALL
+        OUTPUT_NAME ${EXAMPLE_NAME}
+        SOURCES ${EXAMPLE_NAME}.c
+        LIBRARIES check m
+        LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
+    )
+endfunction(add_c_example)

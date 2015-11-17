@@ -23,6 +23,11 @@ tw_bitmap_new(uint64_t size)
   const size_t alloc_size = sizeof(struct tw_bitmap_info) +
                             TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP;
   struct tw_bitmap *bitmap = calloc(1, alloc_size);
+
+  if (!bitmap) {
+    return NULL;
+  }
+
   bitmap->info = tw_bitmap_info_init(size);
   return bitmap;
 }

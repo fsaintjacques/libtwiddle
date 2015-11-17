@@ -1,6 +1,7 @@
 #ifndef TWIDDLE_BLOOMFILTER_H
 #define TWIDDLE_BLOOMFILTER_H
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -24,6 +25,11 @@ struct tw_bloomfilter_info {
   (src.k == dst.k && src.hash_seed == dst.hash_seed)
 
 #define TW_BF_DEFAULT_SEED 3781869495ULL
+
+#define TW_LOG_2 0.6931471805599453
+
+#define tw_bloomfilter_optimal_m(n, p) (-n * log(p) / (TW_LOG_2 * TW_LOG_2))
+#define tw_bloomfilter_optimal_k(n, m) (m / n * TW_LOG_2)
 
 /**
  * struct tw_bloomfilter - bloomfilter

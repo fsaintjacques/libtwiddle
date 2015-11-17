@@ -3,14 +3,14 @@
 
 int main(int argc, char* argv[]) {
   /** allocate a bitmap containing 2 billions bits */
-  const uint32_t nbits = 1UL << 31;
+  const uint64_t nbits = 1UL << 31;
   struct tw_bitmap_rle* bitmap = tw_bitmap_rle_new(nbits);
 
   assert(bitmap);
 
   /** fill 1 billion bits */
-  const uint32_t start = 0UL;
-  const uint32_t end = 1UL << 30;
+  const uint64_t start = 0UL;
+  const uint64_t end = 1UL << 30;
   tw_bitmap_rle_set_range(bitmap, start, end);
 
   /**

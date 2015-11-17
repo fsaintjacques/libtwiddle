@@ -17,8 +17,9 @@ tw_bitmap_clear_extra_bits(struct tw_bitmap* bitmap)
 }
 
 struct tw_bitmap *
-tw_bitmap_new(uint32_t size)
+tw_bitmap_new(uint64_t size)
 {
+  assert(0 < size && size <= TW_BITMAP_MAX_BITS);
   const size_t alloc_size = sizeof(struct tw_bitmap_info) +
                             TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP;
   struct tw_bitmap *bitmap = calloc(1, alloc_size);
@@ -75,29 +76,29 @@ tw_bitmap_clone(const struct tw_bitmap *bitmap)
 }
 
 void __always_inline
-tw_bitmap_set(struct tw_bitmap *bitmap, uint32_t pos)
+tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
   tw_bitmap_test_and_set(bitmap, pos);
 }
 
 void __always_inline
-tw_bitmap_clear(struct tw_bitmap *bitmap, uint32_t pos)
+tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
   tw_bitmap_test_and_clear(bitmap, pos);
 }
 
 bool
-tw_bitmap_test(const struct tw_bitmap *bitmap, uint32_t pos)
+tw_bitmap_test(const struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
   return variable_test_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
 }
 
 bool
-tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos)
+tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
-  assert(bitmap->info.count < UINT32_MAX);
+  assert(bitmap->info.count < UINT64_MAX);
 
   bool val = __test_and_set_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
   if (!val) {
@@ -108,7 +109,7 @@ tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint32_t pos)
 }
 
 bool
-tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint32_t pos)
+tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
 
@@ -134,7 +135,7 @@ tw_bitmap_full(const struct tw_bitmap *bitmap)
   return tw_bitmap_info_full(bitmap->info);
 }
 
-uint32_t
+uint64_t
 tw_bitmap_count(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
@@ -267,7 +268,7 @@ tw_bitmap_union(const struct tw_bitmap *src, struct tw_bitmap *dst)
     return NULL;
   }
 
-  uint32_t count = 0;
+  uint64_t count = 0;
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
     dst->data[i] |= src->data[i];
     count += tw_popcountl(dst->data[i]);
@@ -287,7 +288,7 @@ tw_bitmap_intersection(const struct tw_bitmap *src, struct tw_bitmap *dst)
     return NULL;
   }
 
-  uint32_t count = 0;
+  uint64_t count = 0;
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
     dst->data[i] &= src->data[i];
     count += tw_popcountl(dst->data[i]);
@@ -307,7 +308,7 @@ tw_bitmap_xor(const struct tw_bitmap *src, struct tw_bitmap *dst)
     return NULL;
   }
 
-  uint32_t count = 0;
+  uint64_t count = 0;
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
     dst->data[i] ^= src->data[i];
     count += tw_popcountl(dst->data[i]);

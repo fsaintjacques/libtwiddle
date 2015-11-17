@@ -5,9 +5,9 @@
 #include <twiddle/hash/murmur3.h>
 
 struct tw_bloomfilter *
-tw_bloomfilter_new(uint32_t size, uint32_t k)
+tw_bloomfilter_new(uint64_t size, uint16_t k)
 {
-  assert(size > 0 && k > 0);
+  assert(size > 0 && size <= TW_BITMAP_MAX_BITS && k > 0);
   struct tw_bloomfilter *bf = calloc(1, sizeof(struct tw_bloomfilter));
   if (!bf) {
     return NULL;
@@ -19,7 +19,7 @@ tw_bloomfilter_new(uint32_t size, uint32_t k)
     return NULL;
   }
 
-  bf->info = tw_bloomfilter_info_init(size, k, TW_BF_DEFAULT_SEED);
+  bf->info = tw_bloomfilter_info_init(k, TW_BF_DEFAULT_SEED);
 
   return bf;
 }
@@ -38,7 +38,7 @@ tw_bloomfilter_copy(const struct tw_bloomfilter *src,
 {
   assert(src && dst);
 
-  if (dst->info.size != src->info.size) {
+  if (dst->bitmap->info.size != src->bitmap->info.size) {
     return NULL;
   }
 
@@ -55,7 +55,7 @@ tw_bloomfilter_clone(const struct tw_bloomfilter *bf)
 {
   assert(bf);
 
-  struct tw_bloomfilter *new = tw_bloomfilter_new(bf->info.size, bf->info.k);
+  struct tw_bloomfilter *new = tw_bloomfilter_new(bf->bitmap->info.size, bf->info.k);
   if (!new) {
     return NULL;
   }
@@ -70,7 +70,7 @@ tw_bloomfilter_set(struct tw_bloomfilter *bf,
   assert(bf && size > 0 && buf);
   uint64_t hash = tw_murmur3_64(bf->info.hash_seed, buf, size);
 
-  const uint32_t k = bf->info.k;
+  const uint16_t k = bf->info.k;
   struct tw_bitmap *bitmap = bf->bitmap;
   const uint32_t b_size = bitmap->info.size;
 
@@ -86,7 +86,7 @@ tw_bloomfilter_test(const struct tw_bloomfilter *bf,
   assert(bf && size > 0 && buf);
   uint64_t hash = tw_murmur3_64(bf->info.hash_seed, buf, size);
 
-  const uint32_t k = bf->info.k;
+  const uint16_t k = bf->info.k;
   const struct tw_bitmap *bitmap = bf->bitmap;
   const uint32_t b_size = bitmap->info.size;
 
@@ -113,7 +113,7 @@ tw_bloomfilter_full(const struct tw_bloomfilter *bf)
   return tw_bitmap_full(bf->bitmap);
 }
 
-uint32_t
+uint64_t
 tw_bloomfilter_count(const struct tw_bloomfilter *bf)
 {
   assert(bf);

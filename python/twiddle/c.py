@@ -18,7 +18,7 @@ libtwiddle = CDLL(find_twiddle_so())
 
 # BITMAP
 
-libtwiddle.tw_bitmap_new.argtypes = [c_uint]
+libtwiddle.tw_bitmap_new.argtypes = [c_ulong]
 libtwiddle.tw_bitmap_new.restype  = c_void_p
 
 libtwiddle.tw_bitmap_free.argtypes = [c_void_p]
@@ -30,16 +30,16 @@ libtwiddle.tw_bitmap_copy.restype  = c_void_p
 libtwiddle.tw_bitmap_clone.argtypes = [c_void_p]
 libtwiddle.tw_bitmap_clone.restype  = c_void_p
 
-libtwiddle.tw_bitmap_set.argtypes = [c_void_p, c_uint]
+libtwiddle.tw_bitmap_set.argtypes = [c_void_p, c_ulong]
 libtwiddle.tw_bitmap_set.restype  = None
 
-libtwiddle.tw_bitmap_clear.argtypes = [c_void_p, c_uint]
+libtwiddle.tw_bitmap_clear.argtypes = [c_void_p, c_ulong]
 libtwiddle.tw_bitmap_clear.restype  = None
 
-libtwiddle.tw_bitmap_test.argtypes = [c_void_p, c_uint]
+libtwiddle.tw_bitmap_test.argtypes = [c_void_p, c_ulong]
 libtwiddle.tw_bitmap_test.restype  = c_bool
 
-libtwiddle.tw_bitmap_test_and_clear.argtypes = [c_void_p, c_uint]
+libtwiddle.tw_bitmap_test_and_clear.argtypes = [c_void_p, c_ulong]
 libtwiddle.tw_bitmap_test_and_clear.restype  = c_bool
 
 libtwiddle.tw_bitmap_empty.argtypes = [c_void_p]
@@ -49,7 +49,7 @@ libtwiddle.tw_bitmap_full.argtypes = [c_void_p]
 libtwiddle.tw_bitmap_full.restype  = c_bool
 
 libtwiddle.tw_bitmap_count.argtypes = [c_void_p]
-libtwiddle.tw_bitmap_count.restype  = c_uint
+libtwiddle.tw_bitmap_count.restype  = c_ulong
 
 libtwiddle.tw_bitmap_density.argtypes = [c_void_p]
 libtwiddle.tw_bitmap_density.restype  = c_float
@@ -83,7 +83,7 @@ libtwiddle.tw_bitmap_xor.restype  = c_void_p
 
 # BITMAP_RLE
 
-libtwiddle.tw_bitmap_rle_new.argtypes = [c_uint]
+libtwiddle.tw_bitmap_rle_new.argtypes = [c_ulong]
 libtwiddle.tw_bitmap_rle_new.restype  = c_void_p
 
 libtwiddle.tw_bitmap_rle_free.argtypes = [c_void_p]
@@ -95,10 +95,10 @@ libtwiddle.tw_bitmap_rle_copy.restype  = c_void_p
 libtwiddle.tw_bitmap_rle_clone.argtypes = [c_void_p]
 libtwiddle.tw_bitmap_rle_clone.restype  = c_void_p
 
-libtwiddle.tw_bitmap_rle_set.argtypes = [c_void_p, c_uint]
+libtwiddle.tw_bitmap_rle_set.argtypes = [c_void_p, c_ulong]
 libtwiddle.tw_bitmap_rle_set.restype  = None
 
-libtwiddle.tw_bitmap_rle_test.argtypes = [c_void_p, c_uint]
+libtwiddle.tw_bitmap_rle_test.argtypes = [c_void_p, c_ulong]
 libtwiddle.tw_bitmap_rle_test.restype  = c_bool
 
 libtwiddle.tw_bitmap_rle_empty.argtypes = [c_void_p]
@@ -108,7 +108,7 @@ libtwiddle.tw_bitmap_rle_full.argtypes = [c_void_p]
 libtwiddle.tw_bitmap_rle_full.restype  = c_bool
 
 libtwiddle.tw_bitmap_rle_count.argtypes = [c_void_p]
-libtwiddle.tw_bitmap_rle_count.restype  = c_uint
+libtwiddle.tw_bitmap_rle_count.restype  = c_ulong
 
 libtwiddle.tw_bitmap_rle_density.argtypes = [c_void_p]
 libtwiddle.tw_bitmap_rle_density.restype  = c_float
@@ -139,7 +139,7 @@ libtwiddle.tw_bitmap_rle_intersection.restype  = c_void_p
 
 # BLOOMFILTER
 
-libtwiddle.tw_bloomfilter_new.argtypes = [c_uint, c_uint]
+libtwiddle.tw_bloomfilter_new.argtypes = [c_ulong, c_ushort]
 libtwiddle.tw_bloomfilter_new.restype  = c_void_p
 
 libtwiddle.tw_bloomfilter_free.argtypes = [c_void_p]
@@ -151,10 +151,10 @@ libtwiddle.tw_bloomfilter_copy.restype  = c_void_p
 libtwiddle.tw_bloomfilter_clone.argtypes = [c_void_p]
 libtwiddle.tw_bloomfilter_clone.restype  = c_void_p
 
-libtwiddle.tw_bloomfilter_set.argtypes = [c_void_p, c_uint, c_void_p]
+libtwiddle.tw_bloomfilter_set.argtypes = [c_void_p, c_ulong, c_void_p]
 libtwiddle.tw_bloomfilter_set.restype  = None
 
-libtwiddle.tw_bloomfilter_test.argtypes = [c_void_p, c_uint, c_void_p]
+libtwiddle.tw_bloomfilter_test.argtypes = [c_void_p, c_ulong, c_void_p]
 libtwiddle.tw_bloomfilter_test.restype  = c_bool
 
 libtwiddle.tw_bloomfilter_empty.argtypes = [c_void_p]
@@ -164,7 +164,7 @@ libtwiddle.tw_bloomfilter_full.argtypes = [c_void_p]
 libtwiddle.tw_bloomfilter_full.restype  = c_bool
 
 libtwiddle.tw_bloomfilter_count.argtypes = [c_void_p]
-libtwiddle.tw_bloomfilter_count.restype  = c_uint
+libtwiddle.tw_bloomfilter_count.restype  = c_ulong
 
 libtwiddle.tw_bloomfilter_density.argtypes = [c_void_p]
 libtwiddle.tw_bloomfilter_density.restype  = c_float

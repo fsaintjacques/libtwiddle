@@ -12,17 +12,16 @@
  * @k:    number of hash functions used
  */
 struct tw_bloomfilter_info {
-  uint32_t size;
-  uint32_t k;
   uint64_t hash_seed;
+  uint16_t k;
 };
 
-#define tw_bloomfilter_info_init(s,k,h) \
-  (struct tw_bloomfilter_info) {.size = s, .k = k, .hash_seed = h}
+#define tw_bloomfilter_info_init(k,h) \
+  (struct tw_bloomfilter_info) {.k = k, .hash_seed = h}
 #define tw_bloomfilter_info_copy(src, dst) \
-  dst = (struct tw_bloomfilter_info) {.size = src.size, .k = src.k, .hash_seed = src.hash_seed}
+  dst = (struct tw_bloomfilter_info) {.k = src.k, .hash_seed = src.hash_seed}
 #define tw_bloomfilter_info_equal(src, dst) \
-  (src.size == dst.size && src.k == dst.k && src.hash_seed == dst.hash_seed)
+  (src.k == dst.k && src.hash_seed == dst.hash_seed)
 
 #define TW_BF_DEFAULT_SEED 3781869495ULL
 
@@ -49,7 +48,7 @@ struct tw_bloomfilter {
  *         allocated `struct tw_bloomfilter`.
  */
 struct tw_bloomfilter *
-tw_bloomfilter_new(uint32_t size, uint32_t k);
+tw_bloomfilter_new(uint64_t size, uint16_t k);
 
 /**
  * tw_bloomfilter_free() - free a bloomfilter
@@ -127,7 +126,7 @@ tw_bloomfilter_full(const struct tw_bloomfilter *bf);
  *
  * Return: number of active bits
  */
-uint32_t
+uint64_t
 tw_bloomfilter_count(const struct tw_bloomfilter *bf);
 
 /**

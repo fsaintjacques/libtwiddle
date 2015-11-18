@@ -90,15 +90,15 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  char   *line = NULL;
-  size_t   len = 0;
-  ssize_t read = 0;
+  char   *line     = NULL;
+  size_t  buf_len  = 0;
+  ssize_t line_len = 0;
 
-  while ((read = getline(&line, &len, stdin)) != -1) {
+  while ((line_len = getline(&line, &buf_len, stdin)) != -1) {
 
-    if (!tw_bloomfilter_test(bf, len, line)) {
-      printf("%s", line);
-      tw_bloomfilter_set(bf, len, line);
+    if (!tw_bloomfilter_test(bf, line_len, line)) {
+      fprintf(stdout, "%s", line);
+      tw_bloomfilter_set(bf, line_len, line);
     }
 
   }

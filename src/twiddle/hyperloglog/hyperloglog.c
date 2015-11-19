@@ -2,7 +2,7 @@
 #include <math.h>
 
 #include <twiddle/hyperloglog/hyperloglog.h>
-#include <twiddle/hash/murmur3.h>
+#include <twiddle/hash/metrohash.h>
 #include <twiddle/internal/utils.h>
 
 struct tw_hyperloglog *
@@ -79,7 +79,7 @@ tw_hyperloglog_add(struct tw_hyperloglog *hll,
                    size_t key_size, const char* key_buf)
 {
   assert(hll && key_size > 0 && key_buf);
-  const uint64_t hash = tw_murmur3_64(hll->info.hash_seed, key_buf, key_size);
+  const uint64_t hash = tw_metrohash_64(hll->info.hash_seed, key_buf, key_size);
   tw_hyperloglog_add_hashed(hll, hash);
 }
 

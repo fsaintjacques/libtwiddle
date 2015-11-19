@@ -9,23 +9,7 @@
  */
 
 #include <twiddle/hash/murmur3.h>
-
-static __always_inline
-uint32_t rotl32(uint32_t x, int8_t r)
-{
-  return (x << r) | (x >> (32 - r));
-}
-
-static __always_inline
-uint64_t rotl64(uint64_t x, int8_t r)
-{
-  return (x << r) | (x >> (64 - r));
-}
-
-#define ROTL32(x,y) rotl32(x,y)
-#define ROTL64(x,y) rotl64(x,y)
-
-#define BIG_CONSTANT(x) (x##LLU)
+#include <twiddle/hash/internal.h>
 
 /**
  * Block read - if your platform needs to do endian-swapping or can only
@@ -60,66 +44,21 @@ uint64_t fmix64(uint64_t k)
 }
 
 
-uint32_t
-murmur3_32(uint32_t seed, const void *key, size_t key_len)
-{
-  const uint8_t *data = (const uint8_t*)key;
-  const int nblocks = key_len / 4;
-  int i;
-
-  uint32_t h1 = seed;
-
-  uint32_t c1 = 0xcc9e2d51;
-  uint32_t c2 = 0x1b873593;
-
-  const uint32_t *blocks = (const uint32_t *)(data + nblocks*4);
-
-  for(i = -nblocks; i; i++) {
-    uint32_t k1 = getblock(blocks,i);
-
-    k1 *= c1;
-    k1 = ROTL32(k1,15);
-    k1 *= c2;
-
-    h1 ^= k1;
-    h1 = ROTL32(h1,13);
-    h1 = h1*5+0xe6546b64;
-  }
-
-  const uint8_t *tail = (const uint8_t*)(data + nblocks*4);
-
-  uint32_t k1 = 0;
-
-  switch (key_len & 3) {
-  case 3: k1 ^= tail[2] << 16;
-  case 2: k1 ^= tail[1] << 8;
-  case 1: k1 ^= tail[0];
-          k1 *= c1; k1 = ROTL32(k1,15); k1 *= c2; h1 ^= k1;
-  };
-
-  h1 ^= key_len;
-
-  h1 = fmix32(h1);
-
-  return h1;
-}
-
 uint64_t
-tw_murmur3_64(uint64_t seed, const void *key, size_t key_len)
+tw_murmur3_64(const uint64_t seed, const void *key, const size_t key_len)
 {
-  const tw_uint128_t seed_ = (tw_uint128_t) {.h = seed, .l = BIG_CONSTANT(0x34ca1dbb3ff7f7a6)};
-  return tw_hash_128_64(tw_murmur3_128(seed_, key, key_len));
+  return tw_hash_128_64(tw_murmur3_128(seed, key, key_len));
 }
 
 tw_uint128_t
-tw_murmur3_128(tw_uint128_t seed, const void *key, size_t key_len)
+tw_murmur3_128(const uint64_t seed, const void *key, const size_t key_len)
 {
   const uint8_t *data = (const uint8_t*)key;
   const int nblocks = key_len / 16;
   int i;
 
-  uint64_t h1 = seed.h;
-  uint64_t h2 = seed.l;
+  uint64_t h1 = seed;
+  uint64_t h2 = seed;
 
   const uint64_t c1 = BIG_CONSTANT(0x87c37b91114253d5);
   const uint64_t c2 = BIG_CONSTANT(0x4cf5ad432745937f);
@@ -130,13 +69,13 @@ tw_murmur3_128(tw_uint128_t seed, const void *key, size_t key_len)
     uint64_t k1 = getblock(blocks,i*2+0);
     uint64_t k2 = getblock(blocks,i*2+1);
 
-    k1 *= c1; k1  = ROTL64(k1,31); k1 *= c2; h1 ^= k1;
+    k1 *= c1; k1  = rotl64(k1,31); k1 *= c2; h1 ^= k1;
 
-    h1 = ROTL64(h1,27); h1 += h2; h1 = h1*5+0x52dce729;
+    h1 = rotl64(h1,27); h1 += h2; h1 = h1*5+0x52dce729;
 
-    k2 *= c2; k2  = ROTL64(k2,33); k2 *= c1; h2 ^= k2;
+    k2 *= c2; k2  = rotl64(k2,33); k2 *= c1; h2 ^= k2;
 
-    h2 = ROTL64(h2,31); h2 += h1; h2 = h2*5+0x38495ab5;
+    h2 = rotl64(h2,31); h2 += h1; h2 = h2*5+0x38495ab5;
   }
 
   const uint8_t *tail = (const uint8_t*)(data + nblocks*16);
@@ -153,7 +92,7 @@ tw_murmur3_128(tw_uint128_t seed, const void *key, size_t key_len)
   case 11: k2 ^= (uint64_t)(tail[10]) << 16;
   case 10: k2 ^= (uint64_t)(tail[ 9]) << 8;
   case  9: k2 ^= (uint64_t)(tail[ 8]) << 0;
-           k2 *= c2; k2  = ROTL64(k2,33); k2 *= c1; h2 ^= k2;
+           k2 *= c2; k2  = rotl64(k2,33); k2 *= c1; h2 ^= k2;
 
   case  8: k1 ^= (uint64_t)(tail[ 7]) << 56;
   case  7: k1 ^= (uint64_t)(tail[ 6]) << 48;
@@ -163,7 +102,7 @@ tw_murmur3_128(tw_uint128_t seed, const void *key, size_t key_len)
   case  3: k1 ^= (uint64_t)(tail[ 2]) << 16;
   case  2: k1 ^= (uint64_t)(tail[ 1]) << 8;
   case  1: k1 ^= (uint64_t)(tail[ 0]) << 0;
-           k1 *= c1; k1  = ROTL64(k1,31); k1 *= c2; h1 ^= k1;
+           k1 *= c1; k1  = rotl64(k1,31); k1 *= c2; h1 ^= k1;
   };
 
   h1 ^= key_len; h2 ^= key_len;

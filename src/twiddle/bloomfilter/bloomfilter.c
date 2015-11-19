@@ -2,7 +2,7 @@
 
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bloomfilter/bloomfilter.h>
-#include <twiddle/hash/murmur3.h>
+#include <twiddle/hash/metrohash.h>
 
 struct tw_bloomfilter *
 tw_bloomfilter_new(uint64_t size, uint16_t k)
@@ -68,7 +68,7 @@ tw_bloomfilter_set(struct tw_bloomfilter *bf,
                    size_t size, const char* buf)
 {
   assert(bf && size > 0 && buf);
-  uint64_t hash = tw_murmur3_64(bf->info.hash_seed, buf, size);
+  uint64_t hash = tw_metrohash_64(bf->info.hash_seed, buf, size);
 
   const uint16_t k = bf->info.k;
   struct tw_bitmap *bitmap = bf->bitmap;
@@ -84,7 +84,7 @@ tw_bloomfilter_test(const struct tw_bloomfilter *bf,
                     size_t size, const char* buf)
 {
   assert(bf && size > 0 && buf);
-  uint64_t hash = tw_murmur3_64(bf->info.hash_seed, buf, size);
+  uint64_t hash = tw_metrohash_64(bf->info.hash_seed, buf, size);
 
   const uint16_t k = bf->info.k;
   const struct tw_bitmap *bitmap = bf->bitmap;

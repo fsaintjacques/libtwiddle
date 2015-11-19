@@ -11,13 +11,10 @@
 
 #include <twiddle/hash/hash.h>
 
-uint32_t
-tw_murmur3_32(uint32_t seed, const void *key, size_t key_len);
-
 uint64_t
-tw_murmur3_64(uint64_t seed, const void *key, size_t key_len);
+tw_murmur3_64(const uint64_t seed, const void *key, const size_t key_len);
 
 tw_uint128_t
-tw_murmur3_128(tw_uint128_t seed, const void *key, size_t key_len);
+tw_murmur3_128(const uint64_t seed, const void *key, const size_t key_len);
 
 #endif /* TWIDDLE_HASH_MURMUR3_H */

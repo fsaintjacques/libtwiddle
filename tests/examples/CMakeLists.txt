@@ -18,6 +18,7 @@ add_c_test(example-bloomfilter)
 add_c_test(example-hyperloglog)
 
 add_c_example(bf-uniq)
+add_c_example(hll-wc)
 
 find_package(PythonInterp)
 

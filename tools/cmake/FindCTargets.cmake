@@ -208,7 +208,7 @@ function(add_c_test TEST_NAME)
         SKIP_INSTALL
         OUTPUT_NAME ${TEST_NAME}
         SOURCES ${TEST_NAME}.c
-        LIBRARIES check m
+        LIBRARIES check m rt
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
     add_test(${TEST_NAME} ${TEST_NAME})
@@ -221,7 +221,7 @@ function(add_c_example EXAMPLE_NAME)
         SKIP_INSTALL
         OUTPUT_NAME ${EXAMPLE_NAME}
         SOURCES ${EXAMPLE_NAME}.c
-        LIBRARIES check m
+        LIBRARIES check m rt
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
 endfunction(add_c_example)

@@ -98,6 +98,7 @@ endif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 
 # HACK: forces travis to apply '-lm' linking.
 library_prereq(m)
+library_prereq(rt)
 
 #-----------------------------------------------------------------------
 # Include our subdirectories

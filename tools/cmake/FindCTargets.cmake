@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------
-# Copyright © 2015, RedJack, LLC.
-# All rights reserved.
-#
-# Please see the COPYING file in this distribution for license details.
-# ----------------------------------------------------------------------
-
-
 #-----------------------------------------------------------------------
 # Configuration options that control all of the below
 

@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------
-# Copyright ©
-#     2015, François Saint-Jacques
-#     2011-2015, RedJack, LLC.
-# All rights reserved.
-#
-# Please see the COPYING file in this distribution for license details.
-# ----------------------------------------------------------------------
-
-
 # Update the VERSION property below according to the following rules (taken from
 # [1]):
 #

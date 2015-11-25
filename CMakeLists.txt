@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------
-# Copyright © 2011-2015, RedJack, LLC.
-# All rights reserved.
-#
-# Please see the COPYING file in this distribution for license details.
-# ----------------------------------------------------------------------
-
 cmake_minimum_required(VERSION 2.6)
 set(PROJECT_NAME libtwiddle)
 set(RELEASE_DATE 2015-09-03)

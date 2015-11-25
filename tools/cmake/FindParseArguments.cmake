@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------
-# Copyright © 2015, RedJack, LLC.
-# All rights reserved.
-#
-# Please see the COPYING file in this distribution for license details.
-# ----------------------------------------------------------------------
-
-
 # CMake 2.8.4 and higher gives us cmake_parse_arguments out of the box.  For
 # earlier versions (RHEL5!) we have to define it ourselves.  (The definition
 # comes from <http://www.cmake.org/Wiki/CMakeMacroParseArguments>.)

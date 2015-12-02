@@ -4,7 +4,7 @@
 
 #include <twiddle/bitmap/bitmap.h>
 
-static __always_inline
+static inline
 void
 tw_bitmap_clear_extra_bits(struct tw_bitmap* bitmap)
 {
@@ -79,13 +79,13 @@ tw_bitmap_clone(const struct tw_bitmap *bitmap)
   return tw_bitmap_copy(bitmap, new);
 }
 
-void __always_inline
+void inline
 tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
   tw_bitmap_test_and_set(bitmap, pos);
 }
 
-void __always_inline
+void inline
 tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
   tw_bitmap_test_and_clear(bitmap, pos);

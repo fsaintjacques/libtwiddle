@@ -5,7 +5,7 @@
 #include <twiddle/bitmap/bitmap_rle.h>
 #include <twiddle/internal/utils.h>
 
-static __always_inline
+static inline
 struct tw_bitmap_rle_word *
 tw_bitmap_rle_word_alloc_(struct tw_bitmap_rle *bitmap, uint64_t n_words)
 {
@@ -26,7 +26,7 @@ tw_bitmap_rle_word_alloc_(struct tw_bitmap_rle *bitmap, uint64_t n_words)
 #define tw_bitmap_rle_word_alloc(bitmap) \
   tw_bitmap_rle_word_alloc_(bitmap, TW_BITMAP_RLE_WORD_PER_CACHELINE * 4)
 
-static __always_inline
+static inline
 struct tw_bitmap_rle_word *
 tw_bitmap_rle_word_grow_(struct tw_bitmap_rle *bitmap, uint64_t words)
 {
@@ -48,7 +48,7 @@ tw_bitmap_rle_word_grow_(struct tw_bitmap_rle *bitmap, uint64_t words)
 #define tw_bitmap_rle_word_grow(bitmap) \
   tw_bitmap_rle_word_grow_(bitmap, bitmap->alloc_word)
 
-static __always_inline
+static inline
 struct tw_bitmap_rle_word *
 tw_bitmap_rle_get_next_word(struct tw_bitmap_rle *bitmap)
 {

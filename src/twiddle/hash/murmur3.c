@@ -19,7 +19,7 @@
 #define getblock(p, i) (p[i])
 
 
-static __always_inline
+static inline
 uint64_t fmix64(uint64_t k)
 {
   k ^= k >> 33;

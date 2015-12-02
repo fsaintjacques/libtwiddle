@@ -18,18 +18,6 @@
 
 #define getblock(p, i) (p[i])
 
-static __always_inline
-uint32_t fmix32 (uint32_t h)
-{
-  h ^= h >> 16;
-  h *= 0x85ebca6b;
-  h ^= h >> 13;
-  h *= 0xc2b2ae35;
-  h ^= h >> 16;
-
-  return h;
-}
-
 
 static __always_inline
 uint64_t fmix64(uint64_t k)

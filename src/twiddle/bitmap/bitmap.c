@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include <twiddle/bitmap/bitmap.h>
-#include <twiddle/internal/bitops.h>
 
 static __always_inline
 void
@@ -96,7 +95,14 @@ bool
 tw_bitmap_test(const struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
-  return variable_test_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
+  int oldbit;
+
+  __asm volatile("bt %2,%1\n\t"
+         "sbb %0,%0"
+         : "=r" (oldbit)
+         : "m" (*(unsigned long *)bitmap->data), "Ir" (pos));
+
+  return oldbit;
 }
 
 bool
@@ -105,12 +111,18 @@ tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint64_t pos)
   assert(bitmap && pos < bitmap->info.size);
   assert(bitmap->info.count < UINT64_MAX);
 
-  bool val = __test_and_set_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
-  if (!val) {
+  int oldbit;
+  __asm("bts %2,%1\n\t"
+      "sbb %0,%0"
+      : "=r" (oldbit), TW_BITOP_ADDR(bitmap->data)
+      : "Ir" (pos));
+
+
+  if (!oldbit) {
     bitmap->info.count++;
   }
 
-  return val;
+  return oldbit;
 }
 
 bool
@@ -118,12 +130,17 @@ tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
 
-  bool val = __test_and_clear_bit(pos % 64, &(bitmap->data[TW_BITMAP_POS(pos)]));
-  if (val) {
+  int oldbit;
+  __asm volatile("btr %2,%1\n\t"
+       "sbb %0,%0"
+       : "=r" (oldbit), TW_BITOP_ADDR(bitmap->data)
+       : "Ir" (pos));
+
+  if (oldbit) {
     bitmap->info.count--;
   }
 
-  return val;
+  return oldbit;
 }
 
 bool

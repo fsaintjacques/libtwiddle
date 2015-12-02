@@ -7,6 +7,8 @@
 
 #define TW_ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
+#define TW_BITOP_ADDR(x)      "+m" (*(volatile long *) (x))
+
 #define TW_BITS_IN_WORD 8
 #define TW_BIT_POS(x)  (1 << (x % TW_BITS_IN_WORD))
 #define TW_BYTE_POS(x) (x / TW_BITS_IN_WORD)

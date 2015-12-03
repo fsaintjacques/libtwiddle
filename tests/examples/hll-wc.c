@@ -6,17 +6,14 @@
 
 #include <twiddle/hyperloglog/hyperloglog.h>
 
-static struct option long_options[] = {
-  {"precision", required_argument, 0, 'p'},
-  {"stream",    no_argument,       0, 's'},
-  {0          , 0,                 0,  0 }
-};
+static struct option long_options[] = {{"precision", required_argument, 0, 'p'},
+                                       {"stream", no_argument, 0, 's'},
+                                       {0, 0, 0, 0}};
 
-
-int parse_precision(const char *opt, uint8_t *p) {
+int parse_precision(const char *opt, uint8_t *p)
+{
   const int64_t parsed_p = strtol(optarg, NULL, 10);
-  if (!(TW_HLL_MIN_PRECISION < parsed_p &&
-        parsed_p <= TW_HLL_MAX_PRECISION)) {
+  if (!(TW_HLL_MIN_PRECISION < parsed_p && parsed_p <= TW_HLL_MAX_PRECISION)) {
     return -1;
   }
 
@@ -25,9 +22,7 @@ int parse_precision(const char *opt, uint8_t *p) {
   return 0;
 }
 
-static
-int
-parse_arguments(int argc, char **argv, uint8_t *p, bool *stream)
+static int parse_arguments(int argc, char **argv, uint8_t *p, bool *stream)
 {
   int c = 0;
   int ret = 0;
@@ -37,7 +32,7 @@ parse_arguments(int argc, char **argv, uint8_t *p, bool *stream)
 
     c = getopt_long(argc, argv, "p:s", long_options, &option_index);
     if (c == -1)
-        break;
+      break;
 
     switch (c) {
     case 'p':
@@ -57,8 +52,7 @@ parse_arguments(int argc, char **argv, uint8_t *p, bool *stream)
   return 0;
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   uint8_t p = 16;
   bool stream = false;
@@ -73,19 +67,19 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  char   *line     = NULL;
-  size_t  buf_len  = 0;
+  char *line = NULL;
+  size_t buf_len = 0;
   ssize_t line_len = 0;
 
   while ((line_len = getline(&line, &buf_len, stdin)) != -1) {
     tw_hyperloglog_add(hll, line_len, line);
     if (stream) {
-      fprintf(stdout, "%" PRIu64 "\n", (uint64_t) tw_hyperloglog_count(hll));
+      fprintf(stdout, "%" PRIu64 "\n", (uint64_t)tw_hyperloglog_count(hll));
     }
   }
 
   if (!stream) {
-    fprintf(stdout, "%" PRIu64 "\n", (uint64_t) tw_hyperloglog_count(hll));
+    fprintf(stdout, "%" PRIu64 "\n", (uint64_t)tw_hyperloglog_count(hll));
   }
 
   free(line);

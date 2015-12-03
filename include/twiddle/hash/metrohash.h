@@ -11,10 +11,10 @@
 
 #include <twiddle/hash/hash.h>
 
-uint64_t
-tw_metrohash_64(const uint64_t seed, const void *key, const size_t key_len);
+uint64_t tw_metrohash_64(const uint64_t seed, const void *key,
+                         const size_t key_len);
 
-tw_uint128_t
-tw_metrohash_128(const uint64_t seed, const void *key, const size_t key_len);
+tw_uint128_t tw_metrohash_128(const uint64_t seed, const void *key,
+                              const size_t key_len);
 
 #endif /* TWIDDLE_HASH_METROHASH_H */

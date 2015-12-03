@@ -7,15 +7,12 @@
 #include <twiddle/bloomfilter/bloomfilter.h>
 
 static struct option long_options[] = {
-  {"probability", required_argument, 0, 'p'},
-  {"count"      , required_argument, 0, 'n'},
-  {"duration"   , required_argument, 0, 'd'},
-  {0            , 0                , 0,  0 }
-};
+    {"probability", required_argument, 0, 'p'},
+    {"count", required_argument, 0, 'n'},
+    {"duration", required_argument, 0, 'd'},
+    {0, 0, 0, 0}};
 
-
-static int
-parse_probability(const char *opt, float *p)
+static int parse_probability(const char *opt, float *p)
 {
   const float parsed_p = strtof(optarg, NULL);
   if (!(0 < parsed_p && parsed_p <= 1)) {
@@ -27,9 +24,7 @@ parse_probability(const char *opt, float *p)
   return true;
 }
 
-
-static bool
-parse_count(const char *opt, int64_t *n)
+static bool parse_count(const char *opt, int64_t *n)
 {
   const int64_t parsed_n = strtoll(optarg, NULL, 10);
   if (!(0 <= parsed_n && parsed_n <= TW_BITMAP_MAX_BITS)) {
@@ -41,57 +36,55 @@ parse_count(const char *opt, int64_t *n)
   return true;
 }
 
-
-static bool
-apply_time_suffix(float *x, char suffix_char)
+static bool apply_time_suffix(float *x, char suffix_char)
 {
   int multiplier;
 
   switch (suffix_char) {
-    case 0:
-    case 's':
-      multiplier = 1;
-      break;
-    case 'm':
-      multiplier = 60;
-      break;
-    case 'h':
-      multiplier = 60 * 60;
-      break;
-    case 'd':
-      multiplier = 60 * 60 * 24;
-      break;
-    default:
-      return false;
-    }
+  case 0:
+  case 's':
+    multiplier = 1;
+    break;
+  case 'm':
+    multiplier = 60;
+    break;
+  case 'h':
+    multiplier = 60 * 60;
+    break;
+  case 'd':
+    multiplier = 60 * 60 * 24;
+    break;
+  default:
+    return false;
+  }
 
   *x *= multiplier;
 
   return true;
 }
 
-
-static bool
-parse_duration(const char *str, float *d) {
+static bool parse_duration(const char *str, float *d)
+{
   char *ep;
   float duration = strtof(str, &ep);
 
   if (!(0 <= duration)
       /* No extra chars after the number and an optional s,m,h,d char.  */
-      || (*ep && *(ep + 1))
+      ||
+      (*ep && *(ep + 1))
       /* Check any suffix char and update timeout based on the suffix.  */
-      || !apply_time_suffix (&duration, *ep)) {
-      return false;
-    }
+      ||
+      !apply_time_suffix(&duration, *ep)) {
+    return false;
+  }
 
   *d = duration;
 
   return true;
 }
 
-
-static int
-parse_arguments(int argc, char **argv, int64_t *n, float *p, float *d)
+static int parse_arguments(int argc, char **argv, int64_t *n, float *p,
+                           float *d)
 {
   int c = 0;
 
@@ -100,7 +93,7 @@ parse_arguments(int argc, char **argv, int64_t *n, float *p, float *d)
 
     c = getopt_long(argc, argv, "n:p:d:", long_options, &option_index);
     if (c == -1)
-        break;
+      break;
 
     switch (c) {
     case 'n':
@@ -127,12 +120,11 @@ parse_arguments(int argc, char **argv, int64_t *n, float *p, float *d)
   return 0;
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int64_t n = 1000000;
-  float   p = 0.0001;
-  float   c = -1.0;
+  float p = 0.0001;
+  float c = -1.0;
 
   if (parse_arguments(argc, argv, &n, &p, &c) != 0) {
     exit(-1);
@@ -149,9 +141,8 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-
-  char   *line     = NULL;
-  size_t  buf_len  = 0;
+  char *line = NULL;
+  size_t buf_len = 0;
   ssize_t line_len = 0;
 
   /* setup expire */
@@ -175,9 +166,7 @@ main(int argc, char *argv[])
       fprintf(stdout, "%s", line);
       tw_bloomfilter_set(bf, line_len, line);
     }
-
   }
-
 
   tw_bloomfilter_free(bf);
 

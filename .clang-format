@@ -1,0 +1,10 @@
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 2
+ColumnLimit: 80
+UseTab: Never
+BreakBeforeBraces: Linux
+BinPackArguments: true
+BinPackParameters: true
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false

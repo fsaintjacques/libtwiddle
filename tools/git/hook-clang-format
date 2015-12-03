@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -o nounset
+
+FILE_EXTS=${FILE_EXTS:-(c|h)}
+
+get_files() {
+  git diff --cached --name-only --diff-filter=ACMRT | \
+  egrep "\.$FILE_EXTS\$"
+}
+
+_IFS=$IFS
+IFS='\n'
+FILES=($(get_files))
+IFS=${_IFS}
+
+for ((i = 0; i < ${#FILES[@]}; ++i)); do
+  file=${FILES[$i]}
+  clang-format -output-replacements-xml "$file" | grep "<replacement" > /dev/null
+  if [ $? -ne 1 ]; then
+    echo "File does not respect formatting style: $file"
+    exit 1;
+  fi
+done

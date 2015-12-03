@@ -6,14 +6,15 @@ static const uint64_t k1_64 = 0xA2AA033B;
 static const uint64_t k2_64 = 0x62992FC1;
 static const uint64_t k3_64 = 0x30BC5B29;
 
-uint64_t
-tw_metrohash_64(const uint64_t seed, const void *key, const size_t key_len)
+uint64_t tw_metrohash_64(const uint64_t seed, const void *key,
+                         const size_t key_len)
 {
-  const uint8_t * ptr = (uint8_t *) key;
-  const uint8_t * const end = ptr + key_len;
+  const uint8_t *ptr = (uint8_t *)key;
+  const uint8_t *const end = ptr + key_len;
 
   uint64_t h = (seed + k2_64) * k0_64;
 
+  // clang-format off
   if (key_len >= 32) {
     uint64_t v[4];
     v[0] = h;
@@ -59,32 +60,32 @@ tw_metrohash_64(const uint64_t seed, const void *key, const size_t key_len)
   }
 
   if ((end - ptr) >= 1) {
-    h += cread_u8 (ptr) * k3_64;
+    h += cread_u8(ptr) * k3_64;
     h ^= rotr64(h, 37) * k1_64;
   }
 
   h ^= rotr64(h, 28);
   h *= k0_64;
   h ^= rotr64(h, 29);
+  // clang-format on
 
   return h;
 }
-
 
 static const uint64_t k0_128 = 0xC83A91E1;
 static const uint64_t k1_128 = 0x8648DBDB;
 static const uint64_t k2_128 = 0x7BDEC03B;
 static const uint64_t k3_128 = 0x2F5870A5;
 
-
-tw_uint128_t
-tw_metrohash_128(const uint64_t seed, const void *key, size_t key_len)
+tw_uint128_t tw_metrohash_128(const uint64_t seed, const void *key,
+                              size_t key_len)
 {
-  const uint8_t * ptr = (uint8_t *) key;
-  const uint8_t * const end = ptr + key_len;
+  const uint8_t *ptr = (uint8_t *)key;
+  const uint8_t *const end = ptr + key_len;
 
   uint64_t v[4];
 
+  // clang-format off
   v[0] = (seed - k0_128) * k3_128;
   v[1] = (seed + k1_128) * k2_128;
 
@@ -136,6 +137,7 @@ tw_metrohash_128(const uint64_t seed, const void *key, size_t key_len)
   v[1] += rotr64((v[1] * k1_128) + v[0], 37);
   v[0] += rotr64((v[0] * k2_128) + v[1], 13);
   v[1] += rotr64((v[1] * k3_128) + v[0], 37);
+  // clang-format on
 
-  return (tw_uint128_t) {.h = v[0], .l = v[1]};
+  return (tw_uint128_t){.h = v[0], .l = v[1]};
 }

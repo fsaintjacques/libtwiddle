@@ -8,8 +8,7 @@
 
 #include "include/helpers.h"
 
-static void
-validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)
+static void validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)
 {
 
   ck_assert_msg(tw_bitmap_empty(bitmap), "A new bitmap should be empty");
@@ -38,7 +37,6 @@ validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)
   }
 
   ck_assert_msg(tw_bitmap_empty(bitmap), "A cleared bitmap should be empty");
-
 }
 
 START_TEST(test_bitmap_basic)
@@ -56,7 +54,6 @@ START_TEST(test_bitmap_basic)
       tw_bitmap_free(bitmap);
     }
   }
-
 }
 END_TEST
 
@@ -95,7 +92,6 @@ START_TEST(test_bitmap_copy_and_clone)
       tw_bitmap_free(dst);
     }
   }
-
 }
 END_TEST
 
@@ -137,7 +133,6 @@ START_TEST(test_bitmap_zero_and_fill)
       tw_bitmap_free(bitmap);
     }
   }
-
 }
 END_TEST
 
@@ -170,7 +165,7 @@ START_TEST(test_bitmap_find_first)
       }
 
       // clear last bit
-      tw_bitmap_clear(bitmap, nbits-1);
+      tw_bitmap_clear(bitmap, nbits - 1);
       ck_assert(tw_bitmap_find_first_zero(bitmap) == 0);
       ck_assert(tw_bitmap_find_first_bit(bitmap) == -1);
 
@@ -183,10 +178,9 @@ START_TEST(test_bitmap_find_first)
       }
 
       // set last bit
-      tw_bitmap_set(bitmap, nbits-1);
+      tw_bitmap_set(bitmap, nbits - 1);
       ck_assert(tw_bitmap_find_first_zero(bitmap) == -1);
       ck_assert(tw_bitmap_find_first_bit(bitmap) == 0);
-
     }
   }
 }
@@ -220,7 +214,7 @@ END_TEST
 START_TEST(test_bitmap_set_operations)
 {
   DESCRIBE_TEST;
-  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 1<<17};
+  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 1 << 17};
   const int32_t offsets[] = {-1, 0, 1};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
@@ -238,7 +232,7 @@ START_TEST(test_bitmap_set_operations)
 
       /* remove first and last bits */
       tw_bitmap_clear(src, 0);
-      tw_bitmap_clear(src, nbits-1);
+      tw_bitmap_clear(src, nbits - 1);
 
       tw_bitmap_union(src, dst);
       ck_assert(tw_bitmap_equal(src, dst));
@@ -252,8 +246,8 @@ START_TEST(test_bitmap_set_operations)
       /* dst = src */
       tw_bitmap_intersection(src, dst);
       /* src.count = dst.count */
-      tw_bitmap_clear(src, nbits/2);
-      tw_bitmap_clear(dst, nbits/2 + 1);
+      tw_bitmap_clear(src, nbits / 2);
+      tw_bitmap_clear(dst, nbits / 2 + 1);
       /* differs by one bit */
       ck_assert(!tw_bitmap_equal(src, dst));
 
@@ -280,10 +274,11 @@ START_TEST(test_bitmap_new_assert_max_p1)
 }
 END_TEST
 
-int run_tests() {
+int run_tests()
+{
   int number_failed;
 
-  Suite  *s = suite_create("bitmap");
+  Suite *s = suite_create("bitmap");
   SRunner *runner = srunner_create(s);
 
   TCase *tc = tcase_create("basic");
@@ -307,8 +302,7 @@ int run_tests() {
   return number_failed;
 }
 
-int
-main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-  return (run_tests() == 0)? EXIT_SUCCESS: EXIT_FAILURE;
+  return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

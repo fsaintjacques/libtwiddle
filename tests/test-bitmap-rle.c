@@ -35,7 +35,6 @@ START_TEST(test_bitmap_rle_basic)
       tw_bitmap_rle_free(bitmap);
     }
   }
-
 }
 END_TEST
 
@@ -47,13 +46,13 @@ START_TEST(test_bitmap_rle_range)
       const int32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
 
-      struct tw_bitmap_rle_word word = {.pos = 0, .count = nbits/2 };
+      struct tw_bitmap_rle_word word = {.pos = 0, .count = nbits / 2};
       tw_bitmap_rle_set_word(bitmap, &word);
-      tw_bitmap_rle_set_range(bitmap, nbits/2 + 1, nbits - 1);
+      tw_bitmap_rle_set_range(bitmap, nbits / 2 + 1, nbits - 1);
 
       ck_assert(tw_bitmap_rle_test(bitmap, 0));
-      ck_assert(tw_bitmap_rle_test(bitmap, nbits/2 - 1));
-      ck_assert(tw_bitmap_rle_test(bitmap, nbits/2 + 1));
+      ck_assert(tw_bitmap_rle_test(bitmap, nbits / 2 - 1));
+      ck_assert(tw_bitmap_rle_test(bitmap, nbits / 2 + 1));
       ck_assert(tw_bitmap_rle_test(bitmap, nbits - 1));
 
       tw_bitmap_rle_free(bitmap);
@@ -71,9 +70,9 @@ START_TEST(test_bitmap_rle_copy_and_clone)
       struct tw_bitmap_rle *src = tw_bitmap_rle_new(nbits);
       struct tw_bitmap_rle *dst = tw_bitmap_rle_new(nbits);
 
-      struct tw_bitmap_rle_word word = {.pos = 0, .count = nbits/2 };
+      struct tw_bitmap_rle_word word = {.pos = 0, .count = nbits / 2};
       tw_bitmap_rle_set_word(src, &word);
-      tw_bitmap_rle_set_range(src, nbits/2 + 1, nbits - 1);
+      tw_bitmap_rle_set_range(src, nbits / 2 + 1, nbits - 1);
 
       ck_assert(tw_bitmap_rle_copy(src, dst) != NULL);
 
@@ -82,7 +81,7 @@ START_TEST(test_bitmap_rle_copy_and_clone)
 
       struct tw_bitmap_rle *tmp = tw_bitmap_rle_clone(dst);
 
-      const uint32_t positions[] = {0, nbits/2 - 1, nbits/2 + 1, nbits - 1};
+      const uint32_t positions[] = {0, nbits / 2 - 1, nbits / 2 + 1, nbits - 1};
       for (size_t k = 0; k < TW_ARRAY_SIZE(positions); ++k) {
         const uint32_t pos = positions[k];
         ck_assert(tw_bitmap_rle_test(dst, pos));
@@ -115,7 +114,7 @@ START_TEST(test_bitmap_rle_zero_and_fill)
 
       tw_bitmap_rle_fill(bitmap);
 
-      const uint32_t positions[] = {0, nbits/2 - 1, nbits/2 + 1, nbits - 1};
+      const uint32_t positions[] = {0, nbits / 2 - 1, nbits / 2 + 1, nbits - 1};
       for (size_t k = 0; k < TW_ARRAY_SIZE(positions); ++k) {
         ck_assert(tw_bitmap_rle_test(bitmap, positions[k]));
       }
@@ -133,7 +132,7 @@ START_TEST(test_bitmap_rle_zero_and_fill)
       ck_assert(tw_bitmap_rle_empty(bitmap));
       ck_assert(!tw_bitmap_rle_full(bitmap));
 
-      tw_bitmap_rle_set_range(bitmap, nbits/2 + 1, nbits - 1);
+      tw_bitmap_rle_set_range(bitmap, nbits / 2 + 1, nbits - 1);
       ck_assert(tw_bitmap_rle_test(bitmap, nbits - 1));
       ck_assert(!tw_bitmap_rle_empty(bitmap));
       ck_assert(!tw_bitmap_rle_full(bitmap));
@@ -307,8 +306,8 @@ START_TEST(test_bitmap_rle_union)
       tw_bitmap_rle_zero(b);
       tw_bitmap_rle_zero(c);
 
-      tw_bitmap_rle_set_range(a, 0, nbits/2 + 1);
-      tw_bitmap_rle_set_range(b, nbits/2 - 1, nbits - 1);
+      tw_bitmap_rle_set_range(a, 0, nbits / 2 + 1);
+      tw_bitmap_rle_set_range(b, nbits / 2 - 1, nbits - 1);
       ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
       ck_assert(!tw_bitmap_rle_empty(a) && !tw_bitmap_rle_full(a));
       ck_assert(!tw_bitmap_rle_empty(b) && !tw_bitmap_rle_full(b));
@@ -326,7 +325,6 @@ START_TEST(test_bitmap_rle_union)
 }
 END_TEST
 
-
 START_TEST(test_bitmap_rle_union_advanced)
 {
   DESCRIBE_TEST;
@@ -336,17 +334,17 @@ START_TEST(test_bitmap_rle_union_advanced)
   struct tw_bitmap_rle *c = tw_bitmap_rle_new(nbits);
   struct tw_bitmap_rle *expected = tw_bitmap_rle_new(nbits);
 
-  tw_bitmap_rle_set_range(a,   0,  255);
-  tw_bitmap_rle_set_range(b,   0,    7);
-  tw_bitmap_rle_set_range(b,   9,   15);
-  tw_bitmap_rle_set_range(b,  17,   31);
-  tw_bitmap_rle_set_range(b, 255,  325);
-  tw_bitmap_rle_set_range(a, 327,  410);
-  tw_bitmap_rle_set_range(b, 409,  500);
-  tw_bitmap_rle_set_range(a, 510,  511);
+  tw_bitmap_rle_set_range(a, 0, 255);
+  tw_bitmap_rle_set_range(b, 0, 7);
+  tw_bitmap_rle_set_range(b, 9, 15);
+  tw_bitmap_rle_set_range(b, 17, 31);
+  tw_bitmap_rle_set_range(b, 255, 325);
+  tw_bitmap_rle_set_range(a, 327, 410);
+  tw_bitmap_rle_set_range(b, 409, 500);
+  tw_bitmap_rle_set_range(a, 510, 511);
   ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
 
-  tw_bitmap_rle_set_range(expected,   0, 325);
+  tw_bitmap_rle_set_range(expected, 0, 325);
   tw_bitmap_rle_set_range(expected, 327, 500);
   tw_bitmap_rle_set_range(expected, 510, 511);
   ck_assert(tw_bitmap_rle_equal(expected, c));
@@ -357,16 +355,15 @@ START_TEST(test_bitmap_rle_union_advanced)
   tw_bitmap_rle_zero(expected);
 
   /** Test drainage */
-  tw_bitmap_rle_set_range(a,  0,  4);
-  tw_bitmap_rle_set_range(b,  6,  8);
+  tw_bitmap_rle_set_range(a, 0, 4);
+  tw_bitmap_rle_set_range(b, 6, 8);
   tw_bitmap_rle_set_range(b, 10, 16);
   ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
 
-  tw_bitmap_rle_set_range(expected,  0,  4);
-  tw_bitmap_rle_set_range(expected,  6,  8);
+  tw_bitmap_rle_set_range(expected, 0, 4);
+  tw_bitmap_rle_set_range(expected, 6, 8);
   tw_bitmap_rle_set_range(expected, 10, 16);
   ck_assert(tw_bitmap_rle_equal(expected, c));
-
 
   tw_bitmap_rle_free(expected);
   tw_bitmap_rle_free(c);
@@ -441,18 +438,18 @@ START_TEST(test_bitmap_rle_intersection_advanced)
   struct tw_bitmap_rle *c = tw_bitmap_rle_new(nbits);
   struct tw_bitmap_rle *expected = tw_bitmap_rle_new(nbits);
 
-  tw_bitmap_rle_set_range(a,   0,  127);
-  tw_bitmap_rle_set_range(a, 255,  325);
-  tw_bitmap_rle_set_range(a, 409,  511);
-  tw_bitmap_rle_set_range(b,   0,    8);
-  tw_bitmap_rle_set_range(b,  10,   15);
-  tw_bitmap_rle_set_range(b,  17,  128);
-  tw_bitmap_rle_set_range(b, 255,  500);
+  tw_bitmap_rle_set_range(a, 0, 127);
+  tw_bitmap_rle_set_range(a, 255, 325);
+  tw_bitmap_rle_set_range(a, 409, 511);
+  tw_bitmap_rle_set_range(b, 0, 8);
+  tw_bitmap_rle_set_range(b, 10, 15);
+  tw_bitmap_rle_set_range(b, 17, 128);
+  tw_bitmap_rle_set_range(b, 255, 500);
   ck_assert(tw_bitmap_rle_intersection(a, b, c) != NULL);
 
-  tw_bitmap_rle_set_range(expected,   0,   8);
-  tw_bitmap_rle_set_range(expected,  10,  15);
-  tw_bitmap_rle_set_range(expected,  17, 127);
+  tw_bitmap_rle_set_range(expected, 0, 8);
+  tw_bitmap_rle_set_range(expected, 10, 15);
+  tw_bitmap_rle_set_range(expected, 17, 127);
   tw_bitmap_rle_set_range(expected, 255, 325);
   tw_bitmap_rle_set_range(expected, 409, 500);
   ck_assert(tw_bitmap_rle_equal(expected, c));
@@ -469,10 +466,11 @@ START_TEST(test_bitmap_rle_intersection_advanced)
 }
 END_TEST
 
-int run_tests() {
+int run_tests()
+{
   int number_failed;
 
-  Suite  *s = suite_create("bitmap-rle");
+  Suite *s = suite_create("bitmap-rle");
   SRunner *runner = srunner_create(s);
 
   TCase *basic = tcase_create("basic");
@@ -500,8 +498,7 @@ int run_tests() {
   return number_failed;
 }
 
-int
-main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-  return (run_tests() == 0)? EXIT_SUCCESS: EXIT_FAILURE;
+  return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

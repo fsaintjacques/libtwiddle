@@ -16,18 +16,17 @@ struct tw_bitmap_rle_word {
   uint64_t count;
 };
 
-#define TW_BITMAP_RLE_WORD_PER_CACHELINE \
+#define TW_BITMAP_RLE_WORD_PER_CACHELINE                                       \
   (TW_CACHELINE / sizeof(struct tw_bitmap_rle_word))
 
-#define tw_bitmap_rle_word_zero \
-  (struct tw_bitmap_rle_word) {.pos = 0UL, .count = 0UL}
-#define tw_bitmap_rle_word_full(nbits) \
-  (struct tw_bitmap_rle_word) {.pos = 0UL, .count = nbits}
-#define tw_bitmap_rle_word_equal(a, b) \
-  (a.pos == b.pos && a.count == b.count)
+#define tw_bitmap_rle_word_zero                                                \
+  (struct tw_bitmap_rle_word) { .pos = 0UL, .count = 0UL }
+#define tw_bitmap_rle_word_full(nbits)                                         \
+  (struct tw_bitmap_rle_word) { .pos = 0UL, .count = nbits }
+#define tw_bitmap_rle_word_equal(a, b) (a.pos == b.pos && a.count == b.count)
 #define tw_bitmap_rle_word_end(a) (a.pos + a.count - 1)
 
-#define tw_bitmap_rle_word_min_ref(a, b) \
+#define tw_bitmap_rle_word_min_ref(a, b)                                       \
   ((a_word->pos <= b_word->pos) ? &a : &b)
 
 /**
@@ -57,15 +56,13 @@ struct tw_bitmap_rle {
  * Return: NULL if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_bitmap_rle`.
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_new(uint64_t nbits);
+struct tw_bitmap_rle *tw_bitmap_rle_new(uint64_t nbits);
 
 /**
  * tw_bitmap_rle_free() - free a bitmap
  * @bitmap: bitmap to free
  */
-void
-tw_bitmap_rle_free(struct tw_bitmap_rle *bitmap);
+void tw_bitmap_rle_free(struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_copy() - copy src bitmap into dst
@@ -76,8 +73,8 @@ tw_bitmap_rle_free(struct tw_bitmap_rle *bitmap);
  *
  * Return: NULL if copy failed, otherwise a pointer to dst.
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst);
+struct tw_bitmap_rle *tw_bitmap_rle_copy(const struct tw_bitmap_rle *src,
+                                         struct tw_bitmap_rle *dst);
 
 /**
  * tw_bitmap_rle_clone() - clone a bitmap into a new allocated bitmap
@@ -87,8 +84,7 @@ tw_bitmap_rle_copy(const struct tw_bitmap_rle *src, struct tw_bitmap_rle *dst);
  * the requests bitmap. The caller is responsible to deallocated the bitmap
  * with tw_bitmap_rle_free.
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap);
+struct tw_bitmap_rle *tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_set() - set position in bitmap
@@ -98,8 +94,7 @@ tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap);
  * This function must always be called with a monotone increasing pos
  * argument.
  */
-void
-tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint64_t pos);
+void tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint64_t pos);
 
 /**
  * tw_bitmap_rle_set_word() - set bitmap_rle_word in bitmap
@@ -109,9 +104,8 @@ tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint64_t pos);
  * This is a helper internal-ish function to add ranges in one go instead of
  * sequentially calling tw_bitmap_rle_set.
  */
-void
-tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
-                       const struct tw_bitmap_rle_word *word);
+void tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
+                            const struct tw_bitmap_rle_word *word);
 
 /**
  * tw_bitmap_rle_set_range() - set range in bitmap
@@ -121,10 +115,8 @@ tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
  * This is a helper internal-ish function to add ranges in one go instead of
  * sequentially calling tw_bitmap_rle_set.
  */
-void
-tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
-                        uint64_t start,
-                        uint64_t end);
+void tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap, uint64_t start,
+                             uint64_t end);
 
 /**
  * tw_bitmap_rle_test() - test postition in bitmap
@@ -133,8 +125,7 @@ tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap,
  *
  * Return: value of pos in the bitmap
  */
-bool
-tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint64_t pos);
+bool tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint64_t pos);
 
 /**
  * tw_bitmap_rle_empty() - verify if bitmap is empty
@@ -142,8 +133,7 @@ tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint64_t pos);
  *
  * Return: indicator if the bitmap is empty
  */
-bool
-tw_bitmap_rle_empty(const struct tw_bitmap_rle *bitmap);
+bool tw_bitmap_rle_empty(const struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_full() - verify if bitmap is full
@@ -151,8 +141,7 @@ tw_bitmap_rle_empty(const struct tw_bitmap_rle *bitmap);
  *
  * Return: indicator if the bitmap is full.
  */
-bool
-tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap);
+bool tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_count() - count the number of active bits
@@ -160,8 +149,7 @@ tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap);
  *
  * Return: number of active bits
  */
-uint64_t
-tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap);
+uint64_t tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_density() - count the percentage of active bits
@@ -169,8 +157,7 @@ tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap);
  *
  * Return: the portion of active bits (count / size)
  */
-float
-tw_bitmap_rle_density(const struct tw_bitmap_rle *bitmap);
+float tw_bitmap_rle_density(const struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_zero() - clear all bits in a bitmap
@@ -178,8 +165,7 @@ tw_bitmap_rle_density(const struct tw_bitmap_rle *bitmap);
  *
  * Return: the bitmap
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap);
+struct tw_bitmap_rle *tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_fill() - set all bits in a bitmap
@@ -187,8 +173,7 @@ tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap);
  *
  * Return: the bitmap
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap);
+struct tw_bitmap_rle *tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_find_first_zero() - find the first zero
@@ -196,8 +181,7 @@ tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap);
  *
  * Return: -1 if not found, otherwise the bit position.
  */
-int64_t
-tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
+int64_t tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_find_first_bit() - find the first bit
@@ -205,8 +189,7 @@ tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
  *
  * Return: -1 if not found, otherwise the bit position.
  */
-int64_t
-tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
+int64_t tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
 
 /**
  * tw_bitmap_rle_not() - inverse all bits and zeroes in the bitmap
@@ -219,9 +202,8 @@ tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
  *
  * Return: NULL if failed, pointer to dst otherwise.
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
-                  struct tw_bitmap_rle *dst);
+struct tw_bitmap_rle *tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
+                                        struct tw_bitmap_rle *dst);
 
 /**
  * tw_bitmap_rle_equal() - verify if bitmaps are equal
@@ -230,9 +212,8 @@ tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
  *
  * Return: true if equal, false otherwise
  */
-bool
-tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
-                    const struct tw_bitmap_rle *b);
+bool tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
+                         const struct tw_bitmap_rle *b);
 
 /**
  * tw_bitmap_rle_union() - union 2 bitmaps into a third
@@ -242,10 +223,9 @@ tw_bitmap_rle_equal(const struct tw_bitmap_rle *a,
  *
  * Return: dst if operation successful, NULL otherwise.
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
-                    const struct tw_bitmap_rle *b,
-                          struct tw_bitmap_rle *dst);
+struct tw_bitmap_rle *tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
+                                          const struct tw_bitmap_rle *b,
+                                          struct tw_bitmap_rle *dst);
 
 /**
  * tw_bitmap_rle_intersection() - intersect 2 bitmaps into a third
@@ -255,8 +235,7 @@ tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
  *
  * Return: dst if operation successful, NULL otherwise.
  */
-struct tw_bitmap_rle *
-tw_bitmap_rle_intersection(const struct tw_bitmap_rle *a,
-                           const struct tw_bitmap_rle *b,
-                                 struct tw_bitmap_rle *dst);
+struct tw_bitmap_rle *tw_bitmap_rle_intersection(const struct tw_bitmap_rle *a,
+                                                 const struct tw_bitmap_rle *b,
+                                                 struct tw_bitmap_rle *dst);
 #endif /* TWIDDLE_BITMAP_RLE_H */

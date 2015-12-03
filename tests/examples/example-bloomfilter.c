@@ -3,7 +3,8 @@
 
 #include <twiddle/bloomfilter/bloomfilter.h>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   const uint64_t nbits = 1024;
   const uint16_t k = 7;
   struct tw_bloomfilter *bf = tw_bloomfilter_new(nbits, k);

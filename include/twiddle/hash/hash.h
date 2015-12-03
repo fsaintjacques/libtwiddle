@@ -8,7 +8,6 @@ typedef struct {
   uint64_t l;
 } tw_uint128_t;
 
-uint64_t
-tw_hash_128_64(tw_uint128_t hash);
+uint64_t tw_hash_128_64(tw_uint128_t hash);
 
 #endif /* TWIDDLE_HASH_HASH_H */

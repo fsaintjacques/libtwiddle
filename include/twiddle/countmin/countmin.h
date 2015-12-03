@@ -1,21 +1,21 @@
-#ifndef TWIDDLE_HYPERLOGLOG_H
-#define TWIDDLE_HYPERLOGLOG_H
+#ifndef TWIDDLE_COUNTMIN_H
+#define TWIDDLE_COUNTMIN_H
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 #define hll_t uint8_t
-#define TW_BYTES_PER_HLL sizeof(hll_t)
-#define TW_BITS_PER_HLL (TW_BYTES_PER_HLL * TW_BITS_IN_WORD)
-#define TW_HLL_BITS_PER_REG 6
-#define TW_HLL_REG_PER_HLL (TW_BITS_PER_HLL / TW_HLL_BITS_PER_REG)
+#define TW_BYTES_PER_CMS sizeof(hll_t)
+#define TW_BITS_PER_CMS (TW_BYTES_PER_CMS * TW_BITS_IN_WORD)
+#define TW_CMS_BITS_PER_REG 6
+#define TW_CMS_REG_PER_CMS (TW_BITS_PER_CMS / TW_CMS_BITS_PER_REG)
 
-#define TW_HLL_ERROR_FOR_REG(reg) (1.04 / sqrt((double)(reg)))
-#define TW_HLL_REG_FOR_ERROR(err) (1.0816 / ((err) * (err)))
+#define TW_CMS_ERROR_FOR_REG(reg) (1.04 / sqrt((double)(reg)))
+#define TW_CMS_REG_FOR_ERROR(err) (1.0816 / ((err) * (err)))
 
-#define TW_HLL_MIN_PRECISION 4
-#define TW_HLL_MAX_PRECISION 18
+#define TW_CMS_MIN_PRECISION 4
+#define TW_CMS_MAX_PRECISION 18
 
 #define tw_hyperloglog_info_copy(src, dst)                                     \
   dst = (struct tw_hyperloglog_info)                                           \
@@ -56,7 +56,7 @@ struct tw_hyperloglog {
   uint8_t registers[];
 };
 
-#define TW_HLL_DEFAULT_SEED 646086642ULL
+#define TW_CMS_DEFAULT_SEED 646086642ULL
 
 /**
  * tw_hyperloglog_new() - allocates a hyperloglog data structure
@@ -143,4 +143,4 @@ bool tw_hyperloglog_equal(const struct tw_hyperloglog *a,
  */
 struct tw_hyperloglog *tw_hyperloglog_merge(const struct tw_hyperloglog *src,
                                             struct tw_hyperloglog *dst);
-#endif /* TWIDDLE_HYPERLOGLOG_H */
+#endif /* TWIDDLE_COUNTMIN_H */

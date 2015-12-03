@@ -17,11 +17,11 @@ struct tw_bloomfilter_info {
   uint16_t k;
 };
 
-#define tw_bloomfilter_info_init(k,h) \
-  (struct tw_bloomfilter_info) {.k = k, .hash_seed = h}
-#define tw_bloomfilter_info_copy(src, dst) \
-  dst = (struct tw_bloomfilter_info) {.k = src.k, .hash_seed = src.hash_seed}
-#define tw_bloomfilter_info_equal(src, dst) \
+#define tw_bloomfilter_info_init(k, h)                                         \
+  (struct tw_bloomfilter_info) { .k = k, .hash_seed = h }
+#define tw_bloomfilter_info_copy(src, dst)                                     \
+  dst = (struct tw_bloomfilter_info) { .k = src.k, .hash_seed = src.hash_seed }
+#define tw_bloomfilter_info_equal(src, dst)                                    \
   (src.k == dst.k && src.hash_seed == dst.hash_seed)
 
 #define TW_BF_DEFAULT_SEED 3781869495ULL
@@ -53,15 +53,13 @@ struct tw_bloomfilter {
  * Return: NULL if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_bloomfilter`.
  */
-struct tw_bloomfilter *
-tw_bloomfilter_new(uint64_t size, uint16_t k);
+struct tw_bloomfilter *tw_bloomfilter_new(uint64_t size, uint16_t k);
 
 /**
  * tw_bloomfilter_free() - free a bloomfilter
  * @bf: bloomfilter to free
  */
-void
-tw_bloomfilter_free(struct tw_bloomfilter *bf);
+void tw_bloomfilter_free(struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_copy() - copy src bloomfilter into dst
@@ -72,9 +70,8 @@ tw_bloomfilter_free(struct tw_bloomfilter *bf);
  *
  * Return: NULL if copy failed, otherwise a pointer to dst.
  */
-struct tw_bloomfilter *
-tw_bloomfilter_copy(const struct tw_bloomfilter *src,
-                    struct tw_bloomfilter *dst);
+struct tw_bloomfilter *tw_bloomfilter_copy(const struct tw_bloomfilter *src,
+                                           struct tw_bloomfilter *dst);
 
 /**
  * tw_bloomfilter_clone() - clone a bloomfilter into a newly allocated one
@@ -84,8 +81,7 @@ tw_bloomfilter_copy(const struct tw_bloomfilter *src,
  * from the requested bloomfilter. The caller is responsible to deallocate
  * with tw_bloomfilter_free.
  */
-struct tw_bloomfilter *
-tw_bloomfilter_clone(const struct tw_bloomfilter *bf);
+struct tw_bloomfilter *tw_bloomfilter_clone(const struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_set() - set an element in a bloomfilter
@@ -93,9 +89,8 @@ tw_bloomfilter_clone(const struct tw_bloomfilter *bf);
  * @size: size of the key to add
  * @buf:  buf to the key to add
  */
-void
-tw_bloomfilter_set(struct tw_bloomfilter *bf,
-                   size_t size, const char* buf);
+void tw_bloomfilter_set(struct tw_bloomfilter *bf, size_t size,
+                        const char *buf);
 
 /**
  * tw_bloomfilter_test() - test an element in a bloomfilter
@@ -105,17 +100,15 @@ tw_bloomfilter_set(struct tw_bloomfilter *bf,
  *
  * Return: false if the element is not in the bloomfilter, true otherwise.
  */
-bool
-tw_bloomfilter_test(const struct tw_bloomfilter *bf,
-                    size_t size, const char* buf);
+bool tw_bloomfilter_test(const struct tw_bloomfilter *bf, size_t size,
+                         const char *buf);
 /**
  * tw_bloomfilter_empty() - verify if bloomfilter is empty
  * @bf: bloomfilter to verify
  *
  * Return: true if the bloomfilter is empty, false otherwise.
  */
-bool
-tw_bloomfilter_empty(const struct tw_bloomfilter *bf);
+bool tw_bloomfilter_empty(const struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_full() - verify if bloomfilter is full
@@ -123,8 +116,7 @@ tw_bloomfilter_empty(const struct tw_bloomfilter *bf);
  *
  * Return: true if the bloomfilter is full, false otherwise.
  */
-bool
-tw_bloomfilter_full(const struct tw_bloomfilter *bf);
+bool tw_bloomfilter_full(const struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_count() - count the number of active bits
@@ -132,8 +124,7 @@ tw_bloomfilter_full(const struct tw_bloomfilter *bf);
  *
  * Return: number of active bits
  */
-uint64_t
-tw_bloomfilter_count(const struct tw_bloomfilter *bf);
+uint64_t tw_bloomfilter_count(const struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_density() - count the percentage of active bits
@@ -141,8 +132,7 @@ tw_bloomfilter_count(const struct tw_bloomfilter *bf);
  *
  * Return: the portion of active bits (count / size)
  */
-float
-tw_bloomfilter_density(const struct tw_bloomfilter *bf);
+float tw_bloomfilter_density(const struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_zero() - clear all bits in a bloomfilter
@@ -150,8 +140,7 @@ tw_bloomfilter_density(const struct tw_bloomfilter *bf);
  *
  * Return: the bloomfilter cleared
  */
-struct tw_bloomfilter *
-tw_bloomfilter_zero(struct tw_bloomfilter *bf);
+struct tw_bloomfilter *tw_bloomfilter_zero(struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_fill() - set all bits in a bloomfilter
@@ -159,8 +148,7 @@ tw_bloomfilter_zero(struct tw_bloomfilter *bf);
  *
  * Return: the bloomfilter filled
  */
-struct tw_bloomfilter *
-tw_bloomfilter_fill(struct tw_bloomfilter *bf);
+struct tw_bloomfilter *tw_bloomfilter_fill(struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_not() - inverse all bits and zeroes in the bloomfilter
@@ -168,8 +156,7 @@ tw_bloomfilter_fill(struct tw_bloomfilter *bf);
  *
  * Return: NULL if failed, otherwise the bloomfilter.
  */
-struct tw_bloomfilter *
-tw_bloomfilter_not(struct tw_bloomfilter *bf);
+struct tw_bloomfilter *tw_bloomfilter_not(struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_equal() - verify if bloomfilter are equal
@@ -181,9 +168,8 @@ tw_bloomfilter_not(struct tw_bloomfilter *bf);
  * In order to be comparable, bloomfilters must have the same size and the
  * same number of hash functions (k).
  */
-bool
-tw_bloomfilter_equal(const struct tw_bloomfilter *a,
-                     const struct tw_bloomfilter *b);
+bool tw_bloomfilter_equal(const struct tw_bloomfilter *a,
+                          const struct tw_bloomfilter *b);
 
 /**
  * tw_bloomfilter_union() - computer the union of bloomfilters
@@ -195,9 +181,8 @@ tw_bloomfilter_equal(const struct tw_bloomfilter *a,
  * Only works on bloomfilter of the same size and same number of hash
  * functions(k). This store the results in dst.
  */
-struct tw_bloomfilter *
-tw_bloomfilter_union(const struct tw_bloomfilter *src,
-                           struct tw_bloomfilter *dst);
+struct tw_bloomfilter *tw_bloomfilter_union(const struct tw_bloomfilter *src,
+                                            struct tw_bloomfilter *dst);
 
 /**
  * tw_bloomfilter_intersection() - compute the intersection of bloomfilters
@@ -211,7 +196,7 @@ tw_bloomfilter_union(const struct tw_bloomfilter *src,
  */
 struct tw_bloomfilter *
 tw_bloomfilter_intersection(const struct tw_bloomfilter *src,
-                                  struct tw_bloomfilter *dst);
+                            struct tw_bloomfilter *dst);
 
 /**
  * tw_bloomfilter_xor() - compute the symetric difference of bloomfilters
@@ -223,8 +208,7 @@ tw_bloomfilter_intersection(const struct tw_bloomfilter *src,
  * Only works on bloomfilter of the same size and same number of hash
  * functions(k). This store the results in dst.
  */
-struct tw_bloomfilter *
-tw_bloomfilter_xor(const struct tw_bloomfilter *src,
-                         struct tw_bloomfilter *dst);
+struct tw_bloomfilter *tw_bloomfilter_xor(const struct tw_bloomfilter *src,
+                                          struct tw_bloomfilter *dst);
 
 #endif /* TWIDDLE_BLOOMFILTER_H */

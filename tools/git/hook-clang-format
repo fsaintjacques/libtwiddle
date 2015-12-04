@@ -16,7 +16,7 @@ IFS=${_IFS}
 
 for ((i = 0; i < ${#FILES[@]}; ++i)); do
   file=${FILES[$i]}
-  clang-format -output-replacements-xml "$file" | grep "<replacement" > /dev/null
+  clang-format -output-replacements-xml "$file" | diff "$file" - > /dev/null
   if [ $? -ne 1 ]; then
     echo "File does not respect formatting style: $file"
     exit 1;

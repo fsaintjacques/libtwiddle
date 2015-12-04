@@ -63,14 +63,13 @@ struct tw_bloomfilter *tw_bloomfilter_clone(const struct tw_bloomfilter *bf)
 void tw_bloomfilter_set(struct tw_bloomfilter *bf, size_t size, const char *buf)
 {
   assert(bf && size > 0 && buf);
-  uint64_t hash = tw_metrohash_64(bf->info.hash_seed, buf, size);
-
+  const tw_uint128_t hash = tw_metrohash_128(bf->info.hash_seed, buf, size);
   const uint16_t k = bf->info.k;
   struct tw_bitmap *bitmap = bf->bitmap;
   const uint32_t b_size = bitmap->info.size;
 
   for (int i = 0; i < k; ++i) {
-    tw_bitmap_set(bitmap, (hash + i * hash) % b_size);
+    tw_bitmap_set(bitmap, (hash.h + i * hash.l) % b_size);
   }
 }
 
@@ -78,14 +77,14 @@ bool tw_bloomfilter_test(const struct tw_bloomfilter *bf, size_t size,
                          const char *buf)
 {
   assert(bf && size > 0 && buf);
-  uint64_t hash = tw_metrohash_64(bf->info.hash_seed, buf, size);
+  const tw_uint128_t hash = tw_metrohash_128(bf->info.hash_seed, buf, size);
 
   const uint16_t k = bf->info.k;
   const struct tw_bitmap *bitmap = bf->bitmap;
   const uint32_t b_size = bitmap->info.size;
 
   for (int i = 0; i < k; ++i) {
-    if (!tw_bitmap_test(bitmap, (hash + i * hash) % b_size)) {
+    if (!tw_bitmap_test(bitmap, (hash.h + i * hash.l) % b_size)) {
       return false;
     }
   }

@@ -9,8 +9,8 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 if(VERSION_RESULT)
-    message(FATAL_ERROR
-            "Cannot determine version number: " ${VERSION_RESULT})
+    set(VERSION "0.0.0")
+    message(STATUS "Cannot determine version number reverting to: " ${VERSION})
 endif(VERSION_RESULT)
 message(STATUS "Current version: " ${VERSION})
 

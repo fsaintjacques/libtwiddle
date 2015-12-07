@@ -190,6 +190,59 @@ libtwiddle.tw_bloomfilter_intersection.restype  = c_void_p
 libtwiddle.tw_bloomfilter_xor.argtypes = [c_void_p, c_void_p]
 libtwiddle.tw_bloomfilter_xor.restype  = c_void_p
 
+# BLOOMFILTER-A2
+
+libtwiddle.tw_bloomfilter_a2_new.argtypes = [c_ulong, c_ushort, c_float]
+libtwiddle.tw_bloomfilter_a2_new.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_free.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_free.restype  = None
+
+libtwiddle.tw_bloomfilter_a2_copy.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_bloomfilter_a2_copy.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_clone.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_clone.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_set.argtypes = [c_void_p, c_ulong, c_void_p]
+libtwiddle.tw_bloomfilter_a2_set.restype  = None
+
+libtwiddle.tw_bloomfilter_a2_test.argtypes = [c_void_p, c_ulong, c_void_p]
+libtwiddle.tw_bloomfilter_a2_test.restype  = c_bool
+
+libtwiddle.tw_bloomfilter_a2_empty.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_empty.restype  = c_bool
+
+libtwiddle.tw_bloomfilter_a2_full.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_full.restype  = c_bool
+
+libtwiddle.tw_bloomfilter_a2_count.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_count.restype  = c_ulong
+
+libtwiddle.tw_bloomfilter_a2_density.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_density.restype  = c_float
+
+libtwiddle.tw_bloomfilter_a2_zero.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_zero.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_fill.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_fill.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_not.argtypes = [c_void_p]
+libtwiddle.tw_bloomfilter_a2_not.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_equal.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_bloomfilter_a2_equal.restype  = c_bool
+
+libtwiddle.tw_bloomfilter_a2_union.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_bloomfilter_a2_union.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_intersection.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_bloomfilter_a2_intersection.restype  = c_void_p
+
+libtwiddle.tw_bloomfilter_a2_xor.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_bloomfilter_a2_xor.restype  = c_void_p
+
  # HYPERLOGLOG
 
 libtwiddle.tw_hyperloglog_new.argtypes = [c_ushort]

@@ -20,4 +20,7 @@
 #define tw_ffzl(x) __builtin_ffsl(~x)
 #define tw_popcountl(x) __builtin_popcountl(x)
 
+#define tw_min(a, b) ((a < b) ? a : b)
+#define tw_max(a, b) ((a < b) ? b : a)
+
 #endif /* TWIDDLE_INTERNAL_UTILS_H */

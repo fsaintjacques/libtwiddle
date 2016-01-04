@@ -243,7 +243,7 @@ libtwiddle.tw_bloomfilter_a2_intersection.restype  = c_void_p
 libtwiddle.tw_bloomfilter_a2_xor.argtypes = [c_void_p, c_void_p]
 libtwiddle.tw_bloomfilter_a2_xor.restype  = c_void_p
 
- # HYPERLOGLOG
+# HYPERLOGLOG
 
 libtwiddle.tw_hyperloglog_new.argtypes = [c_ushort]
 libtwiddle.tw_hyperloglog_new.restype  = c_void_p
@@ -271,3 +271,29 @@ libtwiddle.tw_hyperloglog_equal.restype  = c_bool
 
 libtwiddle.tw_hyperloglog_merge.argtypes = [c_void_p, c_void_p]
 libtwiddle.tw_hyperloglog_merge.restype  = c_void_p
+
+# MINHASH
+
+libtwiddle.tw_minhash_new.argtypes = [c_uint]
+libtwiddle.tw_minhash_new.restype  = c_void_p
+
+libtwiddle.tw_minhash_free.argtypes = [c_void_p]
+libtwiddle.tw_minhash_free.restype  = None
+
+libtwiddle.tw_minhash_copy.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_minhash_copy.restype  = c_void_p
+
+libtwiddle.tw_minhash_clone.argtypes = [c_void_p]
+libtwiddle.tw_minhash_clone.restype  = c_void_p
+
+libtwiddle.tw_minhash_add.argtypes = [c_void_p, c_uint, c_void_p]
+libtwiddle.tw_minhash_add.restype  = None
+
+libtwiddle.tw_minhash_estimate.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_minhash_estimate.restype  = c_double
+
+libtwiddle.tw_minhash_equal.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_minhash_equal.restype  = c_bool
+
+libtwiddle.tw_minhash_merge.argtypes = [c_void_p, c_void_p]
+libtwiddle.tw_minhash_merge.restype  = c_void_p

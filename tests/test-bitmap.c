@@ -258,22 +258,6 @@ START_TEST(test_bitmap_set_operations)
 }
 END_TEST
 
-START_TEST(test_bitmap_new_assert_0)
-{
-  struct tw_bitmap *b = tw_bitmap_new(0);
-
-  tw_bitmap_count(b);
-}
-END_TEST
-
-START_TEST(test_bitmap_new_assert_max_p1)
-{
-  struct tw_bitmap *b = tw_bitmap_new(TW_BITMAP_MAX_BITS + 1);
-
-  tw_bitmap_count(b);
-}
-END_TEST
-
 int run_tests()
 {
   int number_failed;
@@ -289,11 +273,6 @@ int run_tests()
   tcase_add_test(tc, test_bitmap_find_first);
   tcase_add_test(tc, test_bitmap_set_operations);
   suite_add_tcase(s, tc);
-
-  TCase *ta = tcase_create("assert");
-  tcase_add_test_raise_signal(ta, test_bitmap_new_assert_0, SIGABRT);
-  tcase_add_test_raise_signal(ta, test_bitmap_new_assert_max_p1, SIGABRT);
-  suite_add_tcase(s, ta);
 
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

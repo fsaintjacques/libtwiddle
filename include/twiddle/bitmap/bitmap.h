@@ -14,6 +14,9 @@
 #define TW_BYTES_PER_BITMAP sizeof(bitmap_t)
 #define TW_BITS_PER_BITMAP (TW_BYTES_PER_BITMAP * TW_BITS_IN_WORD)
 
+#define BITMAP_POS(pos) (pos / TW_BITS_PER_BITMAP)
+#define MASK(pos) (1ULL << (pos % TW_BITS_PER_BITMAP))
+
 /**
  * Computes the number of required `bitmap_t` to hold `nbits` bits.
  */

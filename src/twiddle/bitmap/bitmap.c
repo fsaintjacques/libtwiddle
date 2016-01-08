@@ -72,62 +72,59 @@ struct tw_bitmap *tw_bitmap_clone(const struct tw_bitmap *bitmap)
   return tw_bitmap_copy(bitmap, new);
 }
 
+#define BYTE_POS(pos) (pos / 64)
+#define MASK(pos) (1ULL << (pos % 64))
+
 void inline tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
-  tw_bitmap_test_and_set(bitmap, pos);
+  assert(bitmap && pos < bitmap->info.size);
+
+  const bitmap_t old_bitmap = bitmap->data[BYTE_POS(pos)];
+  const bitmap_t new_bitmap = old_bitmap | MASK(pos);
+  const bool changed = (old_bitmap != new_bitmap);
+  bitmap->info.count += changed;
+  bitmap->data[BYTE_POS(pos)] = new_bitmap;
 }
 
 void inline tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
-  tw_bitmap_test_and_clear(bitmap, pos);
+  assert(bitmap && pos < bitmap->info.size);
+
+  const bitmap_t old_bitmap = bitmap->data[BYTE_POS(pos)];
+  const bitmap_t new_bitmap = old_bitmap & ~MASK(pos);
+  const bool changed = (old_bitmap != new_bitmap);
+  bitmap->info.count -= changed;
+  bitmap->data[BYTE_POS(pos)] = new_bitmap;
 }
 
 bool tw_bitmap_test(const struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
-  int oldbit;
-
-  __asm volatile("bt %2,%1\n\t"
-                 "sbb %0,%0"
-                 : "=r"(oldbit)
-                 : "m"(*(unsigned long *)bitmap->data), "Ir"(pos));
-
-  return oldbit;
+  return !!(bitmap->data[BYTE_POS(pos)] & MASK(pos));
 }
 
 bool tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
-  assert(bitmap->info.count < UINT64_MAX);
 
-  int oldbit;
-  __asm("bts %2,%1\n\t"
-        "sbb %0,%0"
-        : "=r"(oldbit), TW_BITOP_ADDR(bitmap->data)
-        : "Ir"(pos));
-
-  if (!oldbit) {
-    bitmap->info.count++;
-  }
-
-  return oldbit;
+  const bitmap_t old_bitmap = bitmap->data[BYTE_POS(pos)];
+  const bitmap_t new_bitmap = old_bitmap | MASK(pos);
+  const bool changed = (old_bitmap != new_bitmap);
+  bitmap->info.count += changed;
+  bitmap->data[BYTE_POS(pos)] = new_bitmap;
+  return changed ? 0 : 1;
 }
 
 bool tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
 
-  int oldbit;
-  __asm volatile("btr %2,%1\n\t"
-                 "sbb %0,%0"
-                 : "=r"(oldbit), TW_BITOP_ADDR(bitmap->data)
-                 : "Ir"(pos));
-
-  if (oldbit) {
-    bitmap->info.count--;
-  }
-
-  return oldbit;
+  const bitmap_t old_bitmap = bitmap->data[BYTE_POS(pos)];
+  const bitmap_t new_bitmap = old_bitmap & ~MASK(pos);
+  const bool changed = (old_bitmap != new_bitmap);
+  bitmap->info.count -= changed;
+  bitmap->data[BYTE_POS(pos)] = new_bitmap;
+  return changed ? 1 : 0;
 }
 
 bool tw_bitmap_empty(const struct tw_bitmap *bitmap)

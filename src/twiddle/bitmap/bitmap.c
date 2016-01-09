@@ -190,7 +190,7 @@ int64_t tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap)
   }
 
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
-    const int pos = tw_ffzl(bitmap->data[i]);
+    const int pos = tw_ffzll(bitmap->data[i]);
     if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos - 1);
     }
@@ -215,7 +215,7 @@ int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
   }
 
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
-    const uint64_t pos = tw_ffsl(bitmap->data[i]);
+    const int pos = tw_ffsll(bitmap->data[i]);
     if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos - 1);
     }

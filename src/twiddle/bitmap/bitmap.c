@@ -6,16 +6,19 @@
 
 static inline void tw_bitmap_clear_extra_bits(struct tw_bitmap *bitmap)
 {
-  const int32_t size = bitmap->info.size;
-  const int32_t rest = size % TW_BITS_PER_BITMAP;
+  const uint64_t size = bitmap->info.size;
+  const uint64_t rest = size % TW_BITS_PER_BITMAP;
   if (rest) {
-    bitmap->data[size / TW_BITS_PER_BITMAP] ^= ~0UL << rest;
+    bitmap->data[BITMAP_POS(size)] ^= ~0UL << rest;
   }
 }
 
 struct tw_bitmap *tw_bitmap_new(uint64_t size)
 {
-  assert(0 < size && size <= TW_BITMAP_MAX_BITS);
+  if (0 == size || size > TW_BITMAP_MAX_BITS) {
+    return NULL;
+  }
+
   const size_t alloc_size = sizeof(struct tw_bitmap_info) +
                             TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP;
   struct tw_bitmap *bitmap = calloc(1, alloc_size);

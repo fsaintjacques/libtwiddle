@@ -53,7 +53,7 @@ struct tw_hyperloglog_info {
  */
 struct tw_hyperloglog {
   struct tw_hyperloglog_info info;
-  uint8_t registers[];
+  uint8_t *registers;
 };
 
 #define TW_HLL_DEFAULT_SEED 646086642ULL

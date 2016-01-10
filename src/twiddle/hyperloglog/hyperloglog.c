@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <math.h>
+#include <string.h>
 
 #include <twiddle/hyperloglog/hyperloglog.h>
 #include <twiddle/hash/metrohash.h>
@@ -11,11 +12,19 @@ struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
     return NULL;
   }
 
-  struct tw_hyperloglog *hll =
-      calloc(1, sizeof(struct tw_hyperloglog) + (1 << precision));
+  struct tw_hyperloglog *hll = calloc(1, sizeof(struct tw_hyperloglog));
   if (!hll) {
     return NULL;
   }
+
+  size_t alloc_size = (1 << precision) * sizeof(uint8_t);
+
+  if (posix_memalign((void *)&hll->registers, sizeof(uint64_t), alloc_size)) {
+    free(hll);
+    return NULL;
+  }
+
+  memset(hll->registers, 0, alloc_size);
 
   hll->info = (struct tw_hyperloglog_info){.precision = precision,
                                            .hash_seed = TW_HLL_DEFAULT_SEED};
@@ -26,6 +35,7 @@ struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
 void tw_hyperloglog_free(struct tw_hyperloglog *hll)
 {
   assert(hll);
+  free(hll->registers);
   free(hll);
 }
 

@@ -19,13 +19,20 @@ struct tw_bitmap *tw_bitmap_new(uint64_t size)
     return NULL;
   }
 
-  const size_t alloc_size = sizeof(struct tw_bitmap_info) +
-                            TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP;
-  struct tw_bitmap *bitmap = calloc(1, alloc_size);
+  struct tw_bitmap *bitmap = calloc(1, sizeof(struct tw_bitmap));
 
   if (!bitmap) {
     return NULL;
   }
+
+  const size_t data_size = TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP;
+
+  if (posix_memalign((void *)&(bitmap->data), sizeof(bitmap_t), data_size)) {
+    free(bitmap);
+    return NULL;
+  }
+
+  memset(bitmap->data, 0, data_size);
 
   bitmap->info = tw_bitmap_info_init(size);
   return bitmap;
@@ -155,9 +162,9 @@ struct tw_bitmap *tw_bitmap_zero(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
-    bitmap->data[i] = 0UL;
-  }
+  memset(bitmap->data, 0,
+         TW_BITMAP_PER_BITS(bitmap->info.size) * TW_BYTES_PER_BITMAP);
+
   bitmap->info.count = 0U;
 
   return bitmap;
@@ -167,10 +174,11 @@ struct tw_bitmap *tw_bitmap_fill(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
-    bitmap->data[i] = ~0UL;
-  }
+  memset(bitmap->data, 0xFF,
+         TW_BITMAP_PER_BITS(bitmap->info.size) * TW_BYTES_PER_BITMAP);
+
   tw_bitmap_clear_extra_bits(bitmap);
+
   bitmap->info.count = bitmap->info.size;
 
   return bitmap;

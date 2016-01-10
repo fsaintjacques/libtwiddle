@@ -60,7 +60,7 @@ struct tw_bitmap_info {
  */
 struct tw_bitmap {
   struct tw_bitmap_info info;
-  bitmap_t data[];
+  bitmap_t *data;
 };
 
 /**

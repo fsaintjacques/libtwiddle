@@ -1,9 +1,29 @@
 #ifndef TWIDDLE_INTERNAL_UTILS_H
 #define TWIDDLE_INTERNAL_UTILS_H
 
+/* Number of bytes per cache line */
+#ifndef TW_CACHELINE
 #define TW_CACHELINE 64
+#endif
+
+/* Number of bytes per simd vector */
+#ifndef TW_VECTOR_SIZE
+#ifdef USE_AVX512
+#define TW_VECTOR_SIZE 64
+#elif USE_AVX2
+#define TW_VECTOR_SIZE 32
+#else
+#define TW_VECTOR_SIZE 16
+#endif
+#endif
+
+/* Number of simd vector per cache line */
+#define TW_VECTOR_PER_CACHE_LINE (TW_CACHELINE / TW_VECTOR_SIZE)
 
 #define TW_DIV_ROUND_UP(n, d) (((n) + (d)-1) / (d))
+
+#define TW_ALLOC_TO_CACHELINE(size)                                            \
+  ((TW_DIV_ROUND_UP(size, TW_CACHELINE) * TW_CACHELINE))
 
 #define TW_ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 

@@ -27,3 +27,6 @@ add_subdirectory(docs)
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(tests)
+
+option(USE_AVX512 "Enable AVX512 instructions" OFF)
+option(USE_AVX2 "Enable AVX2 instructions" OFF)

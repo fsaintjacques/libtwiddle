@@ -23,5 +23,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 
+if(USE_AVX512)
+  add_definitions(-DUSE_AVX512=1)
+endif()
+
+if(USE_AVX2)
+  add_definitions(-DUSE_AVX2=1)
+endif()
+
+
 # strict compile options
 add_definitions(-Wall -Werror -pedantic)

@@ -10,7 +10,7 @@ function init_deps {
   set +o nounset
   source .venv/bin/activate
   set -o nounset
-  pip install pytest hypothesis
+  pip install pytest hypothesis==1.19.0
 }
 
 

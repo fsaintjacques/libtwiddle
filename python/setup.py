@@ -25,9 +25,6 @@ setup(
     py_modules=['twiddle'],
     license="GPL License, version 3.0",
     packages=find_packages(exclude=['tests']),
-    tests_require=['pytest', 'hypothesis'],
-    cmdclass={'test': PyTest},
-    extra_requires = {
-      "dev": [ "hypothesis" ]
-      }
+    tests_require=['hypothesis==1.19.0', 'pytest'],
+    cmdclass={'test': PyTest}
     )

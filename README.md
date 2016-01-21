@@ -1,6 +1,8 @@
 LIBTWIDDLE
 ==========
 [![Build Status](https://travis-ci.org/fsaintjacques/libtwiddle.svg?branch=develop)](https://travis-ci.org/fsaintjacques/libtwiddle)
+[![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg?style=flat)](https://github.com/fsaintjacques/libtwiddle/blob/develop/LICENSE)
+
 
 libtwiddle is a small library that implements bit data structures:
 

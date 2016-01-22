@@ -90,6 +90,7 @@ START_TEST(test_hyperloglog_merge)
     const uint32_t n_registers = 1 << p;
     struct tw_hyperloglog *src = tw_hyperloglog_new(p);
     struct tw_hyperloglog *dst = tw_hyperloglog_new(p);
+    struct tw_hyperloglog *prev;
 
     const int times = 100;
     /** test linear_count */
@@ -101,7 +102,13 @@ START_TEST(test_hyperloglog_merge)
       }
     }
 
+    prev = tw_hyperloglog_clone(dst);
+
     ck_assert(tw_hyperloglog_merge(src, dst) != NULL);
+
+    // merge should guarantee size increase
+    ck_assert(tw_hyperloglog_count(src) <= tw_hyperloglog_count(dst));
+    ck_assert(tw_hyperloglog_count(prev) <= tw_hyperloglog_count(dst));
 
     double estimate = tw_hyperloglog_count(dst);
     bool within_bound =

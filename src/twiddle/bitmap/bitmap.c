@@ -256,7 +256,7 @@ struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
 #elif USE_AVX
   BITMAP_NOT_LOOP(__m128i, _mm_set1_epi8, _mm_load_si128, _mm_xor_si128,
                   _mm_store_si128)
-#elif USE_PORTABLE
+#else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
     bitmap->data[i] ^= ~0UL;
   }
@@ -294,7 +294,7 @@ bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
 #elif USE_AVX
   BITMAP_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
                  0xFFFF)
-#elif USE_PORTABLE
+#else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     if (a->data[i] != b->data[i]) {
       return false;

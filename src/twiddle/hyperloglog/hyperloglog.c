@@ -143,7 +143,7 @@ bool tw_hyperloglog_equal(const struct tw_hyperloglog *a,
 #elif USE_AVX
   HLL_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
               0xFFFF)
-#elif USE_PORTABLE
+#else
   for (int i = 0; i < n_registers; ++i) {
     if (a->registers[i] != b->registers[i]) {
       return false;

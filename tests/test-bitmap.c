@@ -249,6 +249,11 @@ START_TEST(test_bitmap_set_operations)
       /* differs by one bit */
       ck_assert(!tw_bitmap_equal(src, dst));
 
+      tw_bitmap_zero(src);
+      tw_bitmap_fill(dst);
+
+      ck_assert(tw_bitmap_equal(src, tw_bitmap_intersection(src, dst)));
+
       tw_bitmap_free(dst);
       tw_bitmap_free(src);
     }

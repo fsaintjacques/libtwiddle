@@ -14,7 +14,8 @@
 #define TW_HLL_ERROR_FOR_REG(reg) (1.04 / sqrt((double)(reg)))
 #define TW_HLL_REG_FOR_ERROR(err) (1.0816 / ((err) * (err)))
 
-#define TW_HLL_MIN_PRECISION 4
+// minimum to be aligned with a cacheline.
+#define TW_HLL_MIN_PRECISION 6
 #define TW_HLL_MAX_PRECISION 18
 
 #define tw_hyperloglog_info_copy(src, dst)                                     \

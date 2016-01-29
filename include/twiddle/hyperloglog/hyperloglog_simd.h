@@ -5,7 +5,7 @@
 
 #if USE_AVX2
 /* http://stackoverflow.com/questions/13219146/how-to-sum-m256-horizontally */
-inline float horizontal_sum_avx2(__m256 x)
+static inline float horizontal_sum_avx2(__m256 x)
 {
   const __m128 hi_quad = _mm256_extractf128_ps(x, 1);
   const __m128 lo_quad = _mm256_castps256_ps128(x);
@@ -29,9 +29,9 @@ inline float horizontal_sum_avx2(__m256 x)
 /* https://gcc.gnu.org/ml/gcc-patches/2015-01/msg01199.html */
 #define _mm256_bsrli_si256(A, N)                                               \
   ((__m256i)__builtin_ia32_psrldqi256((__m256i)(A), (int)(N)*8))
-inline void hyperloglog_count_avx2(const uint8_t *registers,
-                                   uint32_t n_registers, float *inverse_sum,
-                                   uint32_t *n_zeros)
+static inline void hyperloglog_count_avx2(const uint8_t *registers,
+                                          uint32_t n_registers,
+                                          float *inverse_sum, uint32_t *n_zeros)
 {
   const __m256i ones = (__m256i)_mm256_set1_ps(1.0f);
   __m256 agg = _mm256_set1_ps(0.0f);
@@ -62,7 +62,7 @@ inline void hyperloglog_count_avx2(const uint8_t *registers,
 
 #elif USE_AVX
 
-inline float horizontal_sum_avx(__m128 x)
+static inline float horizontal_sum_avx(__m128 x)
 {
   x = _mm_hadd_ps(x, x);
   x = _mm_hadd_ps(x, x);
@@ -76,9 +76,9 @@ inline float horizontal_sum_avx(__m128 x)
 #define inverse_power_avx(simd)                                                \
   _mm_sub_epi32(ones, _mm_slli_epi32(_mm_cvtepi8_epi32(simd), 23))
 
-inline void hyperloglog_count_avx(const uint8_t *registers,
-                                  uint32_t n_registers, float *inverse_sum,
-                                  uint32_t *n_zeros)
+static inline void hyperloglog_count_avx(const uint8_t *registers,
+                                         uint32_t n_registers,
+                                         float *inverse_sum, uint32_t *n_zeros)
 {
   const __m128i ones = (__m128i)_mm_set1_ps(1.0f);
   __m128 agg = _mm_set1_ps(0.0f);
@@ -86,10 +86,17 @@ inline void hyperloglog_count_avx(const uint8_t *registers,
   for (size_t i = 0; i < n_registers / sizeof(__m128i); ++i) {
     const __m128i simd = _mm_load_si128((__m128i *)registers + i);
 
-    for (size_t j = 0; j < sizeof(__m128i) / sizeof(float); j++) {
-      const __m128i powers = inverse_power_avx(_mm_srli_si128(simd, j * 4));
-      agg = _mm_add_ps(agg, (__m128)powers);
-    }
+    __m128i powers = inverse_power_avx(simd);
+    agg = _mm_add_ps(agg, (__m128)powers);
+
+    powers = inverse_power_avx(_mm_srli_si128(simd, 4));
+    agg = _mm_add_ps(agg, (__m128)powers);
+
+    powers = inverse_power_avx(_mm_srli_si128(simd, 8));
+    agg = _mm_add_ps(agg, (__m128)powers);
+
+    powers = inverse_power_avx(_mm_srli_si128(simd, 12));
+    agg = _mm_add_ps(agg, (__m128)powers);
 
     *n_zeros += _mm_cntz_epi8(simd);
   }
@@ -99,9 +106,9 @@ inline void hyperloglog_count_avx(const uint8_t *registers,
 
 #endif
 
-inline void hyperloglog_count_port(const uint8_t *registers,
-                                   uint32_t n_registers, float *inverse_sum,
-                                   uint32_t *n_zeros)
+static inline void hyperloglog_count_port(const uint8_t *registers,
+                                          uint32_t n_registers,
+                                          float *inverse_sum, uint32_t *n_zeros)
 
 {
   for (int i = 0; i < n_registers; ++i) {

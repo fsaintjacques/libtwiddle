@@ -4,6 +4,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+set -o xtrace
+
 function set_travis_compiler {
   if [[ -n "${CLANG_VERSION:-}" ]]; then
     export CC="clang-${CLANG_VERSION}" ;
@@ -16,18 +18,52 @@ function set_travis_compiler {
   fi
 }
 
-function prepare_build_dir {
-  mkdir -p build
+function run_tests {
+  local name=$1
 
-  # custom build cmake in path
-  if [[ -e ${PWD}/cmake ]]; then
-    export PATH=${PWD}/cmake/bin:${PATH}
+  local dir="build-${name}"
+
+  # if you change this, modify `python/twiddle/c.py` accordingly.
+  export BUILD_DIR=$dir
+
+  mkdir -p "$dir"
+
+  if [[ ${name:-} = "avx2" ]]; then
+    CMAKE_FLAGS="-DUSE_AVX2=ON ${CMAKE_FLAGS:-}"
+  elif [[ ${name:-} = "avx" ]]; then
+    CMAKE_FLAGS="-DUSE_AVX=ON ${CMAKE_FLAGS:-}"
   fi
 
-  cd build
-  cmake -DCMAKE_BUILD_TYPE=Debug ..
+  pushd $dir
+
+  cmake -DCMAKE_BUILD_TYPE=Debug ${CMAKE_FLAGS:-} ..
+
+  # unit tests
+  make all test VERBOSE=1
+  # property python tests
+  popd
+
+  pushd python
+  run_property_tests
+  popd
+
 }
 
+function run_property_tests {
+  if [[ ${TRAVIS_PULL_REQUEST:-} != "false" ]]; then
+    py_dir=.
+    venv_dir=${py_dir}/.venv
+    virtualenv ${venv_dir}
+    set +o nounset
+    source ${venv_dir}/bin/activate
+    set -o nounset
+    pip install pytest hypothesis==1.19.0
+    PYTHONPATH=${py_dir} py.test tests
+  fi
+}
+
+
 set_travis_compiler
-prepare_build_dir
-make all test VERBOSE=1
+
+run_tests portable
+run_tests avx

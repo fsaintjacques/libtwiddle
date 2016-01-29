@@ -1,7 +1,7 @@
 sudo: false
+
 matrix:
   include:
-
     - env: GCC_VERSION=4.8
       addons: &gcc48
         apt:
@@ -86,4 +86,4 @@ matrix:
 
 
 script:
-  - cd ${TRAVIS_BUILD_DIR} && tools/travis/test && tools/travis/python-test
+  - cd ${TRAVIS_BUILD_DIR} && tools/travis/test

@@ -45,13 +45,13 @@ inline void hyperloglog_count_avx2(const uint8_t *registers,
     __m256i sums = inverse_power_avx2(low);
     agg = _mm256_add_ps(agg, (__m256)sums);
 
-    sums = inverse_power_avx2(_mm_bsrli_si128(low, 8));
+    sums = inverse_power_avx2(_mm_srli_si128(low, 8));
     agg = _mm256_add_ps(agg, (__m256)sums);
 
     sums = inverse_power_avx2(high);
     agg = _mm256_add_ps(agg, (__m256)sums);
 
-    sums = inverse_power_avx2(_mm_bsrli_si128(high, 8));
+    sums = inverse_power_avx2(_mm_srli_si128(high, 8));
     agg = _mm256_add_ps(agg, (__m256)sums);
 
     *n_zeros += _mm256_cntz_epi8(simd);
@@ -87,7 +87,7 @@ inline void hyperloglog_count_avx(const uint8_t *registers,
     const __m128i simd = _mm_load_si128((__m128i *)registers + i);
 
     for (size_t j = 0; j < sizeof(__m128i) / sizeof(float); j++) {
-      const __m128i powers = inverse_power_avx(_mm_bsrli_si128(simd, j * 4));
+      const __m128i powers = inverse_power_avx(_mm_srli_si128(simd, j * 4));
       agg = _mm_add_ps(agg, (__m128)powers);
     }
 

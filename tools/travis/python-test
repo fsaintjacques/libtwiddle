@@ -15,7 +15,9 @@ function init_deps {
 
 
 function run_tests {
-  PYTHONPATH=. py.test tests
+  if [ ${TRAVIS_PULL_REQUEST:-} -ne false ]; then
+    PYTHONPATH=. py.test tests
+  fi
 }
 
 init_deps

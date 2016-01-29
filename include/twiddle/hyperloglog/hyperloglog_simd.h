@@ -26,9 +26,6 @@ static inline float horizontal_sum_avx2(__m256 x)
 #define inverse_power_avx2(simd)                                               \
   _mm256_sub_epi32(ones, _mm256_slli_epi32(_mm256_cvtepu8_epi32(simd), 23))
 
-/* https://gcc.gnu.org/ml/gcc-patches/2015-01/msg01199.html */
-#define _mm256_bsrli_si256(A, N)                                               \
-  ((__m256i)__builtin_ia32_psrldqi256((__m256i)(A), (int)(N)*8))
 static inline void hyperloglog_count_avx2(const uint8_t *registers,
                                           uint32_t n_registers,
                                           float *inverse_sum, uint32_t *n_zeros)

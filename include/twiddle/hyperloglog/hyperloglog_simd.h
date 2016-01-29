@@ -24,7 +24,7 @@ static inline float horizontal_sum_avx2(__m256 x)
       _mm256_movemask_epi8(_mm256_cmpeq_epi8(simd, _mm256_setzero_si256())))
 
 #define inverse_power_avx2(simd)                                               \
-  _mm256_sub_epi32(ones, _mm256_slli_epi32(_mm256_cvtepi8_epi32(simd), 23))
+  _mm256_sub_epi32(ones, _mm256_slli_epi32(_mm256_cvtepu8_epi32(simd), 23))
 
 /* https://gcc.gnu.org/ml/gcc-patches/2015-01/msg01199.html */
 #define _mm256_bsrli_si256(A, N)                                               \
@@ -74,7 +74,7 @@ static inline float horizontal_sum_avx(__m128 x)
       _mm_movemask_epi8(_mm_cmpeq_epi8(simd, _mm_setzero_si128())))
 
 #define inverse_power_avx(simd)                                                \
-  _mm_sub_epi32(ones, _mm_slli_epi32(_mm_cvtepi8_epi32(simd), 23))
+  _mm_sub_epi32(ones, _mm_slli_epi32(_mm_cvtepu8_epi32(simd), 23))
 
 static inline void hyperloglog_count_avx(const uint8_t *registers,
                                          uint32_t n_registers,

@@ -5,9 +5,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define hll_t uint8_t
-#define TW_BYTES_PER_HLL sizeof(hll_t)
-#define TW_BITS_PER_HLL (TW_BYTES_PER_HLL * TW_BITS_IN_WORD)
+#define TW_BYTES_PER_HLL_REGISTER sizeof(uint8_t)
+#define TW_BITS_PER_HLL_REGISTER (TW_BYTES_PER_HLL * TW_BITS_IN_WORD)
 #define TW_HLL_BITS_PER_REG 6
 #define TW_HLL_REG_PER_HLL (TW_BITS_PER_HLL / TW_HLL_BITS_PER_REG)
 

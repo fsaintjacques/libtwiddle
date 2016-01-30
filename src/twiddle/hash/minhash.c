@@ -59,12 +59,12 @@ void tw_minhash_add(struct tw_minhash *hash, size_t key_size,
 {
   assert(hash && key_size > 0 && key_buf);
 
-  const tw_uint128_t hashed =
-      tw_metrohash_128(hash->info.hash_seed, key_buf, key_size);
+  const uint64_t hashed =
+      tw_metrohash_64(hash->info.hash_seed, key_buf, key_size);
 
   const uint32_t n_registers = hash->info.n_registers;
   for (size_t i = 0; i < n_registers; ++i) {
-    const uint64_t hashed_i = (hashed.h + i * hashed.l);
+    const uint32_t hashed_i = ((uint32_t)hashed + i * (uint32_t)(hashed >> 32));
     hash->registers[i] = tw_max(hash->registers[i], hashed_i);
   }
 }

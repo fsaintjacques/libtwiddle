@@ -20,7 +20,7 @@ struct tw_minhash_info {
 #define tw_minhash_info_equal(a, b)                                            \
   (a.n_registers == b.n_registers && a.hash_seed == b.hash_seed)
 
-#define TW_BYTES_PER_MINHASH_REGISTER sizeof(uint64_t)
+#define TW_BYTES_PER_MINHASH_REGISTER sizeof(uint32_t)
 
 /**
  * struct tw_minhash - minhash data structure
@@ -29,7 +29,7 @@ struct tw_minhash_info {
  */
 struct tw_minhash {
   struct tw_minhash_info info;
-  uint64_t registers[];
+  uint32_t registers[];
 };
 
 #define TW_MINHASH_DEFAULT_SEED 18014475172444421775ULL

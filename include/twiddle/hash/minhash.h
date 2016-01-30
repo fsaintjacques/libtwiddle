@@ -29,7 +29,7 @@ struct tw_minhash_info {
  */
 struct tw_minhash {
   struct tw_minhash_info info;
-  uint32_t registers[];
+  uint32_t *registers;
 };
 
 #define TW_MINHASH_DEFAULT_SEED 18014475172444421775ULL
@@ -40,6 +40,9 @@ struct tw_minhash {
  *
  * Return: NULL if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_minhash`.
+ *
+ * Note: The allocation will be rounded up to the closest multiple of a
+ *       cacheline.
  */
 struct tw_minhash *tw_minhash_new(uint32_t n_registers);
 

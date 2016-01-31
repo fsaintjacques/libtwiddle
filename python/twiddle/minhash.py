@@ -29,7 +29,7 @@ class MinHash(object):
 
   def add(self, x):
     h = pointer(c_long(hash(x)))
-    libtwiddle.tw_minhash_add(self.minhash, 8, h)
+    libtwiddle.tw_minhash_add(self.minhash, h, 8)
 
 
   def __eq__(self, other):

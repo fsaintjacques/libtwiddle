@@ -284,7 +284,7 @@ libtwiddle.tw_minhash_copy.restype  = c_void_p
 libtwiddle.tw_minhash_clone.argtypes = [c_void_p]
 libtwiddle.tw_minhash_clone.restype  = c_void_p
 
-libtwiddle.tw_minhash_add.argtypes = [c_void_p, c_uint, c_void_p]
+libtwiddle.tw_minhash_add.argtypes = [c_void_p, c_void_p, c_ulong]
 libtwiddle.tw_minhash_add.restype  = None
 
 libtwiddle.tw_minhash_estimate.argtypes = [c_void_p, c_void_p]

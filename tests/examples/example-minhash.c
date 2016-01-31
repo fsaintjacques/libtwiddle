@@ -13,12 +13,14 @@ int main(int argc, char *argv[])
 
   const uint32_t n_elems = 10 * n_registers;
   for (int i = 0; i < n_elems; ++i) {
+    const size_t key_size = sizeof(i);
+    const void *key = (void *)&i;
     if (i % 3 == 0) {
-      tw_minhash_add(a, sizeof(i), (char *)&i);
+      tw_minhash_add(a, key, key_size);
     }
 
     if (i % 5 == 0) {
-      tw_minhash_add(b, sizeof(i), (char *)&i);
+      tw_minhash_add(b, key, key_size);
     }
   }
 

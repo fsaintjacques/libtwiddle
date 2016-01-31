@@ -66,13 +66,11 @@ struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash)
   return tw_minhash_copy(hash, copy);
 }
 
-void tw_minhash_add(struct tw_minhash *hash, size_t key_size,
-                    const char *key_buf)
+void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
 {
-  assert(hash && key_size > 0 && key_buf);
+  assert(hash && key && key_size > 0);
 
-  const uint64_t hashed =
-      tw_metrohash_64(hash->info.hash_seed, key_buf, key_size);
+  const uint64_t hashed = tw_metrohash_64(hash->info.hash_seed, key, key_size);
 
   const uint32_t n_registers = hash->info.n_registers;
   for (size_t i = 0; i < n_registers; ++i) {

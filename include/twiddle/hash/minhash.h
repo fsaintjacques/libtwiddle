@@ -74,8 +74,13 @@ struct tw_minhash *tw_minhash_copy(const struct tw_minhash *src,
  */
 struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash);
 
-void tw_minhash_add(struct tw_minhash *hash, size_t key_size,
-                    const char *key_buf);
+/**
+ * tw_minhash_add() - add an element into a minhash structure
+ * @hash:     minhash to add
+ * @key:      buffer of the key to add
+ * @key_size: size of the buffer of the key to add
+ */
+void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size);
 
 /**
  * tw_minhash_estimate() - estimate the jaccard index between two minhash.

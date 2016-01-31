@@ -10,10 +10,13 @@
 #ifndef TW_VECTOR_SIZE
 #ifdef USE_AVX512
 #define TW_VECTOR_SIZE 64
+#define TW_VECTOR_SIZE_BITS 512
 #elif USE_AVX2
 #define TW_VECTOR_SIZE 32
+#define TW_VECTOR_SIZE_BITS 256
 #else
 #define TW_VECTOR_SIZE 16
+#define TW_VECTOR_SIZE_BITS 128
 #endif
 #endif
 

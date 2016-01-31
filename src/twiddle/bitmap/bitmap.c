@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <x86intrin.h>
 
 #include <twiddle/bitmap/bitmap.h>
 
@@ -25,16 +26,17 @@ struct tw_bitmap *tw_bitmap_new(uint64_t size)
     return NULL;
   }
 
-  const size_t data_size = TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP;
+  const size_t data_size =
+      TW_ALLOC_TO_CACHELINE(TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP);
 
-  if (posix_memalign((void *)&(bitmap->data), sizeof(bitmap_t), data_size)) {
+  if (posix_memalign((void *)&(bitmap->data), TW_CACHELINE, data_size)) {
     free(bitmap);
     return NULL;
   }
 
   memset(bitmap->data, 0, data_size);
 
-  bitmap->info = tw_bitmap_info_init(size);
+  bitmap->info = tw_bitmap_info_init(data_size * TW_BITS_IN_WORD);
   return bitmap;
 }
 
@@ -119,7 +121,7 @@ bool tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint64_t pos)
   const bool changed = (old_bitmap != new_bitmap);
   bitmap->info.count += changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
-  return changed ? 0 : 1;
+  return !changed;
 }
 
 bool tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
@@ -131,7 +133,7 @@ bool tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
   const bool changed = (old_bitmap != new_bitmap);
   bitmap->info.count -= changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
-  return changed ? 1 : 0;
+  return changed;
 }
 
 bool tw_bitmap_empty(const struct tw_bitmap *bitmap)
@@ -232,20 +234,48 @@ int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
   return -1;
 }
 
+#define BITMAP_NOT_LOOP(simd_t, simd_set1, simd_load, simd_xor, simd_store)    \
+  const simd_t mask = simd_set1(~0);                                           \
+  for (size_t i = 0; i < TW_VECTOR_PER_BITS(bitmap->info.size); ++i) {         \
+    simd_t *addr = (simd_t *)bitmap->data + i;                                 \
+    const simd_t src = simd_load(addr);                                        \
+    const simd_t res = simd_xor(src, mask);                                    \
+    simd_store(addr, res);                                                     \
+  }
+
 struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
+#ifdef USE_AVX512
+  BITMAP_NOT_LOOP(__m512i, _mm512_set1_epi8, _mm512_load_si512,
+                  _mm512_xor_si512, _mm512_store_si512)
+#elif USE_AVX2
+  BITMAP_NOT_LOOP(__m256i, _mm256_set1_epi8, _mm256_load_si256,
+                  _mm256_xor_si256, _mm256_store_si256)
+#elif USE_AVX
+  BITMAP_NOT_LOOP(__m128i, _mm_set1_epi8, _mm_load_si128, _mm_xor_si128,
+                  _mm_store_si128)
+#else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
     bitmap->data[i] ^= ~0UL;
   }
-
-  tw_bitmap_clear_extra_bits(bitmap);
+#endif
 
   bitmap->info.count = bitmap->info.size - bitmap->info.count;
 
   return bitmap;
 }
+
+#define BITMAP_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)  \
+  for (size_t i = 0; i < size / (sizeof(simd_t) * TW_BITS_IN_WORD); ++i) {     \
+    simd_t *a_addr = (simd_t *)a->data + i, *b_addr = (simd_t *)b->data + i;   \
+    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
+    const int h_cmp = simd_maskmove(v_cmp);                                    \
+    if (h_cmp != eq_mask) {                                                    \
+      return false;                                                            \
+    }                                                                          \
+  }
 
 bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
 {
@@ -255,14 +285,37 @@ bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
     return false;
   }
 
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(a->info.size); ++i) {
+  const uint64_t size = a->info.size;
+
+/* AVX512 does not have movemask_epi8 equivalent, fallback to AVX2 */
+#if USE_AVX2
+  BITMAP_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi8,
+                 _mm256_movemask_epi8, 0xFFFFFFFF)
+#elif USE_AVX
+  BITMAP_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
+                 0xFFFF)
+#else
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     if (a->data[i] != b->data[i]) {
       return false;
     }
   }
+#endif
 
   return true;
 }
+
+#define BITMAP_OP_LOOP(simd_t, simd_load, simd_op, simd_store)                 \
+  const size_t uint64_t_per_simd_t = sizeof(simd_t) / sizeof(uint64_t);        \
+  for (size_t i = 0; i < size / (sizeof(simd_t) * TW_BITS_IN_WORD); ++i) {     \
+    simd_t *src_vec = (simd_t *)src->data + i,                                 \
+           *dst_vec = (simd_t *)dst->data + i;                                 \
+    const simd_t res = simd_op(simd_load(src_vec), simd_load(dst_vec));        \
+    simd_store(dst_vec, res);                                                  \
+    for (size_t j = 0; j < uint64_t_per_simd_t; j++) {                         \
+      count += tw_popcountl(dst->data[i * uint64_t_per_simd_t + j]);           \
+    }                                                                          \
+  }
 
 struct tw_bitmap *tw_bitmap_union(const struct tw_bitmap *src,
                                   struct tw_bitmap *dst)
@@ -273,11 +326,23 @@ struct tw_bitmap *tw_bitmap_union(const struct tw_bitmap *src,
     return NULL;
   }
 
+  const uint64_t size = src->info.size;
+
   uint64_t count = 0;
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
+#if USE_AVX512
+  BITMAP_OP_LOOP(__m512i, _mm512_load_si512, _mm512_or_si512,
+                 _mm512_store_si512)
+#elif USE_AVX2
+  BITMAP_OP_LOOP(__m256i, _mm256_load_si256, _mm256_or_si256,
+                 _mm256_store_si256)
+#elif USE_AVX
+  BITMAP_OP_LOOP(__m128i, _mm_load_si128, _mm_or_si128, _mm_store_si128)
+#else
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     dst->data[i] |= src->data[i];
     count += tw_popcountl(dst->data[i]);
   }
+#endif
 
   dst->info.count = count;
 
@@ -293,11 +358,23 @@ struct tw_bitmap *tw_bitmap_intersection(const struct tw_bitmap *src,
     return NULL;
   }
 
+  const uint64_t size = src->info.size;
+
   uint64_t count = 0;
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
+#if USE_AVX512
+  BITMAP_OP_LOOP(__m512i, _mm512_load_si512, _mm512_and_si512,
+                 _mm512_store_si512)
+#elif USE_AVX2
+  BITMAP_OP_LOOP(__m256i, _mm256_load_si256, _mm256_and_si256,
+                 _mm256_store_si256)
+#elif USE_AVX
+  BITMAP_OP_LOOP(__m128i, _mm_load_si128, _mm_and_si128, _mm_store_si128)
+#else
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     dst->data[i] &= src->data[i];
     count += tw_popcountl(dst->data[i]);
   }
+#endif
 
   dst->info.count = count;
 
@@ -313,11 +390,23 @@ struct tw_bitmap *tw_bitmap_xor(const struct tw_bitmap *src,
     return NULL;
   }
 
+  const uint64_t size = src->info.size;
+
   uint64_t count = 0;
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(src->info.size); ++i) {
+#if USE_AVX512
+  BITMAP_OP_LOOP(__m512i, _mm512_load_si512, _mm512_xor_si512,
+                 _mm512_store_si512)
+#elif USE_AVX2
+  BITMAP_OP_LOOP(__m256i, _mm256_load_si256, _mm256_xor_si256,
+                 _mm256_store_si256)
+#elif USE_AVX
+  BITMAP_OP_LOOP(__m128i, _mm_load_si128, _mm_xor_si128, _mm_store_si128)
+#else
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     dst->data[i] ^= src->data[i];
     count += tw_popcountl(dst->data[i]);
   }
+#endif
 
   dst->info.count = count;
 

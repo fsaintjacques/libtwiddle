@@ -1220,11 +1220,11 @@ double alpha(uint32_t n_registers, uint8_t precision)
   }
 }
 
-double estimate(uint8_t precision, uint32_t n_zeros, double inverse_sum)
+double estimate(uint8_t precision, uint32_t n_zeros, float inverse_sum)
 {
   const uint32_t n_registers = 1 << precision;
   const double e = alpha(n_registers, precision) * n_registers * n_registers *
-                   (1.0 / inverse_sum);
+                   (1.0 / (double)inverse_sum);
   const double e_b =
       e - ((e <= 5 * n_registers) ? estimate_bias(precision, e) : 0.0);
   const double e_l = (n_zeros) ? linear_count(n_registers, n_zeros) : e_b;

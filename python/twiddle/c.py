@@ -7,8 +7,9 @@ def find_twiddle_so():
 
   if not libpath:
     travis_home_dir = environ.get("TRAVIS_BUILD_DIR")
+    build_dir = path.join(travis_home_dir, environ.get("BUILD_DIR"))
     if travis_home_dir:
-      libpath = path.join(travis_home_dir, "build", "src", "libtwiddle.so")
+      libpath = path.join(build_dir, "src", "libtwiddle.so")
     else:
       raise ImportError("Couldn't find libtwiddle.so")
 

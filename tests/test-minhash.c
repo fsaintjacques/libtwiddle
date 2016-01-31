@@ -100,7 +100,8 @@ START_TEST(test_minhash_merge)
 {
   DESCRIBE_TEST;
 
-  const uint32_t sizes[] = {256, 512, 1024, 2048, 4096, 1 << 13};
+  const uint32_t sizes[] = {16,  32,   64,   128,  256,
+                            512, 1024, 2048, 4096, 1 << 13};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     const int32_t n_registers = sizes[i];
@@ -120,6 +121,12 @@ START_TEST(test_minhash_merge)
 
     struct tw_minhash *u = tw_minhash_clone(a);
     ck_assert(tw_minhash_merge(b, u) != NULL);
+
+    for (size_t j = 0; j < n_registers; j++) {
+      bool same_value =
+          tw_max(a->registers[j], b->registers[j]) == u->registers[j];
+      ck_assert(same_value);
+    }
 
     ck_assert(estimate_in_bounds(n_registers, 0.5, tw_minhash_estimate(a, u)));
     ck_assert(estimate_in_bounds(n_registers, 0.5, tw_minhash_estimate(b, u)));
@@ -143,6 +150,8 @@ int run_tests()
   tcase_add_test(tc, test_minhash_basic);
   tcase_add_test(tc, test_minhash_copy_and_clone);
   tcase_add_test(tc, test_minhash_merge);
+  /* added for travis slowness of clang */
+  tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

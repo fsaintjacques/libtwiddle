@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <x86intrin.h>
 
 #include <twiddle/internal/utils.h>
 #include <twiddle/hash/minhash.h>
@@ -12,19 +13,30 @@ struct tw_minhash *tw_minhash_new(uint32_t n_registers)
     return NULL;
   }
 
-  struct tw_minhash *hash =
-      calloc(1, sizeof(struct tw_minhash) +
-                    TW_BYTES_PER_MINHASH_REGISTER * n_registers);
+  struct tw_minhash *hash = calloc(1, sizeof(struct tw_minhash));
   if (!hash) {
     return NULL;
   }
 
-  hash->info = tw_minhash_info_init(n_registers, TW_MINHASH_DEFAULT_SEED);
+  const size_t data_size =
+      TW_ALLOC_TO_CACHELINE(n_registers * TW_BYTES_PER_MINHASH_REGISTER);
 
+  if (posix_memalign((void *)&(hash->registers), TW_CACHELINE, data_size)) {
+    free(hash);
+    return NULL;
+  }
+
+  memset(hash->registers, 0, data_size);
+
+  hash->info = tw_minhash_info_init(n_registers, TW_MINHASH_DEFAULT_SEED);
   return hash;
 }
 
-void tw_minhash_free(struct tw_minhash *hash) { free(hash); }
+void tw_minhash_free(struct tw_minhash *hash)
+{
+  free(hash->registers);
+  free(hash);
+}
 
 struct tw_minhash *tw_minhash_copy(const struct tw_minhash *src,
                                    struct tw_minhash *dst)
@@ -59,12 +71,12 @@ void tw_minhash_add(struct tw_minhash *hash, size_t key_size,
 {
   assert(hash && key_size > 0 && key_buf);
 
-  const tw_uint128_t hashed =
-      tw_metrohash_128(hash->info.hash_seed, key_buf, key_size);
+  const uint64_t hashed =
+      tw_metrohash_64(hash->info.hash_seed, key_buf, key_size);
 
   const uint32_t n_registers = hash->info.n_registers;
   for (size_t i = 0; i < n_registers; ++i) {
-    const uint64_t hashed_i = (hashed.h + i * hashed.l);
+    const uint32_t hashed_i = ((uint32_t)hashed + i * (uint32_t)(hashed >> 32));
     hash->registers[i] = tw_max(hash->registers[i], hashed_i);
   }
 }
@@ -79,12 +91,32 @@ float tw_minhash_estimate(const struct tw_minhash *a,
   }
 
   const uint32_t n_registers = a->info.n_registers;
-  uint32_t registers_equal = 0;
-  for (int i = 0; i < n_registers; ++i) {
-    registers_equal += (a->registers[i] == b->registers[i]);
+  uint32_t n_registers_eq = 0;
+
+#define MINH_EST_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)   \
+  const size_t n_vectors =                                                     \
+      n_registers * TW_BYTES_PER_MINHASH_REGISTER / sizeof(simd_t);            \
+  for (size_t i = 0; i < n_vectors; ++i) {                                     \
+    simd_t *a_addr = (simd_t *)a->registers + i,                               \
+           *b_addr = (simd_t *)b->registers + i;                               \
+    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
+    const int h_cmp = simd_maskmove(v_cmp);                                    \
+    n_registers_eq += __builtin_popcount(h_cmp & eq_mask);                     \
   }
 
-  return (float)registers_equal / (float)n_registers;
+#if USE_AVX2
+  MINH_EST_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
+                _mm256_movemask_epi8, 0x11111111)
+#elif USE_AVX
+  MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
+                0x1111)
+#else
+  for (int i = 0; i < n_registers; ++i) {
+    n_registers_eq += (a->registers[i] == b->registers[i]);
+  }
+#endif
+
+  return (float)n_registers_eq / (float)n_registers;
 }
 
 bool tw_minhash_equal(const struct tw_minhash *a, const struct tw_minhash *b)
@@ -96,11 +128,33 @@ bool tw_minhash_equal(const struct tw_minhash *a, const struct tw_minhash *b)
   }
 
   const uint32_t n_registers = a->info.n_registers;
+
+#define MINH_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)    \
+  const size_t n_vectors =                                                     \
+      n_registers * TW_BYTES_PER_MINHASH_REGISTER / sizeof(simd_t);            \
+  for (size_t i = 0; i < n_vectors; ++i) {                                     \
+    simd_t *a_addr = (simd_t *)a->registers + i,                               \
+           *b_addr = (simd_t *)b->registers + i;                               \
+    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
+    const int h_cmp = simd_maskmove(v_cmp);                                    \
+    if (h_cmp != eq_mask) {                                                    \
+      return false;                                                            \
+    }                                                                          \
+  }
+
+#if USE_AVX2
+  MINH_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
+               _mm256_movemask_epi8, 0xFFFFFFFF)
+#elif USE_AVX
+  MINH_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
+               0xFFFF)
+#else
   for (int i = 0; i < n_registers; ++i) {
     if (a->registers[i] != b->registers[i]) {
       return false;
     }
   }
+#endif
 
   return true;
 }
@@ -115,9 +169,30 @@ struct tw_minhash *tw_minhash_merge(const struct tw_minhash *src,
   }
 
   const uint32_t n_registers = src->info.n_registers;
+
+#define MINH_MAX_LOOP(simd_t, simd_load, simd_max, simd_store)                 \
+  const size_t n_vectors =                                                     \
+      n_registers * TW_BYTES_PER_MINHASH_REGISTER / sizeof(simd_t);            \
+  for (size_t i = 0; i < n_vectors; ++i) {                                     \
+    simd_t *src_vec = (simd_t *)src->registers + i,                            \
+           *dst_vec = (simd_t *)dst->registers + i;                            \
+    const simd_t res = simd_max(simd_load(src_vec), simd_load(dst_vec));       \
+    simd_store(dst_vec, res);                                                  \
+  }
+
+#if USE_AVX512
+  MINH_MAX_LOOP(__m512i, _mm512_load_si512, _mm512_max_epu32,
+                _mm512_store_si512)
+#elif USE_AVX2
+  MINH_MAX_LOOP(__m256i, _mm256_load_si256, _mm256_max_epu32,
+                _mm256_store_si256)
+#elif USE_AVX
+  MINH_MAX_LOOP(__m128i, _mm_load_si128, _mm_max_epu32, _mm_store_si128)
+#else
   for (int i = 0; i < n_registers; ++i) {
     dst->registers[i] = tw_max(dst->registers[i], src->registers[i]);
   }
+#endif
 
   return dst;
 }

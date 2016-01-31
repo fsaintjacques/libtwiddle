@@ -24,13 +24,17 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 
 if(USE_AVX512)
-  add_definitions(-DUSE_AVX512=1)
+  add_definitions(-DUSE_AVX512=1 -mavx512f)
+  add_definitions(-DUSE_AVX2=1 -mavx2)
+  add_definitions(-DUSE_AVX=1 -mavx)
+elseif(USE_AVX2)
+  add_definitions(-DUSE_AVX2=1 -mavx2)
+  add_definitions(-DUSE_AVX=1 -mavx)
+elseif(USE_AVX)
+  add_definitions(-DUSE_AVX=1 -mavx)
+else()
+  add_definitions(-DUSE_PORTABLE=1)
 endif()
-
-if(USE_AVX2)
-  add_definitions(-DUSE_AVX2=1)
-endif()
-
 
 # strict compile options
 add_definitions(-Wall -Werror -pedantic)

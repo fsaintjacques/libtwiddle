@@ -1,8 +1,10 @@
 #include <assert.h>
 #include <math.h>
 #include <string.h>
+#include <x86intrin.h>
 
 #include <twiddle/hyperloglog/hyperloglog.h>
+#include <twiddle/hyperloglog/hyperloglog_simd.h>
 #include <twiddle/hash/metrohash.h>
 #include <twiddle/internal/utils.h>
 
@@ -17,9 +19,9 @@ struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
     return NULL;
   }
 
-  size_t alloc_size = (1 << precision) * sizeof(uint8_t);
+  size_t alloc_size = TW_ALLOC_TO_CACHELINE(1 << precision) * sizeof(uint8_t);
 
-  if (posix_memalign((void *)&hll->registers, sizeof(uint64_t), alloc_size)) {
+  if (posix_memalign((void *)&hll->registers, TW_CACHELINE, alloc_size)) {
     free(hll);
     return NULL;
   }
@@ -52,9 +54,8 @@ struct tw_hyperloglog *tw_hyperloglog_copy(const struct tw_hyperloglog *src,
   tw_hyperloglog_info_copy(src->info, dst->info);
 
   const uint32_t n_registers = 1 << precision;
-  for (int i = 0; i < n_registers; ++i) {
-    dst->registers[i] = src->registers[i];
-  }
+  memcpy(dst->registers, src->registers,
+         n_registers * TW_BYTES_PER_HLL_REGISTER);
 
   return dst;
 }
@@ -92,7 +93,21 @@ void tw_hyperloglog_add(struct tw_hyperloglog *hll, size_t key_size,
   tw_hyperloglog_add_hashed(hll, hash);
 }
 
-extern double estimate(uint8_t precision, uint32_t n_zeros, double inverse_sum);
+extern double estimate(uint8_t precision, uint32_t n_zeros, float inverse_sum);
+
+#if USE_AVX2
+extern void hyperloglog_count_avx2(const uint8_t *registers,
+                                   uint32_t n_registers, float *inverse_sum,
+                                   uint32_t *n_zeros);
+#elif USE_AVX
+extern void hyperloglog_count_avx(const uint8_t *registers,
+                                  uint32_t n_registers, float *inverse_sum,
+                                  uint32_t *n_zeros);
+#else
+extern void hyperloglog_count_port(const uint8_t *registers,
+                                   uint32_t n_registers, float *inverse_sum,
+                                   uint32_t *n_zeros);
+#endif
 
 double tw_hyperloglog_count(const struct tw_hyperloglog *hll)
 {
@@ -101,15 +116,15 @@ double tw_hyperloglog_count(const struct tw_hyperloglog *hll)
   const uint8_t precision = hll->info.precision;
   const uint32_t n_registers = 1 << precision;
   uint32_t n_zeros = 0;
-  double inverse_sum = 0.0;
+  float inverse_sum = 0.0;
 
-  for (int i = 0; i < n_registers; ++i) {
-    const uint8_t val = hll->registers[i];
-    inverse_sum += pow(2, -1.0 * val);
-    if (val == 0) {
-      ++n_zeros;
-    }
-  }
+#if USE_AVX2
+  hyperloglog_count_avx2(hll->registers, n_registers, &inverse_sum, &n_zeros);
+#elif USE_AVX
+  hyperloglog_count_avx(hll->registers, n_registers, &inverse_sum, &n_zeros);
+#else
+  hyperloglog_count_port(hll->registers, n_registers, &inverse_sum, &n_zeros);
+#endif
 
   return estimate(precision, n_zeros, inverse_sum);
 }
@@ -126,11 +141,31 @@ bool tw_hyperloglog_equal(const struct tw_hyperloglog *a,
   const uint8_t precision = a->info.precision;
   const uint32_t n_registers = 1 << precision;
 
+#define HLL_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)     \
+  for (size_t i = 0; i < n_registers / (sizeof(simd_t)); ++i) {                \
+    simd_t *a_addr = (simd_t *)a->registers + i,                               \
+           *b_addr = (simd_t *)b->registers + i;                               \
+    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
+    const int h_cmp = simd_maskmove(v_cmp);                                    \
+    if (h_cmp != eq_mask) {                                                    \
+      return false;                                                            \
+    }                                                                          \
+  }
+
+/* AVX512 does not have movemask_epi8 equivalent, fallback to AVX2 */
+#if USE_AVX2
+  HLL_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi8,
+              _mm256_movemask_epi8, 0xFFFFFFFF)
+#elif USE_AVX
+  HLL_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
+              0xFFFF)
+#else
   for (int i = 0; i < n_registers; ++i) {
     if (a->registers[i] != b->registers[i]) {
       return false;
     }
   }
+#endif
 
   return true;
 }
@@ -145,11 +180,26 @@ struct tw_hyperloglog *tw_hyperloglog_merge(const struct tw_hyperloglog *src,
   }
 
   const uint32_t n_registers = 1 << src->info.precision;
-  for (int i = 0; i < n_registers; ++i) {
-    dst->registers[i] = (dst->registers[i] < src->registers[i])
-                            ? src->registers[i]
-                            : dst->registers[i];
+
+#define HLL_MAX_LOOP(simd_t, simd_load, simd_max, simd_store)                  \
+  for (size_t i = 0; i < n_registers / sizeof(simd_t); ++i) {                  \
+    simd_t *src_vec = (simd_t *)src->registers + i,                            \
+           *dst_vec = (simd_t *)dst->registers + i;                            \
+    const simd_t res = simd_max(simd_load(src_vec), simd_load(dst_vec));       \
+    simd_store(dst_vec, res);                                                  \
   }
+
+#if USE_AVX512
+  HLL_MAX_LOOP(__m512i, _mm512_load_si512, _mm512_max_epu8, _mm512_store_si512)
+#elif USE_AVX2
+  HLL_MAX_LOOP(__m256i, _mm256_load_si256, _mm256_max_epu8, _mm256_store_si256)
+#elif USE_AVX
+  HLL_MAX_LOOP(__m128i, _mm_load_si128, _mm_max_epu8, _mm_store_si128)
+#else
+  for (int i = 0; i < n_registers; ++i) {
+    dst->registers[i] = tw_max(src->registers[i], dst->registers[i]);
+  }
+#endif
 
   return dst;
 }

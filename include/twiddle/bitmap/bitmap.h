@@ -21,8 +21,6 @@
  * Computes the number of required `bitmap_t` to hold `nbits` bits.
  */
 #define TW_BITMAP_PER_BITS(nbits) TW_DIV_ROUND_UP(nbits, TW_BITS_PER_BITMAP)
-#define TW_VECTOR_PER_BITS(nbits)                                              \
-  TW_DIV_ROUND_UP(nbits, TW_VECTOR_SIZE *TW_BITS_IN_WORD)
 #define TW_BITMAP_POS(nbits) (nbits / TW_BITS_PER_BITMAP)
 
 #define TW_BITMAP_MAX_BITS (1UL << 48)

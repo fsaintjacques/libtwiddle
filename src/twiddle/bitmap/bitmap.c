@@ -236,7 +236,7 @@ int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
 
 #define BITMAP_NOT_LOOP(simd_t, simd_set1, simd_load, simd_xor, simd_store)    \
   const simd_t mask = simd_set1(~0);                                           \
-  for (size_t i = 0; i < TW_VECTOR_PER_BITS(bitmap->info.size); ++i) {         \
+  for (size_t i = 0; i < size / (sizeof(simd_t) * TW_BITS_IN_WORD); ++i) {     \
     simd_t *addr = (simd_t *)bitmap->data + i;                                 \
     const simd_t src = simd_load(addr);                                        \
     const simd_t res = simd_xor(src, mask);                                    \
@@ -246,6 +246,8 @@ int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
 struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
+
+  const uint64_t size = bitmap->info.size;
 
 #ifdef USE_AVX512
   BITMAP_NOT_LOOP(__m512i, _mm512_set1_epi8, _mm512_load_si512,
@@ -257,7 +259,7 @@ struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
   BITMAP_NOT_LOOP(__m128i, _mm_set1_epi8, _mm_load_si128, _mm_xor_si128,
                   _mm_store_si128)
 #else
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     bitmap->data[i] ^= ~0UL;
   }
 #endif

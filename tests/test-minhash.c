@@ -150,6 +150,8 @@ int run_tests()
   tcase_add_test(tc, test_minhash_basic);
   tcase_add_test(tc, test_minhash_copy_and_clone);
   tcase_add_test(tc, test_minhash_merge);
+  /* added for travis slowness of clang */
+  tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

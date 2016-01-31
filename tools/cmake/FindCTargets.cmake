@@ -203,6 +203,9 @@ function(add_c_test TEST_NAME)
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
     add_test(${TEST_NAME} ${TEST_NAME})
+    if (USE_VALGRIND)
+      add_test(${TEST_NAME}-valgrind valgrind --quiet ./${TEST_NAME})
+    endif(USE_VALGRIND)
 endfunction(add_c_test)
 
 function(add_c_example EXAMPLE_NAME)

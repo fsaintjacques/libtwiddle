@@ -6,6 +6,8 @@ set -o pipefail
 
 set -o xtrace
 
+: ${BUILD_TYPE:=Release}
+
 function set_travis_compiler {
   if [[ -n "${CLANG_VERSION:-}" ]]; then
     export CC="clang-${CLANG_VERSION}" ;
@@ -28,15 +30,24 @@ function run_tests {
 
   mkdir -p "$dir"
 
-  if [[ ${name:-} = "avx2" ]]; then
-    CMAKE_FLAGS="-DUSE_AVX2=ON ${CMAKE_FLAGS:-}"
+  if [[ ${name:-} = "avx512" ]]; then
+    CMAKE_FLAGS="-DUSE_AVX512=ON"
+  elif [[ ${name:-} = "avx2" ]]; then
+    CMAKE_FLAGS="-DUSE_AVX2=ON"
   elif [[ ${name:-} = "avx" ]]; then
-    CMAKE_FLAGS="-DUSE_AVX=ON ${CMAKE_FLAGS:-}"
+    CMAKE_FLAGS="-DUSE_AVX=ON"
+  else
+    # valgrind seems to fail on avx instruction in travis
+    CMAKE_FLAGS="-DUSE_VALGRIND=ON"
   fi
 
   pushd $dir
 
-  cmake -DCMAKE_BUILD_TYPE=Debug ${CMAKE_FLAGS:-} ..
+  cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+        ${CMAKE_FLAGS:-} ..
+
+  # disable FORK (and incidently timeouts)
+  export CK_FORK=no
 
   # unit tests
   make all test VERBOSE=1

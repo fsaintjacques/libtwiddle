@@ -78,23 +78,23 @@ static inline bool tw_bloomfilter_a2_rotate_(struct tw_bloomfilter_a2 *bf)
   return false;
 }
 
-void tw_bloomfilter_a2_set(struct tw_bloomfilter_a2 *bf, size_t size,
-                           const char *buf)
+void tw_bloomfilter_a2_set(struct tw_bloomfilter_a2 *bf, const void *key,
+                           size_t key_size)
 {
-  assert(bf && buf && size > 0);
+  assert(bf && key && key_size > 0);
 
   tw_bloomfilter_a2_rotate_(bf);
 
-  tw_bloomfilter_set(bf->active, size, buf);
+  tw_bloomfilter_set(bf->active, key, key_size);
 }
 
-bool tw_bloomfilter_a2_test(const struct tw_bloomfilter_a2 *bf, size_t size,
-                            const char *buf)
+bool tw_bloomfilter_a2_test(const struct tw_bloomfilter_a2 *bf, const void *key,
+                            size_t key_size)
 {
-  assert(bf && buf && size > 0);
+  assert(bf && key && key_size > 0);
 
-  return tw_bloomfilter_test(bf->active, size, buf) ||
-         tw_bloomfilter_test(bf->passive, size, buf);
+  return tw_bloomfilter_test(bf->active, key, key_size) ||
+         tw_bloomfilter_test(bf->passive, key, key_size);
 }
 
 bool tw_bloomfilter_a2_empty(const struct tw_bloomfilter_a2 *bf)

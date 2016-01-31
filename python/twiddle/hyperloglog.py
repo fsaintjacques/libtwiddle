@@ -33,7 +33,7 @@ class HyperLogLog(object):
 
   def add(self, x):
     h = pointer(c_long(hash(x)))
-    libtwiddle.tw_hyperloglog_add(self.hyperloglog, 8, h)
+    libtwiddle.tw_hyperloglog_add(self.hyperloglog, h, 8)
 
 
   def __eq__(self, other):

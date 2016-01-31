@@ -23,15 +23,15 @@ START_TEST(test_bloomfilter_basic)
 
       for (size_t j = 0; j < TW_ARRAY_SIZE(values); ++j) {
         const char *value = values[j];
-        tw_bloomfilter_set(bf, strlen(value), value);
-        ck_assert(tw_bloomfilter_test(bf, strlen(value), value));
+        tw_bloomfilter_set(bf, value, strlen(value));
+        ck_assert(tw_bloomfilter_test(bf, value, strlen(value)));
       }
 
       /**
        * This is prone to failure and may be removed if causing problem.
        */
       const char *not_there = "oups!";
-      ck_assert(!tw_bloomfilter_test(bf, strlen(not_there), not_there));
+      ck_assert(!tw_bloomfilter_test(bf, not_there, strlen(not_there)));
 
       tw_bloomfilter_free(bf);
     }
@@ -57,7 +57,7 @@ START_TEST(test_bloomfilter_copy_and_clone)
 
       for (size_t j = 0; j < TW_ARRAY_SIZE(values); ++j) {
         const char *value = values[j];
-        tw_bloomfilter_set(bf, strlen(value), value);
+        tw_bloomfilter_set(bf, value, strlen(value));
       }
 
       struct tw_bloomfilter *copy = tw_bloomfilter_new(nbits, k);
@@ -66,16 +66,16 @@ START_TEST(test_bloomfilter_copy_and_clone)
 
       for (size_t j = 0; j < TW_ARRAY_SIZE(values); ++j) {
         const char *value = values[j];
-        ck_assert(tw_bloomfilter_test(bf, strlen(value), value));
-        ck_assert(tw_bloomfilter_test(copy, strlen(value), value));
-        ck_assert(tw_bloomfilter_test(clone, strlen(value), value));
+        ck_assert(tw_bloomfilter_test(bf, value, strlen(value)));
+        ck_assert(tw_bloomfilter_test(copy, value, strlen(value)));
+        ck_assert(tw_bloomfilter_test(clone, value, strlen(value)));
       }
 
       /**
        * This is prone to failure and may be removed if causing problem.
        */
       char *not_there = "oups!";
-      ck_assert(!tw_bloomfilter_test(bf, strlen(not_there), not_there));
+      ck_assert(!tw_bloomfilter_test(bf, not_there, strlen(not_there)));
 
       /**
        * Quickly validate independance
@@ -113,25 +113,25 @@ START_TEST(test_bloomfilter_set_operations)
       struct tw_bloomfilter *src = tw_bloomfilter_new(nbits, k);
       struct tw_bloomfilter *dst = tw_bloomfilter_new(nbits, k);
 
-      tw_bloomfilter_set(src, strlen(values[0]), values[0]);
-      tw_bloomfilter_set(src, strlen(values[1]), values[1]);
-      tw_bloomfilter_set(src, strlen(values[2]), values[2]);
+      tw_bloomfilter_set(src, values[0], strlen(values[0]));
+      tw_bloomfilter_set(src, values[1], strlen(values[1]));
+      tw_bloomfilter_set(src, values[2], strlen(values[2]));
 
-      tw_bloomfilter_set(dst, strlen(values[1]), values[1]);
-      tw_bloomfilter_set(dst, strlen(values[2]), values[2]);
-      tw_bloomfilter_set(dst, strlen(values[3]), values[3]);
+      tw_bloomfilter_set(dst, values[1], strlen(values[1]));
+      tw_bloomfilter_set(dst, values[2], strlen(values[2]));
+      tw_bloomfilter_set(dst, values[3], strlen(values[3]));
 
       ck_assert(tw_bloomfilter_intersection(src, dst) != NULL);
-      ck_assert(!tw_bloomfilter_test(dst, strlen(values[0]), values[0]));
-      ck_assert(tw_bloomfilter_test(dst, strlen(values[1]), values[1]));
-      ck_assert(tw_bloomfilter_test(dst, strlen(values[2]), values[2]));
-      ck_assert(!tw_bloomfilter_test(dst, strlen(values[3]), values[3]));
+      ck_assert(!tw_bloomfilter_test(dst, values[0], strlen(values[0])));
+      ck_assert(tw_bloomfilter_test(dst, values[1], strlen(values[1])));
+      ck_assert(tw_bloomfilter_test(dst, values[2], strlen(values[2])));
+      ck_assert(!tw_bloomfilter_test(dst, values[3], strlen(values[3])));
 
       ck_assert(tw_bloomfilter_union(src, dst) != NULL);
-      ck_assert(tw_bloomfilter_test(dst, strlen(values[0]), values[0]));
-      ck_assert(tw_bloomfilter_test(dst, strlen(values[1]), values[1]));
-      ck_assert(tw_bloomfilter_test(dst, strlen(values[2]), values[2]));
-      ck_assert(!tw_bloomfilter_test(dst, strlen(values[3]), values[3]));
+      ck_assert(tw_bloomfilter_test(dst, values[0], strlen(values[0])));
+      ck_assert(tw_bloomfilter_test(dst, values[1], strlen(values[1])));
+      ck_assert(tw_bloomfilter_test(dst, values[2], strlen(values[2])));
+      ck_assert(!tw_bloomfilter_test(dst, values[3], strlen(values[3])));
       ck_assert(tw_bloomfilter_equal(src, dst));
 
       tw_bloomfilter_free(src);

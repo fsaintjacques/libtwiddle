@@ -35,12 +35,12 @@ class BloomFilterA2(object):
 
   def __getitem__(self, x):
     h = pointer(c_long(hash(x)))
-    return libtwiddle.tw_bloomfilter_a2_test(self.bloomfilter, 8, h)
+    return libtwiddle.tw_bloomfilter_a2_test(self.bloomfilter, h, 8)
 
 
   def set(self, x):
     h = pointer(c_long(hash(x)))
-    libtwiddle.tw_bloomfilter_a2_set(self.bloomfilter, 8, h)
+    libtwiddle.tw_bloomfilter_a2_set(self.bloomfilter, h, 8)
 
 
   def test(self, x):

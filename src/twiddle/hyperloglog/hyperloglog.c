@@ -72,9 +72,11 @@ struct tw_hyperloglog *tw_hyperloglog_clone(const struct tw_hyperloglog *src)
   return tw_hyperloglog_copy(src, dst);
 }
 
-void tw_hyperloglog_add_hashed(struct tw_hyperloglog *hll, uint64_t hash)
+void tw_hyperloglog_add(struct tw_hyperloglog *hll, const void *key,
+                        size_t key_size)
 {
-  assert(hll);
+  assert(hll && key && key_size > 0);
+  const uint64_t hash = tw_metrohash_64(hll->info.hash_seed, key, key_size);
   const uint8_t precision = hll->info.precision;
   const uint32_t bucket_idx = hash >> (64 - precision);
   const uint8_t leading_zeros = (__builtin_clzll(hash << precision |
@@ -83,14 +85,6 @@ void tw_hyperloglog_add_hashed(struct tw_hyperloglog *hll, uint64_t hash)
                 old_val = hll->registers[bucket_idx];
   hll->registers[bucket_idx] =
       (leading_zeros > old_val) ? leading_zeros : old_val;
-}
-
-void tw_hyperloglog_add(struct tw_hyperloglog *hll, size_t key_size,
-                        const char *key_buf)
-{
-  assert(hll && key_size > 0 && key_buf);
-  const uint64_t hash = tw_metrohash_64(hll->info.hash_seed, key_buf, key_size);
-  tw_hyperloglog_add_hashed(hll, hash);
 }
 
 extern double estimate(uint8_t precision, uint32_t n_zeros, float inverse_sum);

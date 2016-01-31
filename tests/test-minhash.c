@@ -34,11 +34,11 @@ START_TEST(test_minhash_basic)
     int32_t intersection = 0;
     for (size_t j = 0; j < n_items; ++j) {
       const size_t key_size = sizeof(j);
-      const char *key_buf = (char *)&j;
+      const void *key = (void *)&j;
 
-      tw_minhash_add(a, key_size, key_buf);
+      tw_minhash_add(a, key, key_size);
       if (j % sample == 0) {
-        tw_minhash_add(b, key_size, key_buf);
+        tw_minhash_add(b, key, key_size);
         intersection++;
       }
     }
@@ -69,16 +69,16 @@ START_TEST(test_minhash_copy_and_clone)
     const int32_t n_items = n_registers / 2;
     for (size_t j = 0; j < n_items; ++j) {
       const size_t key_size = sizeof(j);
-      const char *key_buf = (char *)&j;
-      tw_minhash_add(a, key_size, key_buf);
+      const void *key = (void *)&j;
+      tw_minhash_add(a, key, key_size);
     }
 
     ck_assert(!tw_minhash_equal(a, b));
 
     for (size_t j = 0; j < n_items; ++j) {
       const size_t key_size = sizeof(j);
-      const char *key_buf = (char *)&j;
-      tw_minhash_add(b, key_size, key_buf);
+      const void *key = (void *)&j;
+      tw_minhash_add(b, key, key_size);
     }
 
     ck_assert(tw_minhash_equal(a, b));
@@ -111,8 +111,10 @@ START_TEST(test_minhash_merge)
 
     const int32_t n_items = n_registers * 4;
     for (size_t j = 0; j < n_items; ++j) {
-      tw_minhash_add(((j % 2) ? a : b), sizeof(j), (char *)&j);
-      tw_minhash_add(f, sizeof(j), (char *)&j);
+      const size_t key_size = sizeof(j);
+      const void *key = (void *)&j;
+      tw_minhash_add(((j % 2) ? a : b), key, key_size);
+      tw_minhash_add(f, key, key_size);
     }
 
     ck_assert(estimate_in_bounds(n_registers, 0, tw_minhash_estimate(a, b)));

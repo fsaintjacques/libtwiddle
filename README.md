@@ -4,7 +4,8 @@ LIBTWIDDLE
 [![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg?style=flat)](https://github.com/fsaintjacques/libtwiddle/blob/develop/LICENSE)
 
 
-libtwiddle is a small library that implements bit data structures:
+libtwiddle is a data structure library aimed with speed for modern `x86-64` on
+linux. The following data structures are implemented:
 
   * bitmaps (dense & RLE)
   * bloom filters (standard & active-active)
@@ -12,6 +13,15 @@ libtwiddle is a small library that implements bit data structures:
   * minhash
 
 See `EXAMPLES.md` or `tests/examples/` for examples.
+
+Why should you use libtwiddle?
+------------------------------
+
+  * Written for modern age; `gcc >= 4.8`, `c99`, and `x86-64`
+  * Extensive testing; unit tests and random property testing with `hypothesis`
+  * Python bindings; courtesy of property testing
+  * Vectorized implementations; `AVX`, `AVX2`, and partial `AVX512`
+  * Continuous integration
 
 INSTALL
 =======
@@ -39,6 +49,15 @@ In most cases, you should be able to build the source code using the following:
     $ make
     $ make test
     $ make install
+
+Building with SIMD support
+--------------------------
+
+cmake can be invoked with the following options for SIMD support:
+
+  * AVX;    `-DUSE_AVX=ON`
+  * AVX2;   `-DUSE_AVX2=ON`
+  * AVX512; `-DUSE_AVX512=ON`
 
 Contributions
 -------------

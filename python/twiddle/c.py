@@ -152,10 +152,10 @@ libtwiddle.tw_bloomfilter_copy.restype  = c_void_p
 libtwiddle.tw_bloomfilter_clone.argtypes = [c_void_p]
 libtwiddle.tw_bloomfilter_clone.restype  = c_void_p
 
-libtwiddle.tw_bloomfilter_set.argtypes = [c_void_p, c_ulong, c_void_p]
+libtwiddle.tw_bloomfilter_set.argtypes = [c_void_p, c_void_p, c_ulong]
 libtwiddle.tw_bloomfilter_set.restype  = None
 
-libtwiddle.tw_bloomfilter_test.argtypes = [c_void_p, c_ulong, c_void_p]
+libtwiddle.tw_bloomfilter_test.argtypes = [c_void_p, c_void_p, c_ulong]
 libtwiddle.tw_bloomfilter_test.restype  = c_bool
 
 libtwiddle.tw_bloomfilter_empty.argtypes = [c_void_p]

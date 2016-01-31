@@ -162,9 +162,9 @@ int main(int argc, char *argv[])
       }
     }
 
-    if (!tw_bloomfilter_test(bf, line_len, line)) {
+    if (!tw_bloomfilter_test(bf, line, line_len)) {
       fprintf(stdout, "%s", line);
-      tw_bloomfilter_set(bf, line_len, line);
+      tw_bloomfilter_set(bf, line, line_len);
     }
   }
 

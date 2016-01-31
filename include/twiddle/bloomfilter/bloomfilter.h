@@ -85,23 +85,23 @@ struct tw_bloomfilter *tw_bloomfilter_clone(const struct tw_bloomfilter *bf);
 
 /**
  * tw_bloomfilter_set() - set an element in a bloomfilter
- * @bf:   bloomfilter affected
- * @size: size of the key to add
- * @buf:  buf to the key to add
+ * @bf:       bloomfilter affected
+ * @key:      buffer of the key to add
+ * @key_size: size of the buffer key to add
  */
-void tw_bloomfilter_set(struct tw_bloomfilter *bf, size_t size,
-                        const char *buf);
+void tw_bloomfilter_set(struct tw_bloomfilter *bf, const void *key,
+                        size_t key_size);
 
 /**
  * tw_bloomfilter_test() - test an element in a bloomfilter
- * @bf:   bloomfilter affected
- * @size: size of the key to test
- * @buf:  buf to the key to test
+ * @bf:       bloomfilter affected
+ * @key:      buffer of the key to test
+ * @key_size: size of the buffer of key to test
  *
  * Return: false if the element is not in the bloomfilter, true otherwise.
  */
-bool tw_bloomfilter_test(const struct tw_bloomfilter *bf, size_t size,
-                         const char *buf);
+bool tw_bloomfilter_test(const struct tw_bloomfilter *bf, const void *key,
+                         size_t key_size);
 /**
  * tw_bloomfilter_empty() - verify if bloomfilter is empty
  * @bf: bloomfilter to verify

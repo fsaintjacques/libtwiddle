@@ -13,11 +13,11 @@ int main(int argc, char *argv[])
   char *values[] = {"herp", "derp", "ferp", "merp"};
 
   for (int i = 0; i < ((sizeof(values) / sizeof(values[0]))); ++i) {
-    tw_bloomfilter_set(bf, strlen(values[i]), values[i]);
-    assert(tw_bloomfilter_test(bf, strlen(values[i]), values[i]));
+    tw_bloomfilter_set(bf, values[i], strlen(values[i]));
+    assert(tw_bloomfilter_test(bf, values[i], strlen(values[i])));
   }
 
-  assert(!tw_bloomfilter_test(bf, sizeof("nope"), "nope"));
+  assert(!tw_bloomfilter_test(bf, "nope", sizeof("nope")));
 
   return 0;
 }

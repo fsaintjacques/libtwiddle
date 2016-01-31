@@ -85,7 +85,7 @@ void tw_bloomfilter_a2_set(struct tw_bloomfilter_a2 *bf, size_t size,
 
   tw_bloomfilter_a2_rotate_(bf);
 
-  tw_bloomfilter_set(bf->active, size, buf);
+  tw_bloomfilter_set(bf->active, buf, size);
 }
 
 bool tw_bloomfilter_a2_test(const struct tw_bloomfilter_a2 *bf, size_t size,
@@ -93,8 +93,8 @@ bool tw_bloomfilter_a2_test(const struct tw_bloomfilter_a2 *bf, size_t size,
 {
   assert(bf && buf && size > 0);
 
-  return tw_bloomfilter_test(bf->active, size, buf) ||
-         tw_bloomfilter_test(bf->passive, size, buf);
+  return tw_bloomfilter_test(bf->active, buf, size) ||
+         tw_bloomfilter_test(bf->passive, buf, size);
 }
 
 bool tw_bloomfilter_a2_empty(const struct tw_bloomfilter_a2 *bf)

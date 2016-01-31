@@ -111,7 +111,7 @@ float tw_minhash_estimate(const struct tw_minhash *a,
   MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
                 0x1111)
 #else
-  for (int i = 0; i < n_registers; ++i) {
+  for (size_t i = 0; i < n_registers; ++i) {
     n_registers_eq += (a->registers[i] == b->registers[i]);
   }
 #endif
@@ -149,7 +149,7 @@ bool tw_minhash_equal(const struct tw_minhash *a, const struct tw_minhash *b)
   MINH_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
                0xFFFF)
 #else
-  for (int i = 0; i < n_registers; ++i) {
+  for (size_t i = 0; i < n_registers; ++i) {
     if (a->registers[i] != b->registers[i]) {
       return false;
     }
@@ -189,7 +189,7 @@ struct tw_minhash *tw_minhash_merge(const struct tw_minhash *src,
 #elif USE_AVX
   MINH_MAX_LOOP(__m128i, _mm_load_si128, _mm_max_epu32, _mm_store_si128)
 #else
-  for (int i = 0; i < n_registers; ++i) {
+  for (size_t i = 0; i < n_registers; ++i) {
     dst->registers[i] = tw_max(dst->registers[i], src->registers[i]);
   }
 #endif

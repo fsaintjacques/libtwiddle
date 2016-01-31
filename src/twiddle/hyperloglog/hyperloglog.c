@@ -160,7 +160,7 @@ bool tw_hyperloglog_equal(const struct tw_hyperloglog *a,
   HLL_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
               0xFFFF)
 #else
-  for (int i = 0; i < n_registers; ++i) {
+  for (size_t i = 0; i < n_registers; ++i) {
     if (a->registers[i] != b->registers[i]) {
       return false;
     }
@@ -196,7 +196,7 @@ struct tw_hyperloglog *tw_hyperloglog_merge(const struct tw_hyperloglog *src,
 #elif USE_AVX
   HLL_MAX_LOOP(__m128i, _mm_load_si128, _mm_max_epu8, _mm_store_si128)
 #else
-  for (int i = 0; i < n_registers; ++i) {
+  for (size_t i = 0; i < n_registers; ++i) {
     dst->registers[i] = tw_max(src->registers[i], dst->registers[i]);
   }
 #endif

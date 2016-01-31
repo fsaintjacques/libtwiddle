@@ -258,10 +258,7 @@ libtwiddle.tw_hyperloglog_copy.restype  = c_void_p
 libtwiddle.tw_hyperloglog_clone.argtypes = [c_void_p]
 libtwiddle.tw_hyperloglog_clone.restype  = c_void_p
 
-libtwiddle.tw_hyperloglog_add_hashed.argtypes = [c_void_p, c_ulong]
-libtwiddle.tw_hyperloglog_add_hashed.restype  = None
-
-libtwiddle.tw_hyperloglog_add.argtypes = [c_void_p, c_uint, c_void_p]
+libtwiddle.tw_hyperloglog_add.argtypes = [c_void_p, c_void_p, c_ulong]
 libtwiddle.tw_hyperloglog_add.restype  = None
 
 libtwiddle.tw_hyperloglog_count.argtypes = [c_void_p]

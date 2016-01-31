@@ -96,20 +96,13 @@ struct tw_hyperloglog *tw_hyperloglog_copy(const struct tw_hyperloglog *src,
 struct tw_hyperloglog *tw_hyperloglog_clone(const struct tw_hyperloglog *hll);
 
 /**
- * tw_hyperloglog_add_hashed() - add an element in a hyperloglog structure
- * @hll:  hyperloglog affected
- * @hash: hashed value to add
- */
-void tw_hyperloglog_add_hashed(struct tw_hyperloglog *hll, uint64_t hash);
-
-/**
  * tw_hyperloglog_add() - add an element in a hyperloglog structure
  * @hll:      hyperloglog affected
+ * @key:      buffer of the key to add
  * @key_size: size of the key to add
- * @key_buf:  buf to the key to add
  */
-void tw_hyperloglog_add(struct tw_hyperloglog *hll, size_t key_size,
-                        const char *key_buf);
+void tw_hyperloglog_add(struct tw_hyperloglog *hll, const void *key,
+                        size_t key_size);
 
 /**
  * tw_hyperloglog_count() - estimate the number of elements in hll

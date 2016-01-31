@@ -29,7 +29,7 @@ START_TEST(test_hyperloglog_basic)
     /** test linear_count */
     for (size_t k = 0; k < n_registers; ++k) {
       if (k % 2) {
-        tw_hyperloglog_add(hll, sizeof(k), (const char *)&k);
+        tw_hyperloglog_add(hll, (void *)&k, sizeof(k));
         n_elems += 1.0;
       }
     }
@@ -41,7 +41,7 @@ START_TEST(test_hyperloglog_basic)
     n_elems = 0;
     for (size_t k = 0; k < 10 * n_registers; ++k) {
       if (k % 2) {
-        tw_hyperloglog_add(hll, sizeof(k), (const char *)&k);
+        tw_hyperloglog_add(hll, (void *)&k, sizeof(k));
         n_elems += 1.0;
       }
     }
@@ -65,7 +65,7 @@ START_TEST(test_hyperloglog_copy_and_clone)
     /** test linear_count */
     for (size_t k = 0; k < n_registers; ++k) {
       if (k % 2) {
-        tw_hyperloglog_add(hll, sizeof(k), (const char *)&k);
+        tw_hyperloglog_add(hll, (void *)&k, sizeof(k));
       }
     }
 
@@ -97,9 +97,9 @@ START_TEST(test_hyperloglog_merge)
     /** test linear_count */
     for (size_t k = 0; k < times * n_registers; ++k) {
       if (k % 2) {
-        tw_hyperloglog_add(src, sizeof(k), (const char *)&k);
+        tw_hyperloglog_add(src, (void *)&k, sizeof(k));
       } else {
-        tw_hyperloglog_add(dst, sizeof(k), (const char *)&k);
+        tw_hyperloglog_add(dst, (void *)&k, sizeof(k));
       }
     }
 
@@ -138,7 +138,7 @@ START_TEST(test_hyperloglog_simd)
     /** test linear_count */
     for (size_t k = 0; k < n_registers; ++k) {
       if (k % 2) {
-        tw_hyperloglog_add(hll, sizeof(k), (const char *)&k);
+        tw_hyperloglog_add(hll, (void *)&k, sizeof(k));
         n_elems += 1.0;
       }
     }
@@ -167,7 +167,7 @@ START_TEST(test_hyperloglog_simd)
     n_elems = 0;
     for (size_t k = 0; k < 10 * n_registers; ++k) {
       if (k % 2) {
-        tw_hyperloglog_add(hll, sizeof(k), (const char *)&k);
+        tw_hyperloglog_add(hll, (void *)&k, sizeof(k));
         n_elems += 1.0;
       }
     }

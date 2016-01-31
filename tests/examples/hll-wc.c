@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
   ssize_t line_len = 0;
 
   while ((line_len = getline(&line, &buf_len, stdin)) != -1) {
-    tw_hyperloglog_add(hll, line_len, line);
+    tw_hyperloglog_add(hll, line, line_len);
     if (stream) {
       fprintf(stdout, "%" PRIu64 "\n", (uint64_t)tw_hyperloglog_count(hll));
     }

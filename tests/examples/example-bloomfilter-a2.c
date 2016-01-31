@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
    */
 
   for (int i = 0; i < nbits * 10; ++i) {
-    tw_bloomfilter_a2_set(bf, sizeof(i), (char *)&i);
+    tw_bloomfilter_a2_set(bf, (void *)&i, sizeof(i));
     assert(tw_bloomfilter_a2_density(bf) < 2 * density);
   }
 

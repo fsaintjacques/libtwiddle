@@ -1,5 +1,6 @@
 #include <assert.h>
 
+#include <twiddle/internal/utils.h>
 #include <twiddle/bloomfilter/bloomfilter_a2.h>
 
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_new(uint64_t size, uint16_t k,
@@ -159,7 +160,7 @@ bool tw_bloomfilter_a2_equal(const struct tw_bloomfilter_a2 *a,
 {
   assert(a && b);
 
-  return (a->density == b->density &&
+  return (tw_almost_equal(a->density, b->density) &&
           tw_bloomfilter_equal(a->active, b->active) &&
           tw_bloomfilter_equal(a->passive, b->passive));
 }
@@ -170,7 +171,7 @@ tw_bloomfilter_a2_union(const struct tw_bloomfilter_a2 *src,
 {
   assert(src && dst);
 
-  if (src->density != dst->density) {
+  if (!tw_almost_equal(src->density, dst->density)) {
     return NULL;
   }
 
@@ -186,7 +187,7 @@ tw_bloomfilter_a2_intersection(const struct tw_bloomfilter_a2 *src,
 {
   assert(src && dst);
 
-  if (src->density != dst->density) {
+  if (!tw_almost_equal(src->density, dst->density)) {
     return NULL;
   }
 
@@ -202,7 +203,7 @@ tw_bloomfilter_a2_xor(const struct tw_bloomfilter_a2 *src,
 {
   assert(src && dst);
 
-  if (src->density != dst->density) {
+  if (!tw_almost_equal(src->density, dst->density)) {
     return NULL;
   }
 

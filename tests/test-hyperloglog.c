@@ -9,7 +9,7 @@
 
 #include "include/helpers.h"
 
-bool estimate_within_error(double estimate, double real, double error)
+bool estimate_within_error(double estimate, double real)
 {
   const double diff = fabs(estimate - real);
   const double margin = real * 0.1;
@@ -33,8 +33,8 @@ START_TEST(test_hyperloglog_basic)
         n_elems += 1.0;
       }
     }
-    bool within_error = estimate_within_error(
-        tw_hyperloglog_count(hll), n_elems, TW_HLL_ERROR_FOR_REG(n_registers));
+    bool within_error =
+        estimate_within_error(tw_hyperloglog_count(hll), n_elems);
     ck_assert(within_error);
 
     /** test loglog */
@@ -45,8 +45,7 @@ START_TEST(test_hyperloglog_basic)
         n_elems += 1.0;
       }
     }
-    within_error = estimate_within_error(tw_hyperloglog_count(hll), n_elems,
-                                         TW_HLL_ERROR_FOR_REG(n_registers));
+    within_error = estimate_within_error(tw_hyperloglog_count(hll), n_elems);
     ck_assert_msg(within_error, "estimate %f not within bounds",
                   tw_hyperloglog_count(hll));
     tw_hyperloglog_free(hll);
@@ -58,7 +57,7 @@ START_TEST(test_hyperloglog_copy_and_clone)
 {
   DESCRIBE_TEST;
   for (uint8_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
-    const int32_t n_registers = 1 << p;
+    const uint32_t n_registers = 1 << p;
     struct tw_hyperloglog *hll = tw_hyperloglog_new(p);
     struct tw_hyperloglog *copy = tw_hyperloglog_new(p);
 
@@ -70,12 +69,14 @@ START_TEST(test_hyperloglog_copy_and_clone)
     }
 
     ck_assert(tw_hyperloglog_copy(hll, copy) != NULL);
-    ck_assert(tw_hyperloglog_count(hll) == tw_hyperloglog_count(copy));
+    ck_assert(
+        tw_almost_equal(tw_hyperloglog_count(hll), tw_hyperloglog_count(copy)));
 
     struct tw_hyperloglog *clone = tw_hyperloglog_clone(copy);
     ck_assert(clone != NULL);
     ck_assert(tw_hyperloglog_equal(hll, clone));
-    ck_assert(tw_hyperloglog_count(hll) == tw_hyperloglog_count(clone));
+    ck_assert(tw_almost_equal(tw_hyperloglog_count(hll),
+                              tw_hyperloglog_count(clone)));
 
     tw_hyperloglog_free(clone);
     tw_hyperloglog_free(copy);
@@ -113,8 +114,7 @@ START_TEST(test_hyperloglog_merge)
 
     double estimate = tw_hyperloglog_count(dst);
     bool within_bound =
-        estimate_within_error(estimate, (double)times * n_registers,
-                              TW_HLL_ERROR_FOR_REG(n_registers));
+        estimate_within_error(estimate, (double)times * n_registers);
 
     ck_assert_msg(within_bound, "%d not within bounds",
                   tw_hyperloglog_count(dst));
@@ -142,8 +142,8 @@ START_TEST(test_hyperloglog_simd)
         n_elems += 1.0;
       }
     }
-    bool within_error = estimate_within_error(
-        tw_hyperloglog_count(hll), n_elems, TW_HLL_ERROR_FOR_REG(n_registers));
+    bool within_error =
+        estimate_within_error(tw_hyperloglog_count(hll), n_elems);
     ck_assert(within_error);
 
     /* Verify that the SIMD implementation computes the same
@@ -153,7 +153,7 @@ START_TEST(test_hyperloglog_simd)
     hyperloglog_count_port(hll->registers, n_registers, &sum_1, &n_zeros_1);
 #ifdef USE_AVX2
     hyperloglog_count_avx2(hll->registers, n_registers, &sum_2, &n_zeros_2);
-#elif USE_AVX
+#elif defined USE_AVX
     hyperloglog_count_avx(hll->registers, n_registers, &sum_2, &n_zeros_2);
 #else
     hyperloglog_count_port(hll->registers, n_registers, &sum_2, &n_zeros_2);
@@ -171,8 +171,7 @@ START_TEST(test_hyperloglog_simd)
         n_elems += 1.0;
       }
     }
-    within_error = estimate_within_error(tw_hyperloglog_count(hll), n_elems,
-                                         TW_HLL_ERROR_FOR_REG(n_registers));
+    within_error = estimate_within_error(tw_hyperloglog_count(hll), n_elems);
     ck_assert_msg(within_error, "estimate %f not within bounds",
                   tw_hyperloglog_count(hll));
 
@@ -181,7 +180,7 @@ START_TEST(test_hyperloglog_simd)
     hyperloglog_count_port(hll->registers, n_registers, &sum_1, &n_zeros_1);
 #ifdef USE_AVX2
     hyperloglog_count_avx2(hll->registers, n_registers, &sum_2, &n_zeros_2);
-#elif USE_AVX
+#elif defined USE_AVX
     hyperloglog_count_avx(hll->registers, n_registers, &sum_2, &n_zeros_2);
 #else
     hyperloglog_count_port(hll->registers, n_registers, &sum_2, &n_zeros_2);
@@ -216,7 +215,4 @@ int run_tests()
   return number_failed;
 }
 
-int main(int argc, char *argv[])
-{
-  return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-}
+int main() { return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE; }

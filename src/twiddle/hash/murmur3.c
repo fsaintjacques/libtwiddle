@@ -48,7 +48,7 @@ tw_uint128_t tw_murmur3_128(const uint64_t seed, const void *key,
   const uint64_t c1 = BIG_CONSTANT(0x87c37b91114253d5);
   const uint64_t c2 = BIG_CONSTANT(0x4cf5ad432745937f);
 
-  const uint64_t *blocks = (const uint64_t *)(data);
+  const uint64_t *blocks = (const uint64_t *)(key);
 
   // clang-format off
   for (i = 0; i < nblocks; i++) {
@@ -85,6 +85,7 @@ tw_uint128_t tw_murmur3_128(const uint64_t seed, const void *key,
   case  2: k1 ^= (uint64_t)(tail[ 1]) << 8;
   case  1: k1 ^= (uint64_t)(tail[ 0]) << 0;
            k1 *= c1; k1  = rotl64(k1,31); k1 *= c2; h1 ^= k1;
+  default: ;
   };
 
   h1 ^= key_len;

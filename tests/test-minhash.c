@@ -26,12 +26,12 @@ START_TEST(test_minhash_basic)
   const uint8_t sample = 4;
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
-    const int32_t n_registers = sizes[i];
+    const uint32_t n_registers = sizes[i];
     struct tw_minhash *a = tw_minhash_new(n_registers);
     struct tw_minhash *b = tw_minhash_new(n_registers);
 
-    const int32_t n_items = n_registers * 4;
-    int32_t intersection = 0;
+    const uint32_t n_items = n_registers * 4;
+    uint32_t intersection = 0;
     for (size_t j = 0; j < n_items; ++j) {
       const size_t key_size = sizeof(j);
       const void *key = (void *)&j;
@@ -60,13 +60,13 @@ START_TEST(test_minhash_copy_and_clone)
   const uint32_t sizes[] = {256, 512, 1024, 2048, 4096, 1 << 13};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
-    const int32_t n_registers = sizes[i];
+    const uint32_t n_registers = sizes[i];
     struct tw_minhash *a = tw_minhash_new(n_registers);
     struct tw_minhash *b = tw_minhash_clone(a);
 
     ck_assert(tw_minhash_equal(a, b));
 
-    const int32_t n_items = n_registers / 2;
+    const uint32_t n_items = n_registers / 2;
     for (size_t j = 0; j < n_items; ++j) {
       const size_t key_size = sizeof(j);
       const void *key = (void *)&j;
@@ -104,12 +104,12 @@ START_TEST(test_minhash_merge)
                             512, 1024, 2048, 4096, 1 << 13};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
-    const int32_t n_registers = sizes[i];
+    const uint32_t n_registers = sizes[i];
     struct tw_minhash *a = tw_minhash_new(n_registers);
     struct tw_minhash *b = tw_minhash_new(n_registers);
     struct tw_minhash *f = tw_minhash_new(n_registers);
 
-    const int32_t n_items = n_registers * 4;
+    const uint32_t n_items = n_registers * 4;
     for (size_t j = 0; j < n_items; ++j) {
       const size_t key_size = sizeof(j);
       const void *key = (void *)&j;
@@ -162,7 +162,4 @@ int run_tests()
   return number_failed;
 }
 
-int main(int argc, char *argv[])
-{
-  return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-}
+int main() { return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE; }

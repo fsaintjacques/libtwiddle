@@ -37,4 +37,4 @@ else()
 endif()
 
 # strict compile options
-add_definitions(-Wall -Werror -pedantic)
+add_definitions(-Wall -Werror -pedantic -Wextra -Wshadow -Wfloat-equal -Wundef -Wwrite-strings -Wunreachable-code -Wformat=2 -Wswitch-enum -Wswitch-default -Winit-self)

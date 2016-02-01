@@ -58,10 +58,10 @@ START_TEST(test_bitmap_copy_and_clone)
 {
   DESCRIBE_TEST;
 
-  const int32_t sizes[] = {512, 1024, 2048, 4096};
+  const uint32_t sizes[] = {512, 1024, 2048, 4096};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
-    const int32_t nbits = sizes[i];
+    const uint32_t nbits = sizes[i];
     struct tw_bitmap *src = tw_bitmap_new(nbits);
     struct tw_bitmap *dst = tw_bitmap_new(nbits);
 
@@ -93,14 +93,14 @@ START_TEST(test_bitmap_zero_and_fill)
 {
   DESCRIBE_TEST;
 
-  const int32_t sizes[] = {512, 1024, 2048, 4096};
+  const uint32_t sizes[] = {512, 1024, 2048, 4096};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
-    const int32_t nbits = sizes[i];
+    const uint32_t nbits = sizes[i];
     struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
 
     ck_assert(tw_bitmap_empty(bitmap));
-    ck_assert(tw_bitmap_density(bitmap) == 0.0);
+    ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 0.0));
     ck_assert(!tw_bitmap_full(bitmap));
 
     tw_bitmap_fill(bitmap);
@@ -110,7 +110,7 @@ START_TEST(test_bitmap_zero_and_fill)
     }
 
     ck_assert(tw_bitmap_full(bitmap));
-    ck_assert(tw_bitmap_density(bitmap) == 1.0);
+    ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 1.0));
     ck_assert(!tw_bitmap_empty(bitmap));
 
     tw_bitmap_zero(bitmap);
@@ -131,10 +131,10 @@ START_TEST(test_bitmap_find_first)
 {
   DESCRIBE_TEST;
 
-  const int32_t sizes[] = {1024, 2048, 4096};
+  const uint32_t sizes[] = {1024, 2048, 4096};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
-    const int32_t nbits = sizes[i];
+    const uint32_t nbits = sizes[i];
     struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
 
     ck_assert(tw_bitmap_find_first_zero(bitmap) == 0);
@@ -181,43 +181,43 @@ START_TEST(test_bitmap_report)
 
   ck_assert(tw_bitmap_empty(bitmap));
   ck_assert(!tw_bitmap_full(bitmap));
-  ck_assert(tw_bitmap_density(bitmap) == 0.0);
+  ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 0.0));
 
   uint64_t i = 0;
   for (; i < 128; i++) {
     tw_bitmap_set(bitmap, i);
   }
-  ck_assert(tw_bitmap_density(bitmap) == 0.25);
+  ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 0.25));
 
   for (; i < 256; i++) {
     tw_bitmap_set(bitmap, i);
   }
-  ck_assert(tw_bitmap_density(bitmap) == 0.50);
+  ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 0.50));
 
   tw_bitmap_set(bitmap, 2);
   for (; i < 384; i++) {
     tw_bitmap_set(bitmap, i);
   }
-  ck_assert(tw_bitmap_density(bitmap) == 0.75);
+  ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 0.75));
 
   for (; i < 512; i++) {
     tw_bitmap_set(bitmap, i);
   }
   ck_assert(!tw_bitmap_empty(bitmap));
   ck_assert(tw_bitmap_full(bitmap));
-  ck_assert(tw_bitmap_density(bitmap) == 1.0);
+  ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 1.0));
 }
 END_TEST
 
 START_TEST(test_bitmap_set_operations)
 {
   DESCRIBE_TEST;
-  const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 1 << 17};
-  const int32_t offsets[] = {-1, 0, 1};
+  const uint32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 1 << 17};
+  const uint32_t offsets[] = {-1, 0, 1};
 
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + offsets[j];
+      const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap *src = tw_bitmap_new(nbits);
       struct tw_bitmap *dst = tw_bitmap_new(nbits);
 
@@ -284,7 +284,4 @@ int run_tests()
   return number_failed;
 }
 
-int main(int argc, char *argv[])
-{
-  return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-}
+int main() { return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE; }

@@ -10,7 +10,7 @@ static struct option long_options[] = {{"precision", required_argument, 0, 'p'},
                                        {"stream", no_argument, 0, 's'},
                                        {0, 0, 0, 0}};
 
-int parse_precision(const char *opt, uint8_t *p)
+int parse_precision(uint8_t *p)
 {
   const int64_t parsed_p = strtol(optarg, NULL, 10);
   if (!(TW_HLL_MIN_PRECISION < parsed_p && parsed_p <= TW_HLL_MAX_PRECISION)) {
@@ -36,7 +36,7 @@ static int parse_arguments(int argc, char **argv, uint8_t *p, bool *stream)
 
     switch (c) {
     case 'p':
-      if ((ret = parse_precision(optarg, p)) != 0) {
+      if ((ret = parse_precision(p)) != 0) {
         return ret;
       }
       break;

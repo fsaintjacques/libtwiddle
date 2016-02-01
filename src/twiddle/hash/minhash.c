@@ -102,10 +102,10 @@ float tw_minhash_estimate(const struct tw_minhash *a,
     n_registers_eq += __builtin_popcount(h_cmp & eq_mask);                     \
   }
 
-#if USE_AVX2
+#ifdef USE_AVX2
   MINH_EST_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
                 _mm256_movemask_epi8, 0x11111111)
-#elif USE_AVX
+#elif defined USE_AVX
   MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
                 0x1111)
 #else
@@ -135,15 +135,15 @@ bool tw_minhash_equal(const struct tw_minhash *a, const struct tw_minhash *b)
            *b_addr = (simd_t *)b->registers + i;                               \
     const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
     const int h_cmp = simd_maskmove(v_cmp);                                    \
-    if (h_cmp != eq_mask) {                                                    \
+    if (h_cmp != (int)eq_mask) {                                               \
       return false;                                                            \
     }                                                                          \
   }
 
-#if USE_AVX2
+#ifdef USE_AVX2
   MINH_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
                _mm256_movemask_epi8, 0xFFFFFFFF)
-#elif USE_AVX
+#elif defined USE_AVX
   MINH_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
                0xFFFF)
 #else
@@ -178,13 +178,13 @@ struct tw_minhash *tw_minhash_merge(const struct tw_minhash *src,
     simd_store(dst_vec, res);                                                  \
   }
 
-#if USE_AVX512
+#ifdef USE_AVX512
   MINH_MAX_LOOP(__m512i, _mm512_load_si512, _mm512_max_epu32,
                 _mm512_store_si512)
-#elif USE_AVX2
+#elif defined USE_AVX2
   MINH_MAX_LOOP(__m256i, _mm256_load_si256, _mm256_max_epu32,
                 _mm256_store_si256)
-#elif USE_AVX
+#elif defined USE_AVX
   MINH_MAX_LOOP(__m128i, _mm_load_si128, _mm_max_epu32, _mm_store_si128)
 #else
   for (size_t i = 0; i < n_registers; ++i) {

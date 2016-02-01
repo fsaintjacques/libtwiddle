@@ -8,7 +8,7 @@ bitmap
 #include <assert.h>
 #include <twiddle/bitmap/bitmap.h>
 
-int main(int argc, char* argv[]) {
+int main() {
   const uint64_t nbits = 1024;
   struct tw_bitmap* bitmap = tw_bitmap_new(nbits);
 
@@ -32,7 +32,7 @@ bitmap-rle
 #include <assert.h>
 #include <twiddle/bitmap/bitmap_rle.h>
 
-int main(int argc, char* argv[]) {
+int main() {
   /** allocate a bitmap containing 2 billions bits */
   const uint64_t nbits = 1UL << 31;
   struct tw_bitmap_rle* bitmap = tw_bitmap_rle_new(nbits);
@@ -54,8 +54,8 @@ int main(int argc, char* argv[]) {
 
   assert(tw_bitmap_rle_test(bitmap, start));
   assert(tw_bitmap_rle_test(bitmap, end));
-  assert(tw_bitmap_rle_find_first_bit(bitmap)  == start);
-  assert(tw_bitmap_rle_find_first_zero(bitmap) == end + 1);
+  assert(tw_bitmap_rle_find_first_bit(bitmap)  == (int64_t)start);
+  assert(tw_bitmap_rle_find_first_zero(bitmap) == (int64_t)end + 1);
 
   return 0;
 }
@@ -70,15 +70,15 @@ bloomfilter
 
 #include <twiddle/bloomfilter/bloomfilter.h>
 
-int main(int argc, char *argv[]) {
+int main() {
   const uint64_t nbits = 1024;
   const uint16_t k = 7;
   struct tw_bloomfilter *bf = tw_bloomfilter_new(nbits, k);
   assert(bf);
 
-  char *values[] = {"herp", "derp", "ferp", "merp"};
+  const char *values[] = {"herp", "derp", "ferp", "merp"};
 
-  for (int i = 0; i < ((sizeof(values) / sizeof(values[0]))); ++i) {
+  for (size_t i = 0; i < ((sizeof(values) / sizeof(values[0]))); ++i) {
     tw_bloomfilter_set(bf, strlen(values[i]), values[i]);
     assert(tw_bloomfilter_test(bf, strlen(values[i]), values[i]));
   }
@@ -98,13 +98,13 @@ hyperloglog
 
 #include <twiddle/hyperloglog/hyperloglog.h>
 
-int main(int argc, char *argv[]) {
+int main() {
   const uint8_t precision = 16;
   struct tw_hyperloglog *hll = tw_hyperloglog_new(precision);
   assert(hll);
 
   const uint32_t n_elems = 10 * (1 << precision);
-  for (int i = 0; i < n_elems ; ++i) {
+  for (size_t i = 0; i < n_elems ; ++i) {
     tw_hyperloglog_add(hll, sizeof(i), (char *) &i);
   }
 
@@ -125,7 +125,7 @@ minhash
 
 #include <twiddle/hash/minhash.h>
 
-int main(int argc, char *argv[])
+int main()
 {
   const uint32_t n_registers = 1 << 13;
   struct tw_minhash *a = tw_minhash_new(n_registers);
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
   assert(b);
 
   const uint32_t n_elems = 10 * n_registers;
-  for (int i = 0; i < n_elems; ++i) {
+  for (size_t i = 0; i < n_elems; ++i) {
     if (i % 3 == 0) {
       tw_minhash_add(a, sizeof(i), (char *)&i);
     }

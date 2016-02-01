@@ -3,7 +3,7 @@
 
 #include <twiddle/hash/minhash.h>
 
-int main(int argc, char *argv[])
+int main()
 {
   const uint32_t n_registers = 1 << 13;
   struct tw_minhash *a = tw_minhash_new(n_registers);
@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
   assert(b);
 
   const uint32_t n_elems = 10 * n_registers;
-  for (int i = 0; i < n_elems; ++i) {
+  for (size_t i = 0; i < n_elems; ++i) {
     const size_t key_size = sizeof(i);
     const void *key = (void *)&i;
     if (i % 3 == 0) {

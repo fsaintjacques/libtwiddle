@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <twiddle/bitmap/bitmap_rle.h>
 
-int main(int argc, char *argv[])
+int main()
 {
   /** allocate a bitmap containing 2 billions bits */
   const uint64_t nbits = 1UL << 31;
@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
 
   assert(tw_bitmap_rle_test(bitmap, start));
   assert(tw_bitmap_rle_test(bitmap, end));
-  assert(tw_bitmap_rle_find_first_bit(bitmap) == start);
-  assert(tw_bitmap_rle_find_first_zero(bitmap) == end + 1);
+  assert(tw_bitmap_rle_find_first_bit(bitmap) == (int64_t)start);
+  assert(tw_bitmap_rle_find_first_zero(bitmap) == (int64_t)end + 1);
 
   return 0;
 }

@@ -12,7 +12,7 @@ static struct option long_options[] = {
     {"duration", required_argument, 0, 'd'},
     {0, 0, 0, 0}};
 
-static int parse_probability(const char *opt, float *p)
+static int parse_probability(float *p)
 {
   const float parsed_p = strtof(optarg, NULL);
   if (!(0 < parsed_p && parsed_p <= 1)) {
@@ -24,10 +24,10 @@ static int parse_probability(const char *opt, float *p)
   return true;
 }
 
-static bool parse_count(const char *opt, int64_t *n)
+static bool parse_count(int64_t *n)
 {
   const int64_t parsed_n = strtoll(optarg, NULL, 10);
-  if (!(0 <= parsed_n && parsed_n <= TW_BITMAP_MAX_BITS)) {
+  if (parsed_n < 0) {
     return false;
   }
 
@@ -97,12 +97,12 @@ static int parse_arguments(int argc, char **argv, int64_t *n, float *p,
 
     switch (c) {
     case 'n':
-      if (!parse_count(optarg, n)) {
+      if (!parse_count(n)) {
         return -1;
       }
       break;
     case 'p':
-      if (!parse_probability(optarg, p)) {
+      if (!parse_probability(p)) {
         return -1;
       }
       break;

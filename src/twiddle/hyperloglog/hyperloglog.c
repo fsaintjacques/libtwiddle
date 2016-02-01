@@ -89,11 +89,11 @@ void tw_hyperloglog_add(struct tw_hyperloglog *hll, const void *key,
 
 extern double estimate(uint8_t precision, uint32_t n_zeros, float inverse_sum);
 
-#if USE_AVX2
+#ifdef USE_AVX2
 extern void hyperloglog_count_avx2(const uint8_t *registers,
                                    uint32_t n_registers, float *inverse_sum,
                                    uint32_t *n_zeros);
-#elif USE_AVX
+#elif defined USE_AVX
 extern void hyperloglog_count_avx(const uint8_t *registers,
                                   uint32_t n_registers, float *inverse_sum,
                                   uint32_t *n_zeros);
@@ -112,9 +112,9 @@ double tw_hyperloglog_count(const struct tw_hyperloglog *hll)
   uint32_t n_zeros = 0;
   float inverse_sum = 0.0;
 
-#if USE_AVX2
+#ifdef USE_AVX2
   hyperloglog_count_avx2(hll->registers, n_registers, &inverse_sum, &n_zeros);
-#elif USE_AVX
+#elif defined USE_AVX
   hyperloglog_count_avx(hll->registers, n_registers, &inverse_sum, &n_zeros);
 #else
   hyperloglog_count_port(hll->registers, n_registers, &inverse_sum, &n_zeros);
@@ -141,16 +141,16 @@ bool tw_hyperloglog_equal(const struct tw_hyperloglog *a,
            *b_addr = (simd_t *)b->registers + i;                               \
     const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
     const int h_cmp = simd_maskmove(v_cmp);                                    \
-    if (h_cmp != eq_mask) {                                                    \
+    if (h_cmp != (int)eq_mask) {                                               \
       return false;                                                            \
     }                                                                          \
   }
 
 /* AVX512 does not have movemask_epi8 equivalent, fallback to AVX2 */
-#if USE_AVX2
+#ifdef USE_AVX2
   HLL_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi8,
               _mm256_movemask_epi8, 0xFFFFFFFF)
-#elif USE_AVX
+#elif defined USE_AVX
   HLL_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
               0xFFFF)
 #else
@@ -183,11 +183,11 @@ struct tw_hyperloglog *tw_hyperloglog_merge(const struct tw_hyperloglog *src,
     simd_store(dst_vec, res);                                                  \
   }
 
-#if USE_AVX512
+#ifdef USE_AVX512
   HLL_MAX_LOOP(__m512i, _mm512_load_si512, _mm512_max_epu8, _mm512_store_si512)
-#elif USE_AVX2
+#elif defined USE_AVX2
   HLL_MAX_LOOP(__m256i, _mm256_load_si256, _mm256_max_epu8, _mm256_store_si256)
-#elif USE_AVX
+#elif defined USE_AVX
   HLL_MAX_LOOP(__m128i, _mm_load_si128, _mm_max_epu8, _mm_store_si128)
 #else
   for (size_t i = 0; i < n_registers; ++i) {

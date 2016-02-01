@@ -7,15 +7,16 @@
 
 #include "include/helpers.h"
 
-static const int32_t sizes[] = {32, 64, 128, 256, 512, 1024, 2048, 4096, 32768};
-static const int32_t offsets[] = {-1, 0, 1};
+static const uint32_t sizes[] = {32,   64,   128,  256,  512,
+                                 1024, 2048, 4096, 32768};
+static const uint32_t offsets[] = {-1, 0, 1};
 
 START_TEST(test_bitmap_rle_basic)
 {
   DESCRIBE_TEST;
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + offsets[j];
+      const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
 
       for (uint32_t pos = 0; pos < nbits; ++pos) {
@@ -43,7 +44,7 @@ START_TEST(test_bitmap_rle_range)
   DESCRIBE_TEST;
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + offsets[j];
+      const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
 
       struct tw_bitmap_rle_word word = {.pos = 0, .count = nbits / 2};
@@ -66,7 +67,7 @@ START_TEST(test_bitmap_rle_copy_and_clone)
   DESCRIBE_TEST;
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + offsets[j];
+      const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *src = tw_bitmap_rle_new(nbits);
       struct tw_bitmap_rle *dst = tw_bitmap_rle_new(nbits);
 
@@ -105,11 +106,11 @@ START_TEST(test_bitmap_rle_zero_and_fill)
   DESCRIBE_TEST;
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + offsets[j];
+      const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
 
       ck_assert(tw_bitmap_rle_empty(bitmap));
-      ck_assert(tw_bitmap_rle_density(bitmap) == 0.0);
+      ck_assert(tw_almost_equal(tw_bitmap_rle_density(bitmap), 0.0));
       ck_assert(!tw_bitmap_rle_full(bitmap));
 
       tw_bitmap_rle_fill(bitmap);
@@ -120,7 +121,7 @@ START_TEST(test_bitmap_rle_zero_and_fill)
       }
 
       ck_assert(tw_bitmap_rle_full(bitmap));
-      ck_assert(tw_bitmap_rle_density(bitmap) == 1.0);
+      ck_assert(tw_almost_equal(tw_bitmap_rle_density(bitmap), 1.0));
       ck_assert(!tw_bitmap_rle_empty(bitmap));
 
       tw_bitmap_rle_zero(bitmap);
@@ -148,7 +149,7 @@ START_TEST(test_bitmap_rle_find_first)
   DESCRIBE_TEST;
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + offsets[j];
+      const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
 
       ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 0);
@@ -189,7 +190,7 @@ START_TEST(test_bitmap_rle_equal)
   DESCRIBE_TEST;
   for (size_t i = 0; i < TW_ARRAY_SIZE(sizes); ++i) {
     for (size_t j = 0; j < TW_ARRAY_SIZE(offsets); ++j) {
-      const int32_t nbits = sizes[i] + offsets[j];
+      const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *a = tw_bitmap_rle_new(nbits);
       struct tw_bitmap_rle *b = tw_bitmap_rle_clone(a);
 
@@ -498,7 +499,4 @@ int run_tests()
   return number_failed;
 }
 
-int main(int argc, char *argv[])
-{
-  return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-}
+int main() { return (run_tests() == 0) ? EXIT_SUCCESS : EXIT_FAILURE; }

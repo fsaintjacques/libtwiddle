@@ -3,7 +3,7 @@
 
 #include <x86intrin.h>
 
-#if USE_AVX2
+#ifdef USE_AVX2
 /* http://stackoverflow.com/questions/13219146/how-to-sum-m256-horizontally */
 static inline float horizontal_sum_avx2(__m256 x)
 {
@@ -57,7 +57,7 @@ static inline void hyperloglog_count_avx2(const uint8_t *registers,
   *inverse_sum = horizontal_sum_avx2(agg);
 }
 
-#elif USE_AVX
+#elif defined USE_AVX
 
 static inline float horizontal_sum_avx(__m128 x)
 {
@@ -108,7 +108,7 @@ static inline void hyperloglog_count_port(const uint8_t *registers,
                                           float *inverse_sum, uint32_t *n_zeros)
 
 {
-  for (int i = 0; i < n_registers; ++i) {
+  for (size_t i = 0; i < n_registers; ++i) {
     const uint8_t val = registers[i];
     *inverse_sum += powf(2, -1.0 * val);
     if (val == 0) {

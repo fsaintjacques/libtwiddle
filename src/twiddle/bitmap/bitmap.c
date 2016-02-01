@@ -84,7 +84,7 @@ struct tw_bitmap *tw_bitmap_clone(const struct tw_bitmap *bitmap)
   return tw_bitmap_copy(bitmap, new);
 }
 
-void inline tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
+inline void tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
 
@@ -95,7 +95,7 @@ void inline tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
 }
 
-void inline tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos)
+inline void tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
   assert(bitmap && pos < bitmap->info.size);
 
@@ -252,10 +252,10 @@ struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
 #ifdef USE_AVX512
   BITMAP_NOT_LOOP(__m512i, _mm512_set1_epi8, _mm512_load_si512,
                   _mm512_xor_si512, _mm512_store_si512)
-#elif USE_AVX2
+#elif defined USE_AVX2
   BITMAP_NOT_LOOP(__m256i, _mm256_set1_epi8, _mm256_load_si256,
                   _mm256_xor_si256, _mm256_store_si256)
-#elif USE_AVX
+#elif defined USE_AVX
   BITMAP_NOT_LOOP(__m128i, _mm_set1_epi8, _mm_load_si128, _mm_xor_si128,
                   _mm_store_si128)
 #else
@@ -274,7 +274,7 @@ struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
     simd_t *a_addr = (simd_t *)a->data + i, *b_addr = (simd_t *)b->data + i;   \
     const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
     const int h_cmp = simd_maskmove(v_cmp);                                    \
-    if (h_cmp != eq_mask) {                                                    \
+    if (h_cmp != (int)eq_mask) {                                               \
       return false;                                                            \
     }                                                                          \
   }
@@ -290,10 +290,10 @@ bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
   const uint64_t size = a->info.size;
 
 /* AVX512 does not have movemask_epi8 equivalent, fallback to AVX2 */
-#if USE_AVX2
+#ifdef USE_AVX2
   BITMAP_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi8,
                  _mm256_movemask_epi8, 0xFFFFFFFF)
-#elif USE_AVX
+#elif defined USE_AVX
   BITMAP_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
                  0xFFFF)
 #else
@@ -331,13 +331,13 @@ struct tw_bitmap *tw_bitmap_union(const struct tw_bitmap *src,
   const uint64_t size = src->info.size;
 
   uint64_t count = 0;
-#if USE_AVX512
+#ifdef USE_AVX512
   BITMAP_OP_LOOP(__m512i, _mm512_load_si512, _mm512_or_si512,
                  _mm512_store_si512)
-#elif USE_AVX2
+#elif defined USE_AVX2
   BITMAP_OP_LOOP(__m256i, _mm256_load_si256, _mm256_or_si256,
                  _mm256_store_si256)
-#elif USE_AVX
+#elif defined USE_AVX
   BITMAP_OP_LOOP(__m128i, _mm_load_si128, _mm_or_si128, _mm_store_si128)
 #else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
@@ -363,13 +363,13 @@ struct tw_bitmap *tw_bitmap_intersection(const struct tw_bitmap *src,
   const uint64_t size = src->info.size;
 
   uint64_t count = 0;
-#if USE_AVX512
+#ifdef USE_AVX512
   BITMAP_OP_LOOP(__m512i, _mm512_load_si512, _mm512_and_si512,
                  _mm512_store_si512)
-#elif USE_AVX2
+#elif defined USE_AVX2
   BITMAP_OP_LOOP(__m256i, _mm256_load_si256, _mm256_and_si256,
                  _mm256_store_si256)
-#elif USE_AVX
+#elif defined USE_AVX
   BITMAP_OP_LOOP(__m128i, _mm_load_si128, _mm_and_si128, _mm_store_si128)
 #else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
@@ -395,13 +395,13 @@ struct tw_bitmap *tw_bitmap_xor(const struct tw_bitmap *src,
   const uint64_t size = src->info.size;
 
   uint64_t count = 0;
-#if USE_AVX512
+#ifdef USE_AVX512
   BITMAP_OP_LOOP(__m512i, _mm512_load_si512, _mm512_xor_si512,
                  _mm512_store_si512)
-#elif USE_AVX2
+#elif defined USE_AVX2
   BITMAP_OP_LOOP(__m256i, _mm256_load_si256, _mm256_xor_si256,
                  _mm256_store_si256)
-#elif USE_AVX
+#elif defined USE_AVX
   BITMAP_OP_LOOP(__m128i, _mm_load_si128, _mm_xor_si128, _mm_store_si128)
 #else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {

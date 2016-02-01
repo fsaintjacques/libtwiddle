@@ -3,7 +3,7 @@
 
 #include <twiddle/bloomfilter/bloomfilter_a2.h>
 
-int main(int argc, char *argv[])
+int main()
 {
   const uint64_t nbits = 1024;
   const uint16_t k = 7;
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
    * eviction policy.
    */
 
-  for (int i = 0; i < nbits * 10; ++i) {
+  for (size_t i = 0; i < nbits * 10; ++i) {
     tw_bloomfilter_a2_set(bf, (void *)&i, sizeof(i));
     assert(tw_bloomfilter_a2_density(bf) < 2 * density);
   }

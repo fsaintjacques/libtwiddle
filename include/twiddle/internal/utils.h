@@ -1,6 +1,9 @@
 #ifndef TWIDDLE_INTERNAL_UTILS_H
 #define TWIDDLE_INTERNAL_UTILS_H
 
+#include <float.h>
+#include <math.h>
+
 /* Number of bytes per cache line */
 #ifndef TW_CACHELINE
 #define TW_CACHELINE 64
@@ -28,5 +31,7 @@
 
 #define tw_min(a, b) ((a < b) ? a : b)
 #define tw_max(a, b) ((a < b) ? b : a)
+
+#define tw_almost_equal(a, b) (fabs(a - b) < FLT_EPSILON)
 
 #endif /* TWIDDLE_INTERNAL_UTILS_H */

@@ -38,7 +38,7 @@ function run_tests {
     CMAKE_FLAGS="-DUSE_AVX=ON"
   else
     # valgrind seems to fail on avx instruction in travis
-    CMAKE_FLAGS="-DUSE_VALGRIND=ON"
+    CMAKE_FLAGS="-DUSE_VALGRIND=ON -DUSE_AVX=OFF"
   fi
 
   pushd $dir

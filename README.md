@@ -53,11 +53,17 @@ In most cases, you should be able to build the source code using the following:
 Building with SIMD support
 --------------------------
 
-cmake can be invoked with the following options for SIMD support:
+By default, libtwiddle will compile with `AVX` SIMD instructions. If you wish to
+enable newer instructions, the following flags provide the option to do so:
 
-  * AVX;    `-DUSE_AVX=ON`
   * AVX2;   `-DUSE_AVX2=ON`
   * AVX512; `-DUSE_AVX512=ON`
+
+Note that `AVX2` implies activating `AVX`, and `AVX512` implies `AVX2`, etc.
+Some functions can't be implemented with `AVX512`, thus fullback on `AVX2`.
+
+If one wants to compile without SIMD support, cmake can be invoked with
+`-DUSE_AVX=OFF -DUSE_AVX2=OFF -DUSE_AVX512=OFF`.
 
 Contributions
 -------------

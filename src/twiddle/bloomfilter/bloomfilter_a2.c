@@ -49,7 +49,7 @@ struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_clone(const struct tw_bloomfilter_a2 *bf)
 {
   struct tw_bloomfilter_a2 *new = tw_bloomfilter_a2_new(
-      bf->active->bitmap->size, bf->active->info.k, bf->density);
+      bf->active->bitmap->size, bf->active->k, bf->density);
   if (!new) {
     return NULL;
   }

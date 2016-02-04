@@ -7,23 +7,6 @@
 
 #include <twiddle/bitmap/bitmap.h>
 
-/**
- * struct tw_bloomfilter_info - bloomfilter header
- * @size: number of bits the bloomfilter holds
- * @k:    number of hash functions used
- */
-struct tw_bloomfilter_info {
-  uint64_t hash_seed;
-  uint16_t k;
-};
-
-#define tw_bloomfilter_info_init(k, h)                                         \
-  (struct tw_bloomfilter_info) { .k = k, .hash_seed = h }
-#define tw_bloomfilter_info_copy(src, dst)                                     \
-  dst = (struct tw_bloomfilter_info) { .k = src.k, .hash_seed = src.hash_seed }
-#define tw_bloomfilter_info_equal(src, dst)                                    \
-  (src.k == dst.k && src.hash_seed == dst.hash_seed)
-
 #define TW_BF_DEFAULT_SEED 3781869495ULL
 
 #define TW_LOG_2 0.6931471805599453
@@ -33,15 +16,14 @@ struct tw_bloomfilter_info {
 
 /**
  * struct tw_bloomfilter - bloomfilter
- * @info:      header information
- * @hash_seed: seed used in hashing function
- * @bitmap:    bitmap holding the bits
+ * @k:      number of hash functions
+ * @bitmap: bitmap holding the bits
  *
  * This bloomfilter is static and does not support automatic resizing. The
  * underlaying storage is struct tw_bitmap.
  */
 struct tw_bloomfilter {
-  struct tw_bloomfilter_info info;
+  uint16_t k;
   struct tw_bitmap *bitmap;
 };
 

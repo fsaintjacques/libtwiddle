@@ -25,10 +25,6 @@
 #define tw_likely(x) __builtin_expect((x), 1)
 #define tw_unlikely(x) __builtin_expect((x), 0)
 
-#define tw_ffsll(x) __builtin_ffsll(x)
-#define tw_ffzll(x) __builtin_ffsll(~x)
-#define tw_popcountl(x) __builtin_popcountl(x)
-
 #define tw_min(a, b) ((a < b) ? a : b)
 #define tw_max(a, b) ((a < b) ? b : a)
 

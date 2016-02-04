@@ -202,7 +202,7 @@ int64_t tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap)
   }
 
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->size); ++i) {
-    const int pos = tw_ffzll(bitmap->data[i]);
+    const int pos = __builtin_ffsll(~bitmap->data[i]);
     if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos - 1);
     }
@@ -227,7 +227,7 @@ int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
   }
 
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->size); ++i) {
-    const int pos = tw_ffsll(bitmap->data[i]);
+    const int pos = __builtin_ffsll(bitmap->data[i]);
     if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos - 1);
     }
@@ -315,7 +315,7 @@ bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
     const simd_t res = simd_op(simd_load(src_vec), simd_load(dst_vec));        \
     simd_store(dst_vec, res);                                                  \
     for (size_t j = 0; j < uint64_t_per_simd_t; j++) {                         \
-      count += tw_popcountl(dst->data[i * uint64_t_per_simd_t + j]);           \
+      count += __builtin_popcountl(dst->data[i * uint64_t_per_simd_t + j]);    \
     }                                                                          \
   }
 
@@ -342,7 +342,7 @@ struct tw_bitmap *tw_bitmap_union(const struct tw_bitmap *src,
 #else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     dst->data[i] |= src->data[i];
-    count += tw_popcountl(dst->data[i]);
+    count += __builtin_popcountl(dst->data[i]);
   }
 #endif
 
@@ -374,7 +374,7 @@ struct tw_bitmap *tw_bitmap_intersection(const struct tw_bitmap *src,
 #else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     dst->data[i] &= src->data[i];
-    count += tw_popcountl(dst->data[i]);
+    count += __builtin_popcountl(dst->data[i]);
   }
 #endif
 
@@ -406,7 +406,7 @@ struct tw_bitmap *tw_bitmap_xor(const struct tw_bitmap *src,
 #else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     dst->data[i] ^= src->data[i];
-    count += tw_popcountl(dst->data[i]);
+    count += __builtin_popcountl(dst->data[i]);
   }
 #endif
 

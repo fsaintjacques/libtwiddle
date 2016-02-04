@@ -7,8 +7,8 @@
 
 static inline void tw_bitmap_clear_extra_bits(struct tw_bitmap *bitmap)
 {
-  const uint64_t size = bitmap->info.size;
-  const uint64_t rest = size % TW_BITS_PER_BITMAP;
+  const uint64_t size = bitmap->size;
+  const uint8_t rest = size % TW_BITS_PER_BITMAP;
   if (rest) {
     bitmap->data[BITMAP_POS(size)] ^= ~0UL << rest;
   }
@@ -36,7 +36,7 @@ struct tw_bitmap *tw_bitmap_new(uint64_t size)
 
   memset(bitmap->data, 0, data_size);
 
-  bitmap->info = tw_bitmap_info_init(data_size * TW_BITS_IN_WORD);
+  bitmap->size = data_size * TW_BITS_IN_WORD;
   return bitmap;
 }
 
@@ -59,15 +59,15 @@ struct tw_bitmap *tw_bitmap_copy(const struct tw_bitmap *src,
    *   assert(tw_bitmap_copy(a, b) == b);  // fails because b.size is now 31
    *
    * No memory leaks are involved since calls to tw_bitmap_free don't depends
-   * on bitmap->info.size;
+   * on bitmap->size;
    */
-  if (tw_unlikely(dst->info.size != src->info.size)) {
+  if (tw_unlikely(dst->size != src->size)) {
     return NULL;
   }
 
-  tw_bitmap_info_copy(src->info, dst->info);
+  dst->count = src->count;
   memcpy(dst->data, src->data,
-         TW_BITMAP_PER_BITS(src->info.size) * TW_BYTES_PER_BITMAP);
+         TW_BITMAP_PER_BITS(src->size) * TW_BYTES_PER_BITMAP);
 
   return dst;
 }
@@ -76,7 +76,7 @@ struct tw_bitmap *tw_bitmap_clone(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
-  struct tw_bitmap *new = tw_bitmap_new(bitmap->info.size);
+  struct tw_bitmap *new = tw_bitmap_new(bitmap->size);
   if (!new) {
     return NULL;
   }
@@ -86,52 +86,53 @@ struct tw_bitmap *tw_bitmap_clone(const struct tw_bitmap *bitmap)
 
 inline void tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
-  assert(bitmap && pos < bitmap->info.size);
+  assert(bitmap && pos < bitmap->size);
 
   const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
   const bitmap_t new_bitmap = old_bitmap | MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
-  bitmap->info.count += changed;
+  bitmap->count += changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
+  ;
 }
 
 inline void tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
-  assert(bitmap && pos < bitmap->info.size);
+  assert(bitmap && pos < bitmap->size);
 
   const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
   const bitmap_t new_bitmap = old_bitmap & ~MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
-  bitmap->info.count -= changed;
+  bitmap->count -= changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
 }
 
 bool tw_bitmap_test(const struct tw_bitmap *bitmap, uint64_t pos)
 {
-  assert(bitmap && pos < bitmap->info.size);
+  assert(bitmap && pos < bitmap->size);
   return !!(bitmap->data[BITMAP_POS(pos)] & MASK(pos));
 }
 
 bool tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint64_t pos)
 {
-  assert(bitmap && pos < bitmap->info.size);
+  assert(bitmap && pos < bitmap->size);
 
   const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
   const bitmap_t new_bitmap = old_bitmap | MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
-  bitmap->info.count += changed;
+  bitmap->count += changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
   return !changed;
 }
 
 bool tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
 {
-  assert(bitmap && pos < bitmap->info.size);
+  assert(bitmap && pos < bitmap->size);
 
   const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
   const bitmap_t new_bitmap = old_bitmap & ~MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
-  bitmap->info.count -= changed;
+  bitmap->count -= changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
   return changed;
 }
@@ -139,25 +140,25 @@ bool tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
 bool tw_bitmap_empty(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-  return tw_bitmap_info_empty(bitmap->info);
+  return bitmap->count == 0;
 }
 
 bool tw_bitmap_full(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-  return tw_bitmap_info_full(bitmap->info);
+  return bitmap->size == bitmap->count;
 }
 
 uint64_t tw_bitmap_count(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-  return tw_bitmap_info_count(bitmap->info);
+  return bitmap->count;
 }
 
 float tw_bitmap_density(const struct tw_bitmap *bitmap)
 {
   assert(bitmap);
-  return tw_bitmap_info_density(bitmap->info);
+  return bitmap->count / (float)bitmap->size;
 }
 
 struct tw_bitmap *tw_bitmap_zero(struct tw_bitmap *bitmap)
@@ -165,9 +166,9 @@ struct tw_bitmap *tw_bitmap_zero(struct tw_bitmap *bitmap)
   assert(bitmap);
 
   memset(bitmap->data, 0,
-         TW_BITMAP_PER_BITS(bitmap->info.size) * TW_BYTES_PER_BITMAP);
+         TW_BITMAP_PER_BITS(bitmap->size) * TW_BYTES_PER_BITMAP);
 
-  bitmap->info.count = 0U;
+  bitmap->count = 0U;
 
   return bitmap;
 }
@@ -177,11 +178,11 @@ struct tw_bitmap *tw_bitmap_fill(struct tw_bitmap *bitmap)
   assert(bitmap);
 
   memset(bitmap->data, 0xFF,
-         TW_BITMAP_PER_BITS(bitmap->info.size) * TW_BYTES_PER_BITMAP);
+         TW_BITMAP_PER_BITS(bitmap->size) * TW_BYTES_PER_BITMAP);
 
   tw_bitmap_clear_extra_bits(bitmap);
 
-  bitmap->info.count = bitmap->info.size;
+  bitmap->count = bitmap->size;
 
   return bitmap;
 }
@@ -199,7 +200,7 @@ int64_t tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap)
     return -1;
   }
 
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->size); ++i) {
     const int pos = tw_ffzll(bitmap->data[i]);
     if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos - 1);
@@ -224,7 +225,7 @@ int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
     return -1;
   }
 
-  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->info.size); ++i) {
+  for (size_t i = 0; i < TW_BITMAP_PER_BITS(bitmap->size); ++i) {
     const int pos = tw_ffsll(bitmap->data[i]);
     if (pos) {
       return (i * TW_BITS_PER_BITMAP) + (pos - 1);
@@ -247,7 +248,7 @@ struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
 {
   assert(bitmap);
 
-  const uint64_t size = bitmap->info.size;
+  const uint64_t size = bitmap->size;
 
 #ifdef USE_AVX512
   BITMAP_NOT_LOOP(__m512i, _mm512_set1_epi8, _mm512_load_si512,
@@ -264,7 +265,7 @@ struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
   }
 #endif
 
-  bitmap->info.count = bitmap->info.size - bitmap->info.count;
+  bitmap->count = bitmap->size - bitmap->count;
 
   return bitmap;
 }
@@ -283,11 +284,11 @@ bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
 {
   assert(a && b);
 
-  if (a->info.size != b->info.size || a->info.count != b->info.count) {
+  if (a->size != b->size || a->count != b->count) {
     return false;
   }
 
-  const uint64_t size = a->info.size;
+  const uint64_t size = a->size;
 
 /* AVX512 does not have movemask_epi8 equivalent, fallback to AVX2 */
 #ifdef USE_AVX2
@@ -324,11 +325,11 @@ struct tw_bitmap *tw_bitmap_union(const struct tw_bitmap *src,
 {
   assert(src && dst);
 
-  if (src->info.size != dst->info.size) {
+  if (src->size != dst->size) {
     return NULL;
   }
 
-  const uint64_t size = src->info.size;
+  const uint64_t size = src->size;
 
   uint64_t count = 0;
 #ifdef USE_AVX512
@@ -346,7 +347,7 @@ struct tw_bitmap *tw_bitmap_union(const struct tw_bitmap *src,
   }
 #endif
 
-  dst->info.count = count;
+  dst->count = count;
 
   return dst;
 }
@@ -356,11 +357,11 @@ struct tw_bitmap *tw_bitmap_intersection(const struct tw_bitmap *src,
 {
   assert(src && dst);
 
-  if (src->info.size != dst->info.size) {
+  if (src->size != dst->size) {
     return NULL;
   }
 
-  const uint64_t size = src->info.size;
+  const uint64_t size = src->size;
 
   uint64_t count = 0;
 #ifdef USE_AVX512
@@ -378,7 +379,7 @@ struct tw_bitmap *tw_bitmap_intersection(const struct tw_bitmap *src,
   }
 #endif
 
-  dst->info.count = count;
+  dst->count = count;
 
   return dst;
 }
@@ -388,11 +389,11 @@ struct tw_bitmap *tw_bitmap_xor(const struct tw_bitmap *src,
 {
   assert(src && dst);
 
-  if (src->info.size != dst->info.size) {
+  if (src->size != dst->size) {
     return NULL;
   }
 
-  const uint64_t size = src->info.size;
+  const uint64_t size = src->size;
 
   uint64_t count = 0;
 #ifdef USE_AVX512
@@ -410,7 +411,7 @@ struct tw_bitmap *tw_bitmap_xor(const struct tw_bitmap *src,
   }
 #endif
 
-  dst->info.count = count;
+  dst->count = count;
 
   return dst;
 }

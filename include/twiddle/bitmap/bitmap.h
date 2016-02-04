@@ -28,8 +28,6 @@
 
 /**
  * struct tw_bitmap_info - bitmap miscellaneous information
- * @size:  storage capacity in bits
- * @count: number of active bits
  */
 struct tw_bitmap_info {
   uint64_t size;
@@ -48,8 +46,9 @@ struct tw_bitmap_info {
 
 /**
  * struct tw_bitmap - bitmap data structure
- * @info: bitmap info header
- * @data: buffer holding the bits
+ * @size:  storage capacity in bits
+ * @count: number of active bits
+ * @data:  buffer holding the bits
  *
  * This is the most basic implementation of a bitmap. It does not support
  * resizing and concurrent operations (unless constrained to reads only).
@@ -59,7 +58,8 @@ struct tw_bitmap_info {
  * operations.
  */
 struct tw_bitmap {
-  struct tw_bitmap_info info;
+  uint64_t size;
+  uint64_t count;
   bitmap_t *data;
 };
 

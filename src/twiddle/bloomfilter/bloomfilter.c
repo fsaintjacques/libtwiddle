@@ -35,7 +35,7 @@ struct tw_bloomfilter *tw_bloomfilter_copy(const struct tw_bloomfilter *src,
 {
   assert(src && dst);
 
-  if (dst->bitmap->info.size != src->bitmap->info.size) {
+  if (dst->bitmap->size != src->bitmap->size) {
     return NULL;
   }
 
@@ -51,8 +51,7 @@ struct tw_bloomfilter *tw_bloomfilter_clone(const struct tw_bloomfilter *bf)
 {
   assert(bf);
 
-  struct tw_bloomfilter *new =
-      tw_bloomfilter_new(bf->bitmap->info.size, bf->info.k);
+  struct tw_bloomfilter *new = tw_bloomfilter_new(bf->bitmap->size, bf->info.k);
   if (!new) {
     return NULL;
   }
@@ -67,7 +66,7 @@ void tw_bloomfilter_set(struct tw_bloomfilter *bf, const void *key,
   const tw_uint128_t hash = tw_metrohash_128(bf->info.hash_seed, key, key_size);
   const uint16_t k = bf->info.k;
   struct tw_bitmap *bitmap = bf->bitmap;
-  const uint32_t b_size = bitmap->info.size;
+  const uint32_t b_size = bitmap->size;
 
   for (size_t i = 0; i < k; ++i) {
     tw_bitmap_set(bitmap, (hash.h + i * hash.l) % b_size);
@@ -82,7 +81,7 @@ bool tw_bloomfilter_test(const struct tw_bloomfilter *bf, const void *key,
 
   const uint16_t k = bf->info.k;
   const struct tw_bitmap *bitmap = bf->bitmap;
-  const uint32_t b_size = bitmap->info.size;
+  const uint32_t b_size = bitmap->size;
 
   for (size_t i = 0; i < k; ++i) {
     if (!tw_bitmap_test(bitmap, (hash.h + i * hash.l) % b_size)) {

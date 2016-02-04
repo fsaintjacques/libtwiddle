@@ -1,42 +1,42 @@
-LIBTWIDDLE
+libtwiddle
 ==========
 [![Build Status](https://travis-ci.org/fsaintjacques/libtwiddle.svg?branch=develop)](https://travis-ci.org/fsaintjacques/libtwiddle)
 [![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg?style=flat)](https://github.com/fsaintjacques/libtwiddle/blob/develop/LICENSE)
 
 
-libtwiddle is a data structure library aimed with speed for modern `x86-64` on
-linux. The following data structures are implemented:
+libtwiddle is a data structure library aiming for speed on modern
+Linux x86-64 systems. The following data structures are implemented:
 
-  * bitmaps (dense & RLE)
-  * bloom filters (standard & active-active)
-  * hyperloglog
-  * minhash
+  * bitmaps (dense & RLE);
+  * Bloom filters (standard & active-active);
+  * HyperLogLog
+  * MinHash
 
-See `EXAMPLES.md` or `tests/examples/` for examples.
+See [`EXAMPLES.md`](EXAMPLES.md) and
+[`tests/examples/`](tests/examples/) for examples.
 
 Why should you use libtwiddle?
 ------------------------------
 
-  * Written for modern age; `gcc >= 4.8`, `C11`, and `x86-64`
+  * Written for the modern age; `gcc >= 4.8`, using C11 features, on x86-64
   * Extensive testing; unit tests and random property testing with `hypothesis`
   * Python bindings; courtesy of property testing
-  * Vectorized implementations; `AVX`, `AVX2`, and partial `AVX512`
+  * Vectorized implementations; AVX, AVX2, and partial support for AVX512
   * Continuous integration
 
-INSTALL
+Install
 =======
 
-libtwiddle uses cmake as its build manager.
+libtwiddle uses CMake as its build manager.
 
 Prerequisite libraries
 ----------------------
 
-To build libtwiddle, you need the following libraries installed on
-your system:
+To build libtwiddle, you need the following:
 
-  * pkg-config
-  * check (http://check.sourceforge.net)
-  * latest C compilers (gcc >= 4.8, clang >= 3.5)
+  * pkg-config;
+  * Check (http://libcheck.github.io/check/);
+  * a recent C compiler (`gcc >= 4.8` or `clang >= 3.5`).
 
 Building from source
 --------------------
@@ -53,20 +53,20 @@ In most cases, you should be able to build the source code using the following:
 Building with SIMD support
 --------------------------
 
-By default, libtwiddle will compile with `AVX` SIMD instructions. If you wish to
-enable newer instructions, the following flags provide the option to do so:
+By default, libtwiddle will compile with AVX SIMD instructions. Use
+the following flags to enable newer instructions:
 
-  * AVX2;   `-DUSE_AVX2=ON`
-  * AVX512; `-DUSE_AVX512=ON`
+  * For AVX2:   `-DUSE_AVX2=ON`;
+  * for AVX512: `-DUSE_AVX512=ON`.
 
-Note that `AVX2` implies activating `AVX`, and `AVX512` implies `AVX2`, etc.
-Some functions can't be implemented with `AVX512`, thus fullback on `AVX2`.
+Note that AVX2 implies AVX, and AVX512 implies AVX2. Some functions
+can't be implemented with AVX512, and will fallback to AVX2 code.
 
-If one wants to compile without SIMD support, cmake can be invoked with
-`-DUSE_AVX=OFF -DUSE_AVX2=OFF -DUSE_AVX512=OFF`.
+To compile without SIMD support, invoke CMake with `-DUSE_AVX=OFF
+-DUSE_AVX2=OFF -DUSE_AVX512=OFF`.
 
 Contributions
 -------------
 
-Contributions are more than welcome, see `CONTRIBUTING.md` for detailed
-explanations.
+Contributions are more than welcome, see
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for details.

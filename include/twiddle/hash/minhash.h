@@ -5,30 +5,15 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/**
- * struct tw_minhash_info - minhash header
- * @n_registers: number of registers
- * @hash_seed: seed used by the hash function
- */
-struct tw_minhash_info {
-  uint32_t n_registers;
-  uint64_t hash_seed;
-};
-
-#define tw_minhash_info_init(n, h)                                             \
-  (struct tw_minhash_info) { .n_registers = n, .hash_seed = h }
-#define tw_minhash_info_equal(a, b)                                            \
-  (a.n_registers == b.n_registers && a.hash_seed == b.hash_seed)
-
 #define TW_BYTES_PER_MINHASH_REGISTER sizeof(uint32_t)
 
 /**
  * struct tw_minhash - minhash data structure
- * @info:      minhash info header
+ * @n_registers: number of registers
  * @registers: registers holding computed values
  */
 struct tw_minhash {
-  struct tw_minhash_info info;
+  uint32_t n_registers;
   uint32_t *registers;
 };
 

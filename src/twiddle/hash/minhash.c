@@ -28,7 +28,7 @@ struct tw_minhash *tw_minhash_new(uint32_t n_registers)
 
   memset(hash->registers, 0, data_size);
 
-  hash->info = tw_minhash_info_init(n_registers, TW_MINHASH_DEFAULT_SEED);
+  hash->n_registers = n_registers;
   return hash;
 }
 
@@ -43,12 +43,12 @@ struct tw_minhash *tw_minhash_copy(const struct tw_minhash *src,
 {
   assert(src && dst);
 
-  if (!tw_minhash_info_equal(src->info, dst->info)) {
+  if (src->n_registers != dst->n_registers) {
     return NULL;
   }
 
   memcpy(dst->registers, src->registers,
-         src->info.n_registers * TW_BYTES_PER_MINHASH_REGISTER);
+         src->n_registers * TW_BYTES_PER_MINHASH_REGISTER);
 
   return dst;
 }
@@ -57,11 +57,10 @@ struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash)
 {
   assert(hash);
 
-  struct tw_minhash *copy = tw_minhash_new(hash->info.n_registers);
+  struct tw_minhash *copy = tw_minhash_new(hash->n_registers);
   if (!copy) {
     return NULL;
   }
-  copy->info.hash_seed = hash->info.hash_seed;
 
   return tw_minhash_copy(hash, copy);
 }
@@ -70,9 +69,10 @@ void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
 {
   assert(hash && key && key_size > 0);
 
-  const uint64_t hashed = tw_metrohash_64(hash->info.hash_seed, key, key_size);
+  const uint64_t hashed =
+      tw_metrohash_64(TW_MINHASH_DEFAULT_SEED, key, key_size);
 
-  const uint32_t n_registers = hash->info.n_registers;
+  const uint32_t n_registers = hash->n_registers;
   for (size_t i = 0; i < n_registers; ++i) {
     const uint32_t hashed_i = ((uint32_t)hashed + i * (uint32_t)(hashed >> 32));
     hash->registers[i] = tw_max(hash->registers[i], hashed_i);
@@ -84,11 +84,12 @@ float tw_minhash_estimate(const struct tw_minhash *a,
 {
   assert(a && b);
 
-  if (!tw_minhash_info_equal(a->info, b->info)) {
+  const uint32_t n_registers = a->n_registers;
+
+  if (n_registers != b->n_registers) {
     return 0.0;
   }
 
-  const uint32_t n_registers = a->info.n_registers;
   uint32_t n_registers_eq = 0;
 
 #define MINH_EST_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)   \
@@ -121,11 +122,11 @@ bool tw_minhash_equal(const struct tw_minhash *a, const struct tw_minhash *b)
 {
   assert(a && b);
 
-  if (!tw_minhash_info_equal(a->info, b->info)) {
+  const uint32_t n_registers = a->n_registers;
+
+  if (n_registers != b->n_registers) {
     return false;
   }
-
-  const uint32_t n_registers = a->info.n_registers;
 
 #define MINH_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)    \
   const size_t n_vectors =                                                     \
@@ -162,11 +163,11 @@ struct tw_minhash *tw_minhash_merge(const struct tw_minhash *src,
 {
   assert(src && dst);
 
-  if (!tw_minhash_info_equal(src->info, dst->info)) {
+  const uint32_t n_registers = src->n_registers;
+
+  if (n_registers != dst->n_registers) {
     return NULL;
   }
-
-  const uint32_t n_registers = src->info.n_registers;
 
 #define MINH_MAX_LOOP(simd_t, simd_load, simd_max, simd_store)                 \
   const size_t n_vectors =                                                     \

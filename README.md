@@ -12,7 +12,8 @@ Linux x86-64 systems. The following data structures are implemented:
   * HyperLogLog
   * MinHash
 
-See `EXAMPLES.md` or `tests/examples/` for examples.
+See [`EXAMPLES.md`](EXAMPLES.md) and
+[`tests/examples/`](tests/examples/) for examples.
 
 Why should you use libtwiddle?
 ------------------------------
@@ -67,4 +68,5 @@ To compile without SIMD support, invoke CMake with `-DUSE_AVX=OFF
 Contributions
 -------------
 
-Contributions are more than welcome, see `CONTRIBUTING.md` for details.
+Contributions are more than welcome, see
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for details.

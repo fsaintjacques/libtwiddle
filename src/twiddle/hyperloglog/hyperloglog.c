@@ -22,7 +22,7 @@ struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
 
   size_t alloc_size = TW_ALLOC_TO_CACHELINE(1 << precision) * sizeof(uint8_t);
 
-  if (posix_memalign((void *)&hll->registers, TW_CACHELINE, alloc_size)) {
+  if ((hll->registers = aligned_alloc(TW_CACHELINE, alloc_size)) == NULL) {
     free(hll);
     return NULL;
   }

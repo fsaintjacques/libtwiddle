@@ -22,7 +22,7 @@ struct tw_minhash *tw_minhash_new(uint32_t n_registers)
   const size_t data_size =
       TW_ALLOC_TO_CACHELINE(n_registers * TW_BYTES_PER_MINHASH_REGISTER);
 
-  if (posix_memalign((void *)&(hash->registers), TW_CACHELINE, data_size)) {
+  if ((hash->registers = aligned_alloc(TW_CACHELINE, data_size)) == NULL) {
     free(hash);
     return NULL;
   }

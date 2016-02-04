@@ -17,7 +17,7 @@ See `EXAMPLES.md` or `tests/examples/` for examples.
 Why should you use libtwiddle?
 ------------------------------
 
-  * Written for modern age; `gcc >= 4.8`, `c99`, and `x86-64`
+  * Written for modern age; `gcc >= 4.8`, `C11`, and `x86-64`
   * Extensive testing; unit tests and random property testing with `hypothesis`
   * Python bindings; courtesy of property testing
   * Vectorized implementations; `AVX`, `AVX2`, and partial `AVX512`

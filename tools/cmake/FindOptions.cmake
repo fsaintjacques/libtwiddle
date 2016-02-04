@@ -4,10 +4,10 @@
 # set C standard
 if (CMAKE_VERSION VERSION_LESS "3.1")
   if (CMAKE_C_COMPILER_ID MATCHES "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-    set (CMAKE_C_FLAGS "-std=gnu99 ${CMAKE_C_FLAGS}")
+    set (CMAKE_C_FLAGS "-std=gnu11 ${CMAKE_C_FLAGS}")
   endif ()
 else ()
-  set (CMAKE_C_STANDARD 99)
+  set (CMAKE_C_STANDARD 11)
 endif ()
 
 

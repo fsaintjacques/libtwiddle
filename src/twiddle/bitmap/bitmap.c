@@ -30,7 +30,7 @@ struct tw_bitmap *tw_bitmap_new(uint64_t size)
   const size_t data_size =
       TW_ALLOC_TO_CACHELINE(TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP);
 
-  if (posix_memalign((void *)&(bitmap->data), TW_CACHELINE, data_size)) {
+  if ((bitmap->data = aligned_alloc(TW_CACHELINE, data_size)) == NULL) {
     free(bitmap);
     return NULL;
   }

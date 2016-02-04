@@ -28,8 +28,7 @@ struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
 
   memset(hll->registers, 0, alloc_size);
 
-  hll->info = (struct tw_hyperloglog_info){.precision = precision,
-                                           .hash_seed = TW_HLL_DEFAULT_SEED};
+  hll->precision = precision;
 
   return hll;
 }
@@ -46,12 +45,12 @@ struct tw_hyperloglog *tw_hyperloglog_copy(const struct tw_hyperloglog *src,
 {
   assert(src && dst);
 
-  const uint8_t precision = src->info.precision;
-  if (precision != dst->info.precision) {
+  const uint8_t precision = src->precision;
+  if (precision != dst->precision) {
     return NULL;
   }
 
-  tw_hyperloglog_info_copy(src->info, dst->info);
+  dst->precision = precision;
 
   const uint32_t n_registers = 1 << precision;
   memcpy(dst->registers, src->registers,
@@ -64,7 +63,7 @@ struct tw_hyperloglog *tw_hyperloglog_clone(const struct tw_hyperloglog *src)
 {
   assert(src);
 
-  struct tw_hyperloglog *dst = tw_hyperloglog_new(src->info.precision);
+  struct tw_hyperloglog *dst = tw_hyperloglog_new(src->precision);
   if (dst == NULL) {
     return NULL;
   }
@@ -76,8 +75,8 @@ void tw_hyperloglog_add(struct tw_hyperloglog *hll, const void *key,
                         size_t key_size)
 {
   assert(hll && key && key_size > 0);
-  const uint64_t hash = tw_metrohash_64(hll->info.hash_seed, key, key_size);
-  const uint8_t precision = hll->info.precision;
+  const uint64_t hash = tw_metrohash_64(TW_HLL_DEFAULT_SEED, key, key_size);
+  const uint8_t precision = hll->precision;
   const uint32_t bucket_idx = hash >> (64 - precision);
   const uint8_t leading_zeros = (__builtin_clzll(hash << precision |
                                                  (1 << (precision - 1))) +
@@ -107,7 +106,7 @@ double tw_hyperloglog_count(const struct tw_hyperloglog *hll)
 {
   assert(hll);
 
-  const uint8_t precision = hll->info.precision;
+  const uint8_t precision = hll->precision;
   const uint32_t n_registers = 1 << precision;
   uint32_t n_zeros = 0;
   float inverse_sum = 0.0;
@@ -128,11 +127,12 @@ bool tw_hyperloglog_equal(const struct tw_hyperloglog *a,
 {
   assert(a && b);
 
-  if (!tw_hyperloglog_info_equal(a->info, b->info)) {
+  const uint8_t precision = a->precision;
+
+  if (precision != b->precision) {
     return false;
   }
 
-  const uint8_t precision = a->info.precision;
   const uint32_t n_registers = 1 << precision;
 
 #define HLL_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)     \
@@ -169,11 +169,13 @@ struct tw_hyperloglog *tw_hyperloglog_merge(const struct tw_hyperloglog *src,
 {
   assert(src && dst);
 
-  if (!tw_hyperloglog_info_equal(src->info, dst->info)) {
+  const uint8_t precision = src->precision;
+
+  if (precision != dst->precision) {
     return NULL;
   }
 
-  const uint32_t n_registers = 1 << src->info.precision;
+  const uint32_t n_registers = 1 << precision;
 
 #define HLL_MAX_LOOP(simd_t, simd_load, simd_max, simd_store)                  \
   for (size_t i = 0; i < n_registers / sizeof(simd_t); ++i) {                  \

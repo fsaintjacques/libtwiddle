@@ -17,30 +17,9 @@
 #define TW_HLL_MIN_PRECISION 6
 #define TW_HLL_MAX_PRECISION 18
 
-#define tw_hyperloglog_info_copy(src, dst)                                     \
-  dst = (struct tw_hyperloglog_info)                                           \
-  {                                                                            \
-    .precision = src.precision, .hash_seed = src.hash_seed                     \
-  }
-#define tw_hyperloglog_info_equal(a, b)                                        \
-  (a.precision == b.precision && a.hash_seed == b.hash_seed)
-
-/**
- * struct tw_hyperloglog_info - hyperloglog header
- * @precision: number of registers will be defined as 2^precision.
- * @hash_seed: seed used by the hash function
- *
- * We use precision instead of n_registers because this is the definition used
- * in the original paper and makes it easier to follow the code.
- */
-struct tw_hyperloglog_info {
-  uint8_t precision;
-  uint64_t hash_seed;
-};
-
 /**
  * struct tw_hyperloglog - hyperloglog data structure
- * @info:      header information
+ * @precision: number of registers will be defined as 2^precision.
  * @registers: allocated array containing the 8bit registers
  *
  * This implementation does not use the 6-bit packing and/or mix dense/sparse
@@ -52,7 +31,7 @@ struct tw_hyperloglog_info {
  * Extending Database Technology. ACM, 2013.
  */
 struct tw_hyperloglog {
-  struct tw_hyperloglog_info info;
+  uint8_t precision;
   uint8_t *registers;
 };
 

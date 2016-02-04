@@ -4,6 +4,7 @@
 #include <x86intrin.h>
 
 #include <twiddle/bitmap/bitmap.h>
+#include <twiddle/internal/simd.h>
 
 static inline void tw_bitmap_clear_extra_bits(struct tw_bitmap *bitmap)
 {
@@ -235,12 +236,14 @@ int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap)
   return -1;
 }
 
+#define VECTORS_IN_BITS(simd_t, n_bits)                                        \
+  (n_bits / (sizeof(simd_t) * TW_BITS_IN_WORD))
+
 #define BITMAP_NOT_LOOP(simd_t, simd_set1, simd_load, simd_xor, simd_store)    \
   const simd_t mask = simd_set1(~0);                                           \
-  for (size_t i = 0; i < size / (sizeof(simd_t) * TW_BITS_IN_WORD); ++i) {     \
+  for (size_t i = 0; i < VECTORS_IN_BITS(simd_t, size); ++i) {                 \
     simd_t *addr = (simd_t *)bitmap->data + i;                                 \
-    const simd_t src = simd_load(addr);                                        \
-    const simd_t res = simd_xor(src, mask);                                    \
+    const simd_t res = simd_xor(simd_load(addr), mask);                        \
     simd_store(addr, res);                                                     \
   }
 
@@ -270,12 +273,10 @@ struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap)
   return bitmap;
 }
 
-#define BITMAP_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)  \
-  for (size_t i = 0; i < size / (sizeof(simd_t) * TW_BITS_IN_WORD); ++i) {     \
+#define BITMAP_EQ_LOOP(simd_t, simd_load, simd_equal)                          \
+  for (size_t i = 0; i < VECTORS_IN_BITS(simd_t, size); ++i) {                 \
     simd_t *a_addr = (simd_t *)a->data + i, *b_addr = (simd_t *)b->data + i;   \
-    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
-    const int h_cmp = simd_maskmove(v_cmp);                                    \
-    if (h_cmp != (int)eq_mask) {                                               \
+    if (!simd_equal(simd_load(a_addr), simd_load(b_addr))) {                   \
       return false;                                                            \
     }                                                                          \
   }
@@ -292,11 +293,9 @@ bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
 
 /* AVX512 does not have movemask_epi8 equivalent, fallback to AVX2 */
 #ifdef USE_AVX2
-  BITMAP_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi8,
-                 _mm256_movemask_epi8, 0xFFFFFFFF)
+  BITMAP_EQ_LOOP(__m256i, _mm256_load_si256, tw_mm256_equal)
 #elif defined USE_AVX
-  BITMAP_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
-                 0xFFFF)
+  BITMAP_EQ_LOOP(__m128i, _mm_load_si128, tw_mm_equal)
 #else
   for (size_t i = 0; i < TW_BITMAP_PER_BITS(size); ++i) {
     if (a->data[i] != b->data[i]) {
@@ -310,7 +309,7 @@ bool tw_bitmap_equal(const struct tw_bitmap *a, const struct tw_bitmap *b)
 
 #define BITMAP_OP_LOOP(simd_t, simd_load, simd_op, simd_store)                 \
   const size_t uint64_t_per_simd_t = sizeof(simd_t) / sizeof(uint64_t);        \
-  for (size_t i = 0; i < size / (sizeof(simd_t) * TW_BITS_IN_WORD); ++i) {     \
+  for (size_t i = 0; i < VECTORS_IN_BITS(simd_t, size); ++i) {                 \
     simd_t *src_vec = (simd_t *)src->data + i,                                 \
            *dst_vec = (simd_t *)dst->data + i;                                 \
     const simd_t res = simd_op(simd_load(src_vec), simd_load(dst_vec));        \

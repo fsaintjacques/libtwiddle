@@ -7,6 +7,7 @@
 #include <twiddle/hyperloglog/hyperloglog_simd.h>
 #include <twiddle/hash/metrohash.h>
 #include <twiddle/internal/utils.h>
+#include <twiddle/internal/simd.h>
 
 struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
 {
@@ -135,24 +136,20 @@ bool tw_hyperloglog_equal(const struct tw_hyperloglog *a,
 
   const uint32_t n_registers = 1 << precision;
 
-#define HLL_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)     \
+#define HLL_EQ_LOOP(simd_t, simd_load, simd_equal)                             \
   for (size_t i = 0; i < n_registers / (sizeof(simd_t)); ++i) {                \
     simd_t *a_addr = (simd_t *)a->registers + i,                               \
            *b_addr = (simd_t *)b->registers + i;                               \
-    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
-    const int h_cmp = simd_maskmove(v_cmp);                                    \
-    if (h_cmp != (int)eq_mask) {                                               \
+    if (!simd_equal(simd_load(a_addr), simd_load(b_addr))) {                   \
       return false;                                                            \
     }                                                                          \
   }
 
 /* AVX512 does not have movemask_epi8 equivalent, fallback to AVX2 */
 #ifdef USE_AVX2
-  HLL_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi8,
-              _mm256_movemask_epi8, 0xFFFFFFFF)
+  HLL_EQ_LOOP(__m256i, _mm256_load_si256, tw_mm256_equal)
 #elif defined USE_AVX
-  HLL_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi8, _mm_movemask_epi8,
-              0xFFFF)
+  HLL_EQ_LOOP(__m128i, _mm_load_si128, tw_mm_equal)
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     if (a->registers[i] != b->registers[i]) {

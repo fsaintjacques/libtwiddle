@@ -3,9 +3,10 @@
 #include <string.h>
 #include <x86intrin.h>
 
-#include <twiddle/internal/utils.h>
 #include <twiddle/hash/minhash.h>
 #include <twiddle/hash/metrohash.h>
+#include <twiddle/internal/utils.h>
+#include <twiddle/internal/simd.h>
 
 struct tw_minhash *tw_minhash_new(uint32_t n_registers)
 {
@@ -128,25 +129,21 @@ bool tw_minhash_equal(const struct tw_minhash *a, const struct tw_minhash *b)
     return false;
   }
 
-#define MINH_EQ_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)    \
+#define MINH_EQ_LOOP(simd_t, simd_load, simd_equal)                            \
   const size_t n_vectors =                                                     \
       n_registers * TW_BYTES_PER_MINHASH_REGISTER / sizeof(simd_t);            \
   for (size_t i = 0; i < n_vectors; ++i) {                                     \
     simd_t *a_addr = (simd_t *)a->registers + i,                               \
            *b_addr = (simd_t *)b->registers + i;                               \
-    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
-    const int h_cmp = simd_maskmove(v_cmp);                                    \
-    if (h_cmp != (int)eq_mask) {                                               \
+    if (!simd_equal(simd_load(a_addr), simd_load(b_addr))) {                   \
       return false;                                                            \
     }                                                                          \
   }
 
 #ifdef USE_AVX2
-  MINH_EQ_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
-               _mm256_movemask_epi8, 0xFFFFFFFF)
+  MINH_EQ_LOOP(__m256i, _mm256_load_si256, tw_mm256_equal)
 #elif defined USE_AVX
-  MINH_EQ_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
-               0xFFFF)
+  MINH_EQ_LOOP(__m128i, _mm_load_si128, tw_mm_equal)
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     if (a->registers[i] != b->registers[i]) {

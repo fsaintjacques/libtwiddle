@@ -38,7 +38,8 @@ struct tw_bitmap_rle_word {
  * @data:          buffer holding the bits
  */
 struct tw_bitmap_rle {
-  struct tw_bitmap_info info;
+  uint64_t size;
+  uint64_t count;
 
   uint64_t last_pos;
   uint64_t last_word_idx;

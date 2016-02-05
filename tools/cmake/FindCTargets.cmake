@@ -190,8 +190,6 @@ endfunction(add_c_executable)
 #-----------------------------------------------------------------------
 # Test case
 
-pkgconfig_prereq(check OPTIONAL)
-
 function(add_c_test TEST_NAME)
     get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
     add_c_executable(
@@ -199,7 +197,7 @@ function(add_c_test TEST_NAME)
         SKIP_INSTALL
         OUTPUT_NAME ${TEST_NAME}
         SOURCES ${TEST_NAME}.c
-        LIBRARIES check m rt
+        LIBRARIES check
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
     add_test(${TEST_NAME} ${TEST_NAME})
@@ -215,7 +213,7 @@ function(add_c_example EXAMPLE_NAME)
         SKIP_INSTALL
         OUTPUT_NAME ${EXAMPLE_NAME}
         SOURCES ${EXAMPLE_NAME}.c
-        LIBRARIES check m rt
+        LIBRARIES check
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
 endfunction(add_c_example)

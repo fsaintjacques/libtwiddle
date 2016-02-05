@@ -45,7 +45,7 @@ START_TEST(test_minhash_basic)
 
     const float jaccard = (float)intersection / (float)n_items;
     const float jaccard_estimate = tw_minhash_estimate(a, b);
-    ck_assert_msg(estimate_in_bounds(n_registers, jaccard, jaccard_estimate));
+    ck_assert(estimate_in_bounds(n_registers, jaccard, jaccard_estimate));
 
     tw_minhash_free(b);
     tw_minhash_free(a);

@@ -5,6 +5,7 @@
 
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/internal/simd.h>
+#include <twiddle/internal/utils.h>
 
 static inline void tw_bitmap_clear_extra_bits(struct tw_bitmap *bitmap)
 {
@@ -30,7 +31,7 @@ struct tw_bitmap *tw_bitmap_new(uint64_t size)
   const size_t data_size =
       TW_ALLOC_TO_CACHELINE(TW_BITMAP_PER_BITS(size) * TW_BYTES_PER_BITMAP);
 
-  if ((bitmap->data = aligned_alloc(TW_CACHELINE, data_size)) == NULL) {
+  if ((bitmap->data = malloc_aligned(TW_CACHELINE, data_size)) == NULL) {
     free(bitmap);
     return NULL;
   }

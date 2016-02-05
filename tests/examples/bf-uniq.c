@@ -120,6 +120,19 @@ static int parse_arguments(int argc, char **argv, int64_t *n, float *p,
   return 0;
 }
 
+#ifdef __APPLE__
+#include <sys/time.h>
+#define CLOCK_MONOTONIC 0
+int clock_gettime(int __attribute__((unused)) clk_id, struct timespec* t) {
+    struct timeval now;
+    int rv = gettimeofday(&now, NULL);
+    if (rv) return rv;
+    t->tv_sec  = now.tv_sec;
+    t->tv_nsec = now.tv_usec * 1000;
+    return 0;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
   int64_t n = 1000000;
@@ -146,14 +159,14 @@ int main(int argc, char *argv[])
   ssize_t line_len = 0;
 
   /* setup expire */
-  struct timespec next_expire;
+  struct timespec next_expire = {0, 0};
   clock_gettime(CLOCK_MONOTONIC, &next_expire);
   next_expire.tv_sec += c;
 
   while ((line_len = getline(&line, &buf_len, stdin)) != -1) {
 
     if (tw_unlikely(c > 0)) {
-      struct timespec now;
+      struct timespec now = {0, 0};
       clock_gettime(CLOCK_MONOTONIC, &now);
 
       if (tw_unlikely(now.tv_sec >= next_expire.tv_sec)) {

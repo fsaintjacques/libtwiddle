@@ -19,10 +19,7 @@ find_package(Options)
 #-----------------------------------------------------------------------
 # Check for prerequisite libraries
 
-#pkgconfig_prereq(libcork>=0.14.0)
-# HACK: forces travis to apply '-lm' linking.
-library_prereq(m)
-library_prereq(rt)
+pkgconfig_prereq(check OPTIONAL)
 
 #-----------------------------------------------------------------------
 # Include our subdirectories
@@ -31,4 +28,3 @@ add_subdirectory(docs)
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(tests)
-

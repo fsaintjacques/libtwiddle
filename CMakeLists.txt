@@ -16,13 +16,7 @@ find_package(CTargets)
 find_package(Version)
 find_package(Options)
 
-#-----------------------------------------------------------------------
-# Check for prerequisite libraries
-
 pkgconfig_prereq(check OPTIONAL)
-
-#-----------------------------------------------------------------------
-# Include our subdirectories
 
 add_subdirectory(docs)
 add_subdirectory(include)

@@ -23,7 +23,7 @@ setup(
     author_email="fsaintjacques@gmail.com",
     url="https://github.com/fsaintjacques/libtwiddle",
     py_modules=['twiddle'],
-    license="GPL License, version 3.0",
+    license="LGPL License, version 3.0",
     packages=find_packages(exclude=['tests']),
     tests_require=['hypothesis==1.19.0', 'pytest'],
     cmdclass={'test': PyTest}

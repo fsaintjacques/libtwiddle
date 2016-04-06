@@ -5,9 +5,10 @@
 
 #include <twiddle/internal/utils.h>
 #include <twiddle/hyperloglog/hyperloglog.h>
-#include <twiddle/hyperloglog/hyperloglog_simd.h>
 
 #include "include/helpers.h"
+
+#include "../src/twiddle/hyperloglog/hyperloglog_simd.c"
 
 bool estimate_within_error(double estimate, double real)
 {

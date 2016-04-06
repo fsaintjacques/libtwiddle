@@ -4,10 +4,11 @@
 #include <x86intrin.h>
 
 #include <twiddle/hyperloglog/hyperloglog.h>
-#include <twiddle/hyperloglog/hyperloglog_simd.h>
 #include <twiddle/hash/metrohash.h>
 #include <twiddle/internal/utils.h>
 #include <twiddle/internal/simd.h>
+
+#include "hyperloglog_simd.c"
 
 struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
 {

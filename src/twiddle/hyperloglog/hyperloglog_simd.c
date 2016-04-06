@@ -1,7 +1,7 @@
-#ifndef TWIDDLE_HYPERLOGLOG_SIMD_H
-#define TWIDDLE_HYPERLOGLOG_SIMD_H
-
+#include <math.h>
 #include <x86intrin.h>
+
+#include <twiddle/hyperloglog/hyperloglog.h>
 
 #ifdef USE_AVX2
 /* http://stackoverflow.com/questions/13219146/how-to-sum-m256-horizontally */
@@ -59,7 +59,7 @@ static inline void hyperloglog_count_avx2(const uint8_t *registers,
 
 #elif defined USE_AVX
 
-static inline float horizontal_sum_avx(__m128 x)
+inline float horizontal_sum_avx(__m128 x)
 {
   x = _mm_hadd_ps(x, x);
   x = _mm_hadd_ps(x, x);
@@ -73,7 +73,7 @@ static inline float horizontal_sum_avx(__m128 x)
 #define inverse_power_avx(simd)                                                \
   _mm_sub_epi32(ones, _mm_slli_epi32(_mm_cvtepu8_epi32(simd), 23))
 
-static inline void hyperloglog_count_avx(const uint8_t *registers,
+inline void hyperloglog_count_avx(const uint8_t *registers,
                                          uint32_t n_registers,
                                          float *inverse_sum, uint32_t *n_zeros)
 {
@@ -103,7 +103,7 @@ static inline void hyperloglog_count_avx(const uint8_t *registers,
 
 #endif
 
-static inline void hyperloglog_count_port(const uint8_t *registers,
+inline void hyperloglog_count_port(const uint8_t *registers,
                                           uint32_t n_registers,
                                           float *inverse_sum, uint32_t *n_zeros)
 
@@ -116,5 +116,3 @@ static inline void hyperloglog_count_port(const uint8_t *registers,
     }
   }
 }
-
-#endif // TWIDDLE_HYPERLOGLOG_SIMD_H

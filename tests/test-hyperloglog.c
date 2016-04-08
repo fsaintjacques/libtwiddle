@@ -6,7 +6,7 @@
 #include <twiddle/internal/utils.h>
 #include <twiddle/hyperloglog/hyperloglog.h>
 
-#include "include/helpers.h"
+#include "test.h"
 
 #include "../src/twiddle/hyperloglog/hyperloglog_simd.c"
 
@@ -23,7 +23,7 @@ START_TEST(test_hyperloglog_basic)
   for (uint8_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
     const uint32_t n_registers = 1 << p;
     struct tw_hyperloglog *hll = tw_hyperloglog_new(p);
-    ck_assert(hll != NULL);
+    ck_assert_ptr_ne(hll, NULL);
 
     double n_elems = 0.0;
 
@@ -69,12 +69,12 @@ START_TEST(test_hyperloglog_copy_and_clone)
       }
     }
 
-    ck_assert(tw_hyperloglog_copy(hll, copy) != NULL);
+    ck_assert_ptr_ne(tw_hyperloglog_copy(hll, copy), NULL);
     ck_assert(
         tw_almost_equal(tw_hyperloglog_count(hll), tw_hyperloglog_count(copy)));
 
     struct tw_hyperloglog *clone = tw_hyperloglog_clone(copy);
-    ck_assert(clone != NULL);
+    ck_assert_ptr_ne(clone, NULL);
     ck_assert(tw_hyperloglog_equal(hll, clone));
     ck_assert(tw_almost_equal(tw_hyperloglog_count(hll),
                               tw_hyperloglog_count(clone)));
@@ -107,7 +107,7 @@ START_TEST(test_hyperloglog_merge)
 
     prev = tw_hyperloglog_clone(dst);
 
-    ck_assert(tw_hyperloglog_merge(src, dst) != NULL);
+    ck_assert_ptr_ne(tw_hyperloglog_merge(src, dst), NULL);
 
     // merge should guarantee size increase
     ck_assert(tw_hyperloglog_count(src) <= tw_hyperloglog_count(dst));
@@ -132,7 +132,7 @@ START_TEST(test_hyperloglog_simd)
   for (uint8_t p = TW_HLL_MIN_PRECISION; p <= TW_HLL_MAX_PRECISION; ++p) {
     const uint32_t n_registers = 1 << p;
     struct tw_hyperloglog *hll = tw_hyperloglog_new(p);
-    ck_assert(hll != NULL);
+    ck_assert_ptr_ne(hll, NULL);
 
     double n_elems = 0.0;
 
@@ -159,7 +159,7 @@ START_TEST(test_hyperloglog_simd)
 #else
     hyperloglog_count_port(hll->registers, n_registers, &sum_2, &n_zeros_2);
 #endif
-    ck_assert(n_zeros_1 == n_zeros_2);
+    ck_assert_uint32_t_eq(n_zeros_1, n_zeros_2);
     /* float sums is _not_ associative, thus it might differ a bit when using
      * SIMD operations */
     ck_assert(fabs(sum_1 - sum_2) < sum_1 * 0.00001);
@@ -186,7 +186,7 @@ START_TEST(test_hyperloglog_simd)
 #else
     hyperloglog_count_port(hll->registers, n_registers, &sum_2, &n_zeros_2);
 #endif
-    ck_assert(n_zeros_1 == n_zeros_2);
+    ck_assert_uint32_t_eq(n_zeros_1, n_zeros_2);
     /* float sums is _not_ associative, thus it might differ a bit when using
      * SIMD operations */
     ck_assert(fabs(sum_1 - sum_2) < sum_1 * 0.0001);

@@ -5,7 +5,7 @@
 #include <twiddle/bitmap/bitmap_rle.h>
 #include <twiddle/internal/utils.h>
 
-#include "include/helpers.h"
+#include "test.h"
 
 static const uint32_t sizes[] = {32,   64,   128,  256,  512,
                                  1024, 2048, 4096, 32768};
@@ -75,7 +75,7 @@ START_TEST(test_bitmap_rle_copy_and_clone)
       tw_bitmap_rle_set_word(src, &word);
       tw_bitmap_rle_set_range(src, nbits / 2 + 1, nbits - 1);
 
-      ck_assert(tw_bitmap_rle_copy(src, dst) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_copy(src, dst), NULL);
 
       /* free original to catch potential dangling pointers */
       tw_bitmap_rle_free(src);
@@ -152,32 +152,32 @@ START_TEST(test_bitmap_rle_find_first)
       const uint32_t nbits = sizes[i] + offsets[j];
       struct tw_bitmap_rle *bitmap = tw_bitmap_rle_new(nbits);
 
-      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 0);
-      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == -1);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_zero(bitmap), 0);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_bit(bitmap), -1);
 
       tw_bitmap_rle_set(bitmap, 0);
-      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 1);
-      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_zero(bitmap), 1);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_bit(bitmap), 0);
 
       tw_bitmap_rle_set(bitmap, 1);
-      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 2);
-      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_zero(bitmap), 2);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_bit(bitmap), 0);
 
       tw_bitmap_rle_set(bitmap, 3);
-      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 2);
-      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_zero(bitmap), 2);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_bit(bitmap), 0);
 
       tw_bitmap_rle_fill(bitmap);
-      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == -1);
-      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == 0);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_zero(bitmap), -1);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_bit(bitmap), 0);
 
       tw_bitmap_rle_zero(bitmap);
-      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 0);
-      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == -1);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_zero(bitmap), 0);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_bit(bitmap), -1);
 
       tw_bitmap_rle_set(bitmap, nbits - 1);
-      ck_assert(tw_bitmap_rle_find_first_zero(bitmap) == 0);
-      ck_assert(tw_bitmap_rle_find_first_bit(bitmap) == nbits - 1);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_zero(bitmap), 0);
+      ck_assert_int64_t_eq(tw_bitmap_rle_find_first_bit(bitmap), nbits - 1);
 
       tw_bitmap_rle_free(bitmap);
     }
@@ -292,13 +292,13 @@ START_TEST(test_bitmap_rle_union)
       struct tw_bitmap_rle *b = tw_bitmap_rle_new(nbits);
       struct tw_bitmap_rle *c = tw_bitmap_rle_new(nbits);
 
-      ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_union(a, b, c), NULL);
       ck_assert(tw_bitmap_rle_empty(a));
       ck_assert(tw_bitmap_rle_empty(b));
       ck_assert(tw_bitmap_rle_empty(c));
 
       tw_bitmap_rle_fill(a);
-      ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_union(a, b, c), NULL);
       ck_assert(tw_bitmap_rle_full(a));
       ck_assert(tw_bitmap_rle_empty(b));
       ck_assert(tw_bitmap_rle_full(c));
@@ -309,7 +309,7 @@ START_TEST(test_bitmap_rle_union)
 
       tw_bitmap_rle_set_range(a, 0, nbits / 2 + 1);
       tw_bitmap_rle_set_range(b, nbits / 2 - 1, nbits - 1);
-      ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_union(a, b, c), NULL);
       ck_assert(!tw_bitmap_rle_empty(a) && !tw_bitmap_rle_full(a));
       ck_assert(!tw_bitmap_rle_empty(b) && !tw_bitmap_rle_full(b));
       ck_assert(tw_bitmap_rle_full(c));
@@ -343,7 +343,7 @@ START_TEST(test_bitmap_rle_union_advanced)
   tw_bitmap_rle_set_range(a, 327, 410);
   tw_bitmap_rle_set_range(b, 409, 500);
   tw_bitmap_rle_set_range(a, 510, 511);
-  ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
+  ck_assert_ptr_ne(tw_bitmap_rle_union(a, b, c), NULL);
 
   tw_bitmap_rle_set_range(expected, 0, 325);
   tw_bitmap_rle_set_range(expected, 327, 500);
@@ -359,7 +359,7 @@ START_TEST(test_bitmap_rle_union_advanced)
   tw_bitmap_rle_set_range(a, 0, 4);
   tw_bitmap_rle_set_range(b, 6, 8);
   tw_bitmap_rle_set_range(b, 10, 16);
-  ck_assert(tw_bitmap_rle_union(a, b, c) != NULL);
+  ck_assert_ptr_ne(tw_bitmap_rle_union(a, b, c), NULL);
 
   tw_bitmap_rle_set_range(expected, 0, 4);
   tw_bitmap_rle_set_range(expected, 6, 8);
@@ -383,14 +383,14 @@ START_TEST(test_bitmap_rle_intersection)
       struct tw_bitmap_rle *b = tw_bitmap_rle_new(nbits);
       struct tw_bitmap_rle *c = tw_bitmap_rle_new(nbits);
 
-      ck_assert(tw_bitmap_rle_intersection(a, b, c) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_intersection(a, b, c), NULL);
       ck_assert(tw_bitmap_rle_empty(a));
       ck_assert(tw_bitmap_rle_empty(b));
       ck_assert(tw_bitmap_rle_empty(c));
 
       tw_bitmap_rle_fill(a);
       tw_bitmap_rle_zero(b);
-      ck_assert(tw_bitmap_rle_intersection(a, b, c) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_intersection(a, b, c), NULL);
       ck_assert(tw_bitmap_rle_full(a));
       ck_assert(tw_bitmap_rle_empty(b));
       ck_assert(tw_bitmap_rle_empty(c));
@@ -401,7 +401,7 @@ START_TEST(test_bitmap_rle_intersection)
 
       tw_bitmap_rle_fill(a);
       tw_bitmap_rle_fill(b);
-      ck_assert(tw_bitmap_rle_intersection(a, b, c) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_intersection(a, b, c), NULL);
       ck_assert(tw_bitmap_rle_full(a));
       ck_assert(tw_bitmap_rle_full(b));
       ck_assert(tw_bitmap_rle_full(c));
@@ -412,7 +412,7 @@ START_TEST(test_bitmap_rle_intersection)
 
       tw_bitmap_rle_set_range(a, 0, 4);
       tw_bitmap_rle_set_range(b, 4, nbits - 1);
-      ck_assert(tw_bitmap_rle_intersection(a, b, c) != NULL);
+      ck_assert_ptr_ne(tw_bitmap_rle_intersection(a, b, c), NULL);
       ck_assert(!tw_bitmap_rle_empty(a) && !tw_bitmap_rle_full(a));
       ck_assert(!tw_bitmap_rle_empty(b) && !tw_bitmap_rle_full(b));
       ck_assert(!tw_bitmap_rle_empty(c) && !tw_bitmap_rle_full(c));
@@ -446,7 +446,7 @@ START_TEST(test_bitmap_rle_intersection_advanced)
   tw_bitmap_rle_set_range(b, 10, 15);
   tw_bitmap_rle_set_range(b, 17, 128);
   tw_bitmap_rle_set_range(b, 255, 500);
-  ck_assert(tw_bitmap_rle_intersection(a, b, c) != NULL);
+  ck_assert_ptr_ne(tw_bitmap_rle_intersection(a, b, c), NULL);
 
   tw_bitmap_rle_set_range(expected, 0, 8);
   tw_bitmap_rle_set_range(expected, 10, 15);

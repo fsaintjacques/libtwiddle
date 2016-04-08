@@ -7,7 +7,7 @@
 #include <twiddle/internal/utils.h>
 #include <twiddle/hash/minhash.h>
 
-#include "include/helpers.h"
+#include "test.h"
 
 static bool estimate_in_bounds(uint32_t n, float jaccard,
                                float jaccard_estimate)
@@ -86,7 +86,7 @@ START_TEST(test_minhash_copy_and_clone)
     struct tw_minhash *c = tw_minhash_new(n_registers);
 
     ck_assert(!tw_minhash_equal(a, c));
-    ck_assert(tw_minhash_copy(b, c) != NULL);
+    ck_assert_ptr_ne(tw_minhash_copy(b, c), NULL);
     ck_assert(tw_minhash_equal(a, c));
 
     tw_minhash_free(c);
@@ -122,7 +122,7 @@ START_TEST(test_minhash_merge)
     ck_assert(estimate_in_bounds(n_registers, 0.5, tw_minhash_estimate(b, f)));
 
     struct tw_minhash *u = tw_minhash_clone(a);
-    ck_assert(tw_minhash_merge(b, u) != NULL);
+    ck_assert_ptr_ne(tw_minhash_merge(b, u), NULL);
 
     for (size_t j = 0; j < n_registers; j++) {
       bool same_value =

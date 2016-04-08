@@ -6,7 +6,7 @@
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/internal/utils.h>
 
-#include "include/helpers.h"
+#include "test.h"
 
 static void validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)
 {
@@ -14,29 +14,23 @@ static void validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)
   ck_assert_msg(tw_bitmap_empty(bitmap), "A new bitmap should be empty");
 
   for (uint32_t pos = 0; pos < nbits; ++pos) {
-    ck_assert_msg(!tw_bitmap_test(bitmap, pos),
-                  "Unexpected bit from freshly initialized bitmap at pos: %d",
-                  pos);
+    ck_assert(!tw_bitmap_test(bitmap, pos));
     tw_bitmap_set(bitmap, pos);
   }
 
   for (uint32_t pos = 0; pos < nbits; ++pos) {
-    ck_assert_msg(tw_bitmap_test(bitmap, (nbits - 1) - pos),
-                  "Unexpected zero at pos: %d", (nbits - 1) - pos);
+    ck_assert(tw_bitmap_test(bitmap, (nbits - 1) - pos));
   }
 
-  ck_assert_msg(tw_bitmap_full(bitmap), "A full bitmap should be full");
+  ck_assert(tw_bitmap_full(bitmap));
 
   for (uint32_t pos = 0; pos < nbits; ++pos) {
-    ck_assert_msg(tw_bitmap_test(bitmap, pos),
-                  "Unexpected zero from freshly populated bitmap at pos: %d",
-                  pos);
+    ck_assert_msg(tw_bitmap_test(bitmap, pos));
     tw_bitmap_clear(bitmap, pos);
-    ck_assert_msg(!tw_bitmap_test(bitmap, pos),
-                  "Unexpected cleared bit at pos: %d", pos);
+    ck_assert_msg(!tw_bitmap_test(bitmap, pos));
   }
 
-  ck_assert_msg(tw_bitmap_empty(bitmap), "A cleared bitmap should be empty");
+  ck_assert(tw_bitmap_empty(bitmap));
 }
 
 START_TEST(test_bitmap_basic)
@@ -71,7 +65,7 @@ START_TEST(test_bitmap_copy_and_clone)
       }
     }
 
-    ck_assert(tw_bitmap_copy(src, dst) != NULL);
+    ck_assert_ptr_ne(tw_bitmap_copy(src, dst), NULL);
 
     struct tw_bitmap *tmp = tw_bitmap_clone(src);
 
@@ -137,39 +131,35 @@ START_TEST(test_bitmap_find_first)
     const uint32_t nbits = sizes[i];
     struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
 
-    ck_assert(tw_bitmap_find_first_zero(bitmap) == 0);
-    ck_assert(tw_bitmap_find_first_bit(bitmap) == -1);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap), 0);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap), -1);
 
     tw_bitmap_fill(bitmap);
 
-    ck_assert(tw_bitmap_find_first_zero(bitmap) == -1);
-    ck_assert(tw_bitmap_find_first_bit(bitmap) == 0);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap),-1);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap),  0);
 
     for (uint32_t pos = 0; pos < nbits - 1; ++pos) {
       tw_bitmap_clear(bitmap, pos);
-      ck_assert_msg(tw_bitmap_find_first_zero(bitmap) == 0,
-                    "expected first zero at pos 0");
-      ck_assert_msg(tw_bitmap_find_first_bit(bitmap) == pos + 1,
-                    "expected first bit at pos %d", pos + 1);
+      ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap), 0);
+      ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap), pos + 1);
     }
 
     // clear last bit
     tw_bitmap_clear(bitmap, nbits - 1);
-    ck_assert(tw_bitmap_find_first_zero(bitmap) == 0);
-    ck_assert(tw_bitmap_find_first_bit(bitmap) == -1);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap), 0);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap), -1);
 
     for (uint32_t pos = 0; pos < nbits - 1; ++pos) {
       tw_bitmap_set(bitmap, pos);
-      ck_assert_msg(tw_bitmap_find_first_zero(bitmap) == pos + 1,
-                    "expected first zero at pos %d", pos + 1);
-      ck_assert_msg(tw_bitmap_find_first_bit(bitmap) == 0,
-                    "expected first bit at pos 0");
+      ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap), pos + 1);
+      ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap), 0);
     }
 
     // set last bit
     tw_bitmap_set(bitmap, nbits - 1);
-    ck_assert(tw_bitmap_find_first_zero(bitmap) == -1);
-    ck_assert(tw_bitmap_find_first_bit(bitmap) == 0);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap), -1);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap), 0);
   }
 }
 END_TEST

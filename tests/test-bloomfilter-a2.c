@@ -5,7 +5,7 @@
 #include <twiddle/bloomfilter/bloomfilter.h>
 #include <twiddle/bloomfilter/bloomfilter_a2.h>
 
-#include "include/helpers.h"
+#include "test.h"
 
 START_TEST(test_bloomfilter_a2_basic)
 {
@@ -122,13 +122,13 @@ START_TEST(test_bloomfilter_a2_set_operations)
       tw_bloomfilter_a2_set(dst, values[2], strlen(values[2]));
       tw_bloomfilter_a2_set(dst, values[3], strlen(values[3]));
 
-      ck_assert(tw_bloomfilter_a2_intersection(src, dst) != NULL);
+      ck_assert_ptr_ne(tw_bloomfilter_a2_intersection(src, dst), NULL);
       ck_assert(!tw_bloomfilter_a2_test(dst, values[0], strlen(values[0])));
       ck_assert(tw_bloomfilter_a2_test(dst, values[1], strlen(values[1])));
       ck_assert(tw_bloomfilter_a2_test(dst, values[2], strlen(values[2])));
       ck_assert(!tw_bloomfilter_a2_test(dst, values[3], strlen(values[3])));
 
-      ck_assert(tw_bloomfilter_a2_union(src, dst) != NULL);
+      ck_assert_ptr_ne(tw_bloomfilter_a2_union(src, dst), NULL);
       ck_assert(tw_bloomfilter_a2_test(dst, values[0], strlen(values[0])));
       ck_assert(tw_bloomfilter_a2_test(dst, values[1], strlen(values[1])));
       ck_assert(tw_bloomfilter_a2_test(dst, values[2], strlen(values[2])));
@@ -150,7 +150,7 @@ START_TEST(test_bloomfilter_a2_test_rotation)
   const float density = 0.25;
 
   struct tw_bloomfilter_a2 *bf = tw_bloomfilter_a2_new(size, k, density);
-  ck_assert(bf != NULL);
+  ck_assert_ptr_ne(bf, NULL);
   ck_assert(tw_bloomfilter_a2_empty(bf));
 
   const size_t rotations = 10;
@@ -167,15 +167,15 @@ START_TEST(test_bloomfilter_a2_test_rotation)
       ++i;
     }
 
-    ck_assert(bf->active == active);
-    ck_assert(bf->passive == passive);
+    ck_assert_ptr_eq(bf->active, active);
+    ck_assert_ptr_eq(bf->passive, passive);
 
     // trigger rotation
     tw_bloomfilter_a2_set(bf, (void *)&i, sizeof(i));
     ++i;
 
-    ck_assert(bf->active == passive);
-    ck_assert(bf->passive == active);
+    ck_assert_ptr_eq(bf->active, passive);
+    ck_assert_ptr_eq(bf->passive, active);
     ck_assert(tw_bloomfilter_density(active) >= density);
     ck_assert(tw_bloomfilter_density(passive) < density);
     ck_assert(!tw_bloomfilter_a2_empty(bf));

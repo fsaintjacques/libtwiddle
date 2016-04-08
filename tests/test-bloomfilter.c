@@ -4,7 +4,7 @@
 
 #include <twiddle/bloomfilter/bloomfilter.h>
 
-#include "include/helpers.h"
+#include "test.h"
 
 START_TEST(test_bloomfilter_basic)
 {
@@ -121,13 +121,13 @@ START_TEST(test_bloomfilter_set_operations)
       tw_bloomfilter_set(dst, values[2], strlen(values[2]));
       tw_bloomfilter_set(dst, values[3], strlen(values[3]));
 
-      ck_assert(tw_bloomfilter_intersection(src, dst) != NULL);
+      ck_assert_ptr_ne(tw_bloomfilter_intersection(src, dst), NULL);
       ck_assert(!tw_bloomfilter_test(dst, values[0], strlen(values[0])));
       ck_assert(tw_bloomfilter_test(dst, values[1], strlen(values[1])));
       ck_assert(tw_bloomfilter_test(dst, values[2], strlen(values[2])));
       ck_assert(!tw_bloomfilter_test(dst, values[3], strlen(values[3])));
 
-      ck_assert(tw_bloomfilter_union(src, dst) != NULL);
+      ck_assert_ptr_ne(tw_bloomfilter_union(src, dst), NULL);
       ck_assert(tw_bloomfilter_test(dst, values[0], strlen(values[0])));
       ck_assert(tw_bloomfilter_test(dst, values[1], strlen(values[1])));
       ck_assert(tw_bloomfilter_test(dst, values[2], strlen(values[2])));

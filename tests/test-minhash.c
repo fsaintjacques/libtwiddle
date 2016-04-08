@@ -2,8 +2,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include <check.h>
-
 #include <twiddle/internal/utils.h>
 #include <twiddle/hash/minhash.h>
 

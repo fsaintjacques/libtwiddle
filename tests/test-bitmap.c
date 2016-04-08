@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <signal.h>
 
-#include <check.h>
-
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/internal/utils.h>
 

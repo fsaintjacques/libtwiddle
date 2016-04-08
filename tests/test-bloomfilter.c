@@ -1,7 +1,5 @@
 #include <stdlib.h>
 
-#include <check.h>
-
 #include <twiddle/bloomfilter/bloomfilter.h>
 
 #include "test.h"

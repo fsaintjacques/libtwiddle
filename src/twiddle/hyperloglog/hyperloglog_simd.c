@@ -59,7 +59,7 @@ static inline void hyperloglog_count_avx2(const uint8_t *registers,
 
 #elif defined USE_AVX
 
-inline float horizontal_sum_avx(__m128 x)
+static inline float horizontal_sum_avx(__m128 x)
 {
   x = _mm_hadd_ps(x, x);
   x = _mm_hadd_ps(x, x);
@@ -73,7 +73,7 @@ inline float horizontal_sum_avx(__m128 x)
 #define inverse_power_avx(simd)                                                \
   _mm_sub_epi32(ones, _mm_slli_epi32(_mm_cvtepu8_epi32(simd), 23))
 
-inline void hyperloglog_count_avx(const uint8_t *registers,
+static inline void hyperloglog_count_avx(const uint8_t *registers,
                                          uint32_t n_registers,
                                          float *inverse_sum, uint32_t *n_zeros)
 {
@@ -103,7 +103,7 @@ inline void hyperloglog_count_avx(const uint8_t *registers,
 
 #endif
 
-inline void hyperloglog_count_port(const uint8_t *registers,
+static inline void hyperloglog_count_port(const uint8_t *registers,
                                           uint32_t n_registers,
                                           float *inverse_sum, uint32_t *n_zeros)
 

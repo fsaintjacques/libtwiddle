@@ -10,6 +10,12 @@
 
 #include "hyperloglog_simd.c"
 
+static_assert(TW_HLL_MIN_PRECISION >= 6,
+              "precision must be at least one cacheline");
+
+static_assert(TW_HLL_MAX_PRECISION < 64,
+              "precision must be smaller than 64 for defined bit shifts");
+
 struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision)
 {
   if (precision < TW_HLL_MIN_PRECISION || precision > TW_HLL_MAX_PRECISION) {

@@ -9,8 +9,12 @@ set -o xtrace
 : ${BUILD_TYPE:=Release}
 : ${RUN_VALGRIND:=false}
 : ${RUN_HYPOTHESIS:=false}
+: ${VERBOSE:=false}
 
-function set_travis_compiler {
+function set_travis_env {
+
+  VERBOSE=true
+
   if [[ -n "${CLANG_VERSION:-}" ]]; then
     export CC="clang-${CLANG_VERSION}" ;
     export CXX="clang++-${CLANG_VERSION}" ;
@@ -59,8 +63,12 @@ function run_tests {
   # disable FORK (and incidently timeouts)
   export CK_FORK=no
 
+  if [[ ${VERBOSE:-false} != "false" ]]; then
+    VERBOSE_FLAG="VERBOSE=1"
+  fi
+
   # unit tests
-  make all test VERBOSE=1
+  make all test ${VERBOSE_FLAG:-}
   popd
 
   if [[ ${RUN_HYPOTHESIS} != "false" ]]; then
@@ -96,7 +104,9 @@ function run_tests_with_extension {
 }
 
 
-set_travis_compiler
+if [[ -n "${TRAVIS:-}" ]]; then
+  set_travis_env
+fi
 
 run_tests portable
 run_tests_with_extension avx

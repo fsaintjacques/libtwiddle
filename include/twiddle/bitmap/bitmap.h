@@ -1,9 +1,9 @@
 #ifndef TWIDDLE_BITMAP_H
 #define TWIDDLE_BITMAP_H
 
-#include <stdlib.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 #include <twiddle/internal/utils.h>
 

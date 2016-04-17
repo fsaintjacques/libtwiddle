@@ -1,9 +1,9 @@
 #ifndef TWIDDLE_INTERNAL_UTILS_H
 #define TWIDDLE_INTERNAL_UTILS_H
 
-#include <stdlib.h>
 #include <float.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* Number of bytes per cache line */
 #ifndef TW_CACHELINE
@@ -31,10 +31,9 @@
 
 #define tw_almost_equal(a, b) (fabs(a - b) < FLT_EPSILON)
 
-
 /* OSX doesn't provide `aligned_alloc` like C11 mandates (we're in 2016). */
 #if defined(__APPLE__)
-static inline void * __aligned_alloc(size_t align, size_t size)
+static inline void *__aligned_alloc(size_t align, size_t size)
 {
   void *ptr = NULL;
   if (posix_memalign(&ptr, align, size)) {

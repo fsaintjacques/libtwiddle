@@ -2,8 +2,8 @@
 #define TWIDDLE_HASH_MINHASH_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define TW_BYTES_PER_MINHASH_REGISTER sizeof(uint32_t)
 

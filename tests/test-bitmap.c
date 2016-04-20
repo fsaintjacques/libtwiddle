@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <signal.h>
+#include <stdlib.h>
 
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/internal/utils.h>
@@ -134,8 +134,8 @@ START_TEST(test_bitmap_find_first)
 
     tw_bitmap_fill(bitmap);
 
-    ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap),-1);
-    ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap),  0);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap), -1);
+    ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap), 0);
 
     for (uint32_t pos = 0; pos < nbits - 1; ++pos) {
       tw_bitmap_clear(bitmap, pos);

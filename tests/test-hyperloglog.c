@@ -1,8 +1,8 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <twiddle/internal/utils.h>
 #include <twiddle/hyperloglog/hyperloglog.h>
+#include <twiddle/internal/utils.h>
 
 #include "test.h"
 

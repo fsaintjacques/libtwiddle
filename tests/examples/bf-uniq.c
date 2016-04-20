@@ -70,11 +70,9 @@ static bool parse_duration(const char *str, float *d)
 
   if (!(0 <= duration)
       /* No extra chars after the number and an optional s,m,h,d char.  */
-      ||
-      (*ep && *(ep + 1))
+      || (*ep && *(ep + 1))
       /* Check any suffix char and update timeout based on the suffix.  */
-      ||
-      !apply_time_suffix(&duration, *ep)) {
+      || !apply_time_suffix(&duration, *ep)) {
     return false;
   }
 
@@ -123,13 +121,15 @@ static int parse_arguments(int argc, char **argv, int64_t *n, float *p,
 #ifdef __APPLE__
 #include <sys/time.h>
 #define CLOCK_MONOTONIC 0
-int clock_gettime(int __attribute__((unused)) clk_id, struct timespec* t) {
-    struct timeval now;
-    int rv = gettimeofday(&now, NULL);
-    if (rv) return rv;
-    t->tv_sec  = now.tv_sec;
-    t->tv_nsec = now.tv_usec * 1000;
-    return 0;
+int clock_gettime(int __attribute__((unused)) clk_id, struct timespec *t)
+{
+  struct timeval now;
+  int rv = gettimeofday(&now, NULL);
+  if (rv)
+    return rv;
+  t->tv_sec = now.tv_sec;
+  t->tv_nsec = now.tv_usec * 1000;
+  return 0;
 }
 #endif
 

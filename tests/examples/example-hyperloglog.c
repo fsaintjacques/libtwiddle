@@ -17,5 +17,7 @@ int main()
   printf("estimated count: %f, real count: %d\n", tw_hyperloglog_count(hll),
          n_elems);
 
+  tw_hyperloglog_free(hll);
+
   return 0;
 }

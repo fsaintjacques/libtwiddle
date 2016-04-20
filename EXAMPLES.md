@@ -21,6 +21,8 @@ int main() {
   tw_bitmap_set(bitmap, 768);
   assert(tw_bitmap_find_first_bit(bitmap) == 768);
 
+  tw_bitmap_free(bitmap);
+
   return 0;
 }
 ```
@@ -56,6 +58,8 @@ int main() {
   assert(tw_bitmap_rle_test(bitmap, end));
   assert(tw_bitmap_rle_find_first_bit(bitmap)  == (int64_t)start);
   assert(tw_bitmap_rle_find_first_zero(bitmap) == (int64_t)end + 1);
+
+  tw_bitmap_rle_free(bitmap);
 
   return 0;
 }
@@ -111,6 +115,8 @@ int main() {
   printf("estimated count: %f, real count: %d\n",
          tw_hyperloglog_count(hll),
          n_elems);
+
+  tw_hyperloglog_free(hll);
 
   return 0;
 }

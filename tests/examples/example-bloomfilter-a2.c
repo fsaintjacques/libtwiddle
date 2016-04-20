@@ -29,5 +29,7 @@ int main()
     assert(tw_bloomfilter_a2_density(bf) < 2 * density);
   }
 
+  tw_bloomfilter_a2_free(bf);
+
   return 0;
 }

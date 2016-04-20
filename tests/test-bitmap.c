@@ -158,6 +158,8 @@ START_TEST(test_bitmap_find_first)
     tw_bitmap_set(bitmap, nbits - 1);
     ck_assert_int64_t_eq(tw_bitmap_find_first_zero(bitmap), -1);
     ck_assert_int64_t_eq(tw_bitmap_find_first_bit(bitmap), 0);
+
+    tw_bitmap_free(bitmap);
   }
 }
 END_TEST
@@ -194,6 +196,8 @@ START_TEST(test_bitmap_report)
   ck_assert(!tw_bitmap_empty(bitmap));
   ck_assert(tw_bitmap_full(bitmap));
   ck_assert(tw_almost_equal(tw_bitmap_density(bitmap), 1.0));
+
+  tw_bitmap_free(bitmap);
 }
 END_TEST
 

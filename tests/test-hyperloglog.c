@@ -120,6 +120,7 @@ START_TEST(test_hyperloglog_merge)
 
     tw_hyperloglog_free(dst);
     tw_hyperloglog_free(src);
+    tw_hyperloglog_free(prev);
   }
 }
 END_TEST

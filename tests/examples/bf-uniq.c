@@ -181,6 +181,8 @@ int main(int argc, char *argv[])
     }
   }
 
+  free(line);
+
   tw_bloomfilter_free(bf);
 
   return 0;

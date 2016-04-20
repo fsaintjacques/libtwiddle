@@ -27,5 +27,7 @@ int main()
   assert(tw_bitmap_rle_find_first_bit(bitmap) == (int64_t)start);
   assert(tw_bitmap_rle_find_first_zero(bitmap) == (int64_t)end + 1);
 
+  tw_bitmap_rle_free(bitmap);
+
   return 0;
 }

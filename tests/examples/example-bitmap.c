@@ -15,5 +15,7 @@ int main()
   tw_bitmap_set(bitmap, 768);
   assert(tw_bitmap_find_first_bit(bitmap) == 768);
 
+  tw_bitmap_free(bitmap);
+
   return 0;
 }

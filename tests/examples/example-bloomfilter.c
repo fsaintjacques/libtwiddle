@@ -19,5 +19,7 @@ int main()
 
   assert(!tw_bloomfilter_test(bf, "nope", sizeof("nope")));
 
+  tw_bloomfilter_free(bf);
+
   return 0;
 }

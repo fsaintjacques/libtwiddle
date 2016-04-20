@@ -183,6 +183,8 @@ START_TEST(test_bloomfilter_a2_test_rotation)
       ck_assert(tw_bloomfilter_a2_test(bf, (void *)&l, sizeof(l)));
     }
   }
+
+  tw_bloomfilter_a2_free(bf);
 }
 END_TEST
 

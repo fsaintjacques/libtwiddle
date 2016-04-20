@@ -42,7 +42,11 @@ struct tw_bitmap *tw_bitmap_new(uint64_t size)
   return bitmap;
 }
 
-void tw_bitmap_free(struct tw_bitmap *bitmap) { free(bitmap); }
+void tw_bitmap_free(struct tw_bitmap *bitmap)
+{
+  free(bitmap->data);
+  free(bitmap);
+}
 
 struct tw_bitmap *tw_bitmap_copy(const struct tw_bitmap *src,
                                  struct tw_bitmap *dst)

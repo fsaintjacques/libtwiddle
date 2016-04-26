@@ -206,6 +206,18 @@ function(add_c_test TEST_NAME)
     endif(USE_VALGRIND)
 endfunction(add_c_test)
 
+function(add_c_benchmark BENCHMARK_NAME)
+    get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
+    add_c_executable(
+        ${BENCHMARK_NAME}
+        SKIP_INSTALL
+        OUTPUT_NAME ${BENCHMARK_NAME}
+        SOURCES ${BENCHMARK_NAME}.c
+        LIBRARIES check
+        LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
+    )
+endfunction(add_c_benchmark)
+
 function(add_c_example EXAMPLE_NAME)
     get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
     add_c_executable(

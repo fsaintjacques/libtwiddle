@@ -19,6 +19,13 @@ void bitmap_dual_setup(struct benchmark *b)
   assert(dual->a);
   dual->b = tw_bitmap_new(size);
   assert(dual->b);
+
+  for (size_t i = 0; i < size; ++i) {
+    if (i % 5) {
+      tw_bitmap_set(dual->a, i);
+      tw_bitmap_set(dual->b, i);
+    }
+  }
 }
 
 void bitmap_dual_teardown(struct benchmark *b)
@@ -37,16 +44,33 @@ void bitmap_xor(void *opaque)
   tw_bitmap_xor(dual->a, dual->b);
 }
 
-int main()
+void bitmap_equal(void *opaque)
 {
-  const size_t n_bits = 1 << 16;
+  struct dual_bitmap *dual = (struct dual_bitmap *)opaque;
+
+  bool res = tw_bitmap_equal(dual->a, dual->b);
+  (void)res;
+}
+
+int main(int argc, char *argv[])
+{
+
+  if (argc != 3) {
+    fprintf(stderr, "usage: %s <repeat> <size>\n", argv[0]);
+    return EXIT_FAILURE;
+  }
+
+  const size_t repeat = strtol(argv[1], NULL, 10);
+  const size_t size = strtol(argv[2], NULL, 10);
 
   struct benchmark benchmarks[] = {
-      BENCHMARK_FIXTURE(bitmap_xor, 4096, n_bits, bitmap_dual_setup,
+      BENCHMARK_FIXTURE(bitmap_equal, repeat, size, bitmap_dual_setup,
+                        bitmap_dual_teardown),
+      BENCHMARK_FIXTURE(bitmap_xor, repeat, size, bitmap_dual_setup,
                         bitmap_dual_teardown),
   };
 
-  run_benchmarks(benchmarks, 1);
+  run_benchmarks(benchmarks, sizeof(benchmarks) / sizeof(benchmarks[0]));
 
   return EXIT_SUCCESS;
 }

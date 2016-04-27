@@ -6,8 +6,12 @@
 
 struct benchmark {
   const char *name;
+
   size_t size;
+  /* number of repetitions */
   size_t repeat;
+  /* skip the first `size` results for warmup */
+  size_t skip;
 
   void *opaque;
 
@@ -18,8 +22,9 @@ struct benchmark {
 
 #define BENCHMARK_FIXTURE(bench, b_repeat, b_size, b_setup, b_teardown)        \
   ((struct benchmark){.name = #bench,                                          \
-                      .size = b_size,                                          \
-                      .repeat = b_repeat,                                      \
+                      .size = (b_size),                                        \
+                      .repeat = (b_repeat),                                    \
+                      .skip = (size_t)((b_repeat)*0.05),                       \
                       .benchmark = bench,                                      \
                       .setup = b_setup,                                        \
                       .teardown = b_teardown})
@@ -67,14 +72,16 @@ void run_benchmark(struct benchmark *b)
   assert(b);
 
   const size_t repeat = b->repeat;
+  const size_t size = b->size;
+  const size_t skip = b->skip;
   const char *name = b->name;
+
+  if (b->setup) {
+    b->setup(b);
+  }
 
   for (size_t i = 0; i < repeat; i++) {
     uint64_t cycles_start, cycles_final;
-
-    if (b->setup) {
-      b->setup(b);
-    }
 
     __asm volatile("" ::: /* pretend to clobber */ "memory");
 
@@ -84,11 +91,14 @@ void run_benchmark(struct benchmark *b)
 
     RDTSC_FINAL(cycles_final);
 
-    if (b->teardown) {
-      b->teardown(b);
+    if (i >= skip) {
+      printf("%s,%.2F\n", name,
+             ((double)(cycles_final - cycles_start) / (double)size));
     }
+  }
 
-    printf("%s,%zu\n", name, (cycles_final - cycles_start));
+  if (b->teardown) {
+    b->teardown(b);
   }
 }
 

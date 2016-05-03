@@ -253,6 +253,62 @@ START_TEST(test_bitmap_set_operations)
 }
 END_TEST
 
+START_TEST(test_bitmap_errors)
+{
+  DESCRIBE_TEST;
+
+  const size_t a_size = 1 << 16, b_size = (1 << 16) + 1;
+
+  struct tw_bitmap *a = tw_bitmap_new(a_size);
+  struct tw_bitmap *b = tw_bitmap_new(b_size);
+
+  ck_assert_ptr_eq(tw_bitmap_new(0), NULL);
+  ck_assert_ptr_eq(tw_bitmap_new(TW_BITMAP_MAX_BITS), NULL);
+
+  ck_assert_ptr_eq(tw_bitmap_clone(NULL), NULL);
+
+  /* This should not raise a segfault. */
+  tw_bitmap_set(a, a_size);
+  tw_bitmap_set(a, a_size + 1);
+  tw_bitmap_clear(a, a_size);
+  tw_bitmap_clear(a, a_size + 1);
+  ck_assert(!tw_bitmap_test(a, a_size));
+  ck_assert(!tw_bitmap_test(a, a_size + 1));
+
+  ck_assert(!tw_bitmap_test_and_set(NULL, a_size));
+  ck_assert(!tw_bitmap_test_and_set(a, a_size));
+  ck_assert(!tw_bitmap_test_and_set(a, a_size + 1));
+
+  ck_assert(!tw_bitmap_test_and_clear(NULL, a_size));
+  ck_assert(!tw_bitmap_test_and_clear(a, a_size));
+  ck_assert(!tw_bitmap_test_and_clear(a, a_size + 1));
+
+  ck_assert(!tw_bitmap_empty(NULL));
+  ck_assert(!tw_bitmap_full(NULL));
+  ck_assert_int_eq(tw_bitmap_count(NULL), 0);
+  ck_assert_ptr_eq(tw_bitmap_zero(NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_fill(NULL), NULL);
+  ck_assert_int_eq(tw_bitmap_find_first_zero(NULL), -1);
+  ck_assert_int_eq(tw_bitmap_find_first_bit(NULL), -1);
+
+  ck_assert_ptr_eq(tw_bitmap_not(NULL), NULL);
+  ck_assert(!tw_bitmap_equal(a, NULL));
+  ck_assert(!tw_bitmap_equal(NULL, a));
+  ck_assert_ptr_eq(tw_bitmap_union(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_union(NULL, a), NULL);
+  ck_assert_ptr_eq(tw_bitmap_union(a, b), NULL);
+  ck_assert_ptr_eq(tw_bitmap_intersection(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_intersection(NULL, a), NULL);
+  ck_assert_ptr_eq(tw_bitmap_intersection(a, b), NULL);
+  ck_assert_ptr_eq(tw_bitmap_xor(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_xor(NULL, a), NULL);
+  ck_assert_ptr_eq(tw_bitmap_xor(a, b), NULL);
+
+  tw_bitmap_free(b);
+  tw_bitmap_free(a);
+}
+END_TEST
+
 int run_tests()
 {
   int number_failed;
@@ -267,6 +323,7 @@ int run_tests()
   tcase_add_test(tc, test_bitmap_zero_and_fill);
   tcase_add_test(tc, test_bitmap_find_first);
   tcase_add_test(tc, test_bitmap_set_operations);
+  tcase_add_test(tc, test_bitmap_errors);
   suite_add_tcase(s, tc);
 
   srunner_run_all(runner, CK_NORMAL);

@@ -5,4 +5,5 @@ add_c_test(test-bloomfilter-a2)
 add_c_test(test-hyperloglog)
 add_c_test(test-minhash)
 
+add_subdirectory(benchmarks)
 add_subdirectory(examples)

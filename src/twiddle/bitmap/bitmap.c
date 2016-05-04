@@ -6,6 +6,15 @@
 #include <twiddle/internal/simd.h>
 #include <twiddle/internal/utils.h>
 
+#define TW_BYTES_PER_BITMAP sizeof(uint64_t)
+#define TW_BITS_PER_BITMAP (TW_BYTES_PER_BITMAP * TW_BITS_IN_WORD)
+
+#define BITMAP_POS(pos) (pos / TW_BITS_PER_BITMAP)
+#define MASK(pos) (1ULL << (pos % TW_BITS_PER_BITMAP))
+
+#define TW_BITMAP_PER_BITS(nbits) TW_DIV_ROUND_UP(nbits, TW_BITS_PER_BITMAP)
+#define TW_BITMAP_POS(nbits) (nbits / TW_BITS_PER_BITMAP)
+
 static inline void tw_bitmap_clear_extra_bits(struct tw_bitmap *bitmap)
 {
   const uint64_t size = bitmap->size;
@@ -81,8 +90,8 @@ inline void tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos)
     return;
   }
 
-  const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
-  const bitmap_t new_bitmap = old_bitmap | MASK(pos);
+  const uint64_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
+  const uint64_t new_bitmap = old_bitmap | MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
   bitmap->count += changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
@@ -95,8 +104,8 @@ inline void tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos)
     return;
   }
 
-  const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
-  const bitmap_t new_bitmap = old_bitmap & ~MASK(pos);
+  const uint64_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
+  const uint64_t new_bitmap = old_bitmap & ~MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
   bitmap->count -= changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
@@ -117,8 +126,8 @@ bool tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint64_t pos)
     return false;
   }
 
-  const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
-  const bitmap_t new_bitmap = old_bitmap | MASK(pos);
+  const uint64_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
+  const uint64_t new_bitmap = old_bitmap | MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
   bitmap->count += changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
@@ -131,8 +140,8 @@ bool tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos)
     return false;
   }
 
-  const bitmap_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
-  const bitmap_t new_bitmap = old_bitmap & ~MASK(pos);
+  const uint64_t old_bitmap = bitmap->data[BITMAP_POS(pos)];
+  const uint64_t new_bitmap = old_bitmap & ~MASK(pos);
   const bool changed = (old_bitmap != new_bitmap);
   bitmap->count -= changed;
   bitmap->data[BITMAP_POS(pos)] = new_bitmap;
@@ -212,7 +221,7 @@ int64_t tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap)
   }
 
   /**
-   * This check is required since we allocate memory on multiple of bitmap_t.
+   * This check is required since we allocate memory on multiple of uint64_t.
    * Thus if bitmap.size is not aligned on 64 bits, a full bitmap
    * would incorrectly report nbits+1 as the position of the first zero.
    */

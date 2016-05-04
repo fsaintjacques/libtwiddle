@@ -3,25 +3,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
-
-#include <twiddle/internal/utils.h>
-
-/**
- * We define the bitmap to be a 64 bits block.
- */
-#define bitmap_t uint64_t
-#define TW_BYTES_PER_BITMAP sizeof(bitmap_t)
-#define TW_BITS_PER_BITMAP (TW_BYTES_PER_BITMAP * TW_BITS_IN_WORD)
-
-#define BITMAP_POS(pos) (pos / TW_BITS_PER_BITMAP)
-#define MASK(pos) (1ULL << (pos % TW_BITS_PER_BITMAP))
-
-/**
- * Computes the number of required `bitmap_t` to hold `nbits` bits.
- */
-#define TW_BITMAP_PER_BITS(nbits) TW_DIV_ROUND_UP(nbits, TW_BITS_PER_BITMAP)
-#define TW_BITMAP_POS(nbits) (nbits / TW_BITS_PER_BITMAP)
 
 #define TW_BITMAP_MAX_BITS (1UL << 48)
 #define TW_BITMAP_MAX_POS (TW_BITMAP_MAX_BITS - 1)
@@ -42,7 +23,7 @@
 struct tw_bitmap {
   uint64_t size;
   uint64_t count;
-  bitmap_t *data;
+  uint64_t *data;
 };
 
 /**

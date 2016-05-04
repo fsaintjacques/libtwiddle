@@ -1,7 +1,9 @@
 #include <assert.h>
 
-#include <twiddle/internal/utils.h>
+#include <twiddle/bitmap/bitmap.h>
+#include <twiddle/bloomfilter/bloomfilter.h>
 #include <twiddle/bloomfilter/bloomfilter_a2.h>
+#include <twiddle/internal/utils.h>
 
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_new(uint64_t size, uint16_t k,
                                                 float density)

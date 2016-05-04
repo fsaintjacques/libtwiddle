@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <twiddle/bloomfilter/bloomfilter.h>
 
 #include "benchmark.h"

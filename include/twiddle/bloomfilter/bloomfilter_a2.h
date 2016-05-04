@@ -1,7 +1,10 @@
 #ifndef TWIDDLE_BLOOMFILTER_A2_H
 #define TWIDDLE_BLOOMFILTER_A2_H
 
-#include <twiddle/bloomfilter/bloomfilter.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+struct tw_bloomfilter;
 
 /**
  * struct tw_bloomfilter_a2 - aging bloom filter with active buffers

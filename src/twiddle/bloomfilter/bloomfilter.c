@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdlib.h>
 
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bloomfilter/bloomfilter.h>

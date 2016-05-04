@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <twiddle/bitmap/bitmap.h>
 
 #include "benchmark.h"

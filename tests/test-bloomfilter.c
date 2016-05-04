@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include <twiddle/bloomfilter/bloomfilter.h>
+#include <twiddle/internal/utils.h>
 
 #include "test.h"
 

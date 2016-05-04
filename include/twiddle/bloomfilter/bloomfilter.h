@@ -3,9 +3,8 @@
 
 #include <math.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-
-#include <twiddle/bitmap/bitmap.h>
 
 #define TW_BF_DEFAULT_SEED 3781869495ULL
 
@@ -13,6 +12,8 @@
 
 #define tw_bloomfilter_optimal_m(n, p) (-n * log(p) / (TW_LOG_2 * TW_LOG_2))
 #define tw_bloomfilter_optimal_k(n, m) (m / n * TW_LOG_2)
+
+struct tw_bitmap;
 
 /**
  * struct tw_bloomfilter - bloomfilter

@@ -50,7 +50,7 @@ struct tw_bitmap {
  * @size: number of bits the bitmap should hold
  *
  * Bitmaps are static and do not grow in size. Bitmaps cannot contain more
- * than TW_BITMAP_MAX_POS.
+ * than TW_BITMAP_MAX_BITS.
  *
  * Return: NULL if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_bitmap`.

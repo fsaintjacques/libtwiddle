@@ -195,6 +195,43 @@ START_TEST(test_hyperloglog_simd)
 }
 END_TEST
 
+START_TEST(test_hyperloglog_errors)
+{
+  DESCRIBE_TEST;
+
+  const uint8_t a_precision = TW_HLL_MIN_PRECISION,
+                b_precision = TW_HLL_MIN_PRECISION + 1;
+
+  struct tw_hyperloglog *a = tw_hyperloglog_new(a_precision);
+  struct tw_hyperloglog *b = tw_hyperloglog_new(b_precision);
+
+  ck_assert_ptr_eq(tw_hyperloglog_new(TW_HLL_MIN_PRECISION - 1), NULL);
+  ck_assert_ptr_eq(tw_hyperloglog_new(TW_HLL_MAX_PRECISION + 1), NULL);
+
+  ck_assert_ptr_eq(tw_hyperloglog_copy(a, b), NULL);
+  ck_assert_ptr_eq(tw_hyperloglog_clone(NULL), NULL);
+
+  tw_hyperloglog_add(NULL, NULL, 0);
+  tw_hyperloglog_add(a, NULL, 1);
+  tw_hyperloglog_add(a, &a_precision, 0);
+  tw_hyperloglog_add(a, &a_precision, 1);
+
+  tw_hyperloglog_count(NULL);
+
+  ck_assert(!tw_hyperloglog_equal(a, b));
+  ck_assert(!tw_hyperloglog_equal(NULL, b));
+  ck_assert(!tw_hyperloglog_equal(a, NULL));
+
+  ck_assert_ptr_eq(tw_hyperloglog_merge(a, b), NULL);
+  ck_assert_ptr_eq(tw_hyperloglog_merge(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_hyperloglog_merge(NULL, b), NULL);
+
+  tw_hyperloglog_free(NULL);
+  tw_hyperloglog_free(b);
+  tw_hyperloglog_free(a);
+}
+END_TEST
+
 int run_tests()
 {
   int number_failed;
@@ -206,6 +243,7 @@ int run_tests()
   tcase_add_test(tc, test_hyperloglog_copy_and_clone);
   tcase_add_test(tc, test_hyperloglog_merge);
   tcase_add_test(tc, test_hyperloglog_simd);
+  tcase_add_test(tc, test_hyperloglog_errors);
   tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);

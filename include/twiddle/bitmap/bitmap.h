@@ -193,8 +193,8 @@ struct tw_bitmap *tw_bitmap_fill(struct tw_bitmap *bitmap);
  *
  * `bitmap' must be non-null.
  *
- * Return: -1 if not found or pre-conditions not met, otherwise the bit
- * position.
+ * Return: -1 if not found or pre-conditions not met, otherwise the position
+ * of the first zero.
  */
 int64_t tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap);
 
@@ -204,8 +204,8 @@ int64_t tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap);
  *
  * `bitmap' must be non-null.
  *
- * Return: -1 if not found or pre-conditions are not met, otherwise the bit
- * position.
+ * Return: -1 if not found or pre-conditions are not met, otherwise position
+ * of the first bit.
  */
 int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap);
 

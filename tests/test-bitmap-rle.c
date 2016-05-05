@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bitmap/bitmap_rle.h>
 #include <twiddle/internal/utils.h>
 
@@ -465,6 +466,54 @@ START_TEST(test_bitmap_rle_intersection_advanced)
 }
 END_TEST
 
+START_TEST(test_bitmap_rle_errors)
+{
+  DESCRIBE_TEST;
+
+  const size_t a_size = 1 << 16, b_size = (1 << 16) + 1;
+
+  struct tw_bitmap_rle *a = tw_bitmap_rle_new(a_size);
+  struct tw_bitmap_rle *b = tw_bitmap_rle_new(b_size);
+
+  ck_assert_ptr_eq(tw_bitmap_rle_new(0), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_new(TW_BITMAP_MAX_BITS + 1), NULL);
+
+  ck_assert_ptr_eq(tw_bitmap_rle_copy(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_copy(NULL, a), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_clone(NULL), NULL);
+
+  /* This should not raise a segfault. */
+  tw_bitmap_rle_set(NULL, a_size);
+  tw_bitmap_rle_set(a, a_size);
+  tw_bitmap_rle_set(a, a_size + 1);
+  ck_assert(!tw_bitmap_rle_test(NULL, a_size));
+  ck_assert(!tw_bitmap_rle_test(a, a_size));
+  ck_assert(!tw_bitmap_rle_test(a, a_size + 1));
+
+  ck_assert(!tw_bitmap_rle_empty(NULL));
+  ck_assert(!tw_bitmap_rle_full(NULL));
+  ck_assert_int_eq(tw_bitmap_rle_count(NULL), 0);
+  ck_assert_ptr_eq(tw_bitmap_rle_zero(NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_fill(NULL), NULL);
+  ck_assert_int_eq(tw_bitmap_rle_find_first_zero(NULL), -1);
+  ck_assert_int_eq(tw_bitmap_rle_find_first_bit(NULL), -1);
+
+  ck_assert_ptr_eq(tw_bitmap_rle_not(NULL, NULL), NULL);
+  ck_assert(!tw_bitmap_rle_equal(NULL, NULL));
+  ck_assert(!tw_bitmap_rle_equal(a, NULL));
+  ck_assert(!tw_bitmap_rle_equal(NULL, a));
+  ck_assert_ptr_eq(tw_bitmap_rle_union(a, NULL, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_union(NULL, a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_union(a, b, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_intersection(a, NULL, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_intersection(NULL, a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bitmap_rle_intersection(a, b, NULL), NULL);
+
+  tw_bitmap_rle_free(b);
+  tw_bitmap_rle_free(a);
+}
+END_TEST
+
 int run_tests()
 {
   int number_failed;
@@ -478,6 +527,7 @@ int run_tests()
   tcase_add_test(basic, test_bitmap_rle_copy_and_clone);
   tcase_add_test(basic, test_bitmap_rle_zero_and_fill);
   tcase_add_test(basic, test_bitmap_rle_find_first);
+  tcase_add_test(basic, test_bitmap_rle_errors);
   tcase_set_timeout(basic, 15);
   suite_add_tcase(s, basic);
 

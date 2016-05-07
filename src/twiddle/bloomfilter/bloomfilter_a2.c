@@ -1,5 +1,3 @@
-#include <assert.h>
-
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bloomfilter/bloomfilter.h>
 #include <twiddle/bloomfilter/bloomfilter_a2.h>
@@ -8,8 +6,10 @@
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_new(uint64_t size, uint16_t k,
                                                 float density)
 {
-  assert(size > 0 && size <= TW_BITMAP_MAX_BITS && k > 0 && 0 < density &&
-         density <= 1);
+  if ((!size || size > TW_BITMAP_MAX_BITS) || !k ||
+      (density <= 0.0 || density > 1.0)) {
+    return NULL;
+  }
 
   struct tw_bloomfilter_a2 *bf = calloc(1, sizeof(struct tw_bloomfilter_a2));
 
@@ -37,7 +37,9 @@ struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_copy(const struct tw_bloomfilter_a2 *src,
                        struct tw_bloomfilter_a2 *dst)
 {
-  assert(src && dst);
+  if (!src || !dst) {
+    return NULL;
+  }
 
   if (!tw_bloomfilter_copy(src->active, dst->active) ||
       !tw_bloomfilter_copy(src->passive, dst->passive)) {
@@ -50,6 +52,10 @@ tw_bloomfilter_a2_copy(const struct tw_bloomfilter_a2 *src,
 struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_clone(const struct tw_bloomfilter_a2 *bf)
 {
+  if (!bf) {
+    return NULL;
+  }
+
   struct tw_bloomfilter_a2 *new = tw_bloomfilter_a2_new(
       bf->active->bitmap->size, bf->active->k, bf->density);
   if (!new) {
@@ -61,7 +67,9 @@ tw_bloomfilter_a2_clone(const struct tw_bloomfilter_a2 *bf)
 
 void tw_bloomfilter_a2_free(struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return;
+  }
 
   tw_bloomfilter_free(bf->active);
   tw_bloomfilter_free(bf->passive);
@@ -84,7 +92,9 @@ static inline bool tw_bloomfilter_a2_rotate_(struct tw_bloomfilter_a2 *bf)
 void tw_bloomfilter_a2_set(struct tw_bloomfilter_a2 *bf, const void *key,
                            size_t key_size)
 {
-  assert(bf && key && key_size > 0);
+  if (!bf || !key || !key_size) {
+    return;
+  }
 
   tw_bloomfilter_a2_rotate_(bf);
 
@@ -94,7 +104,9 @@ void tw_bloomfilter_a2_set(struct tw_bloomfilter_a2 *bf, const void *key,
 bool tw_bloomfilter_a2_test(const struct tw_bloomfilter_a2 *bf, const void *key,
                             size_t key_size)
 {
-  assert(bf && key && key_size > 0);
+  if (!bf || !key || !key_size) {
+    return false;
+  }
 
   return tw_bloomfilter_test(bf->active, key, key_size) ||
          tw_bloomfilter_test(bf->passive, key, key_size);
@@ -102,28 +114,36 @@ bool tw_bloomfilter_a2_test(const struct tw_bloomfilter_a2 *bf, const void *key,
 
 bool tw_bloomfilter_a2_empty(const struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return false;
+  }
 
   return tw_bloomfilter_empty(bf->active) && tw_bloomfilter_empty(bf->passive);
 }
 
 bool tw_bloomfilter_a2_full(const struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return false;
+  }
 
   return tw_bloomfilter_full(bf->active) && tw_bloomfilter_full(bf->passive);
 }
 
 uint64_t tw_bloomfilter_a2_count(const struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return 0;
+  }
 
   return tw_bloomfilter_count(bf->active) + tw_bloomfilter_count(bf->passive);
 }
 
 float tw_bloomfilter_a2_density(const struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return 0.0;
+  }
 
   return (tw_bloomfilter_density(bf->active) +
           tw_bloomfilter_density(bf->passive)) /
@@ -132,7 +152,9 @@ float tw_bloomfilter_a2_density(const struct tw_bloomfilter_a2 *bf)
 
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_zero(struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return NULL;
+  }
 
   return (tw_bloomfilter_zero(bf->active) && tw_bloomfilter_zero(bf->passive))
              ? bf
@@ -141,7 +163,9 @@ struct tw_bloomfilter_a2 *tw_bloomfilter_a2_zero(struct tw_bloomfilter_a2 *bf)
 
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_fill(struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return NULL;
+  }
 
   return (tw_bloomfilter_fill(bf->active) && tw_bloomfilter_fill(bf->passive))
              ? bf
@@ -150,28 +174,34 @@ struct tw_bloomfilter_a2 *tw_bloomfilter_a2_fill(struct tw_bloomfilter_a2 *bf)
 
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_not(struct tw_bloomfilter_a2 *bf)
 {
-  assert(bf);
+  if (!bf) {
+    return NULL;
+  }
 
   return (tw_bloomfilter_not(bf->active) && tw_bloomfilter_not(bf->passive))
              ? bf
              : NULL;
 }
 
-bool tw_bloomfilter_a2_equal(const struct tw_bloomfilter_a2 *a,
-                             const struct tw_bloomfilter_a2 *b)
+bool tw_bloomfilter_a2_equal(const struct tw_bloomfilter_a2 *fst,
+                             const struct tw_bloomfilter_a2 *snd)
 {
-  assert(a && b);
+  if (!fst || !snd) {
+    return false;
+  }
 
-  return (tw_almost_equal(a->density, b->density) &&
-          tw_bloomfilter_equal(a->active, b->active) &&
-          tw_bloomfilter_equal(a->passive, b->passive));
+  return (tw_almost_equal(fst->density, snd->density) &&
+          tw_bloomfilter_equal(fst->active, snd->active) &&
+          tw_bloomfilter_equal(fst->passive, snd->passive));
 }
 
 struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_union(const struct tw_bloomfilter_a2 *src,
                         struct tw_bloomfilter_a2 *dst)
 {
-  assert(src && dst);
+  if (!src || !dst) {
+    return NULL;
+  }
 
   if (!tw_almost_equal(src->density, dst->density)) {
     return NULL;
@@ -187,7 +217,9 @@ struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_intersection(const struct tw_bloomfilter_a2 *src,
                                struct tw_bloomfilter_a2 *dst)
 {
-  assert(src && dst);
+  if (!src || !dst) {
+    return NULL;
+  }
 
   if (!tw_almost_equal(src->density, dst->density)) {
     return NULL;
@@ -203,7 +235,9 @@ struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_xor(const struct tw_bloomfilter_a2 *src,
                       struct tw_bloomfilter_a2 *dst)
 {
-  assert(src && dst);
+  if (!src || !dst) {
+    return NULL;
+  }
 
   if (!tw_almost_equal(src->density, dst->density)) {
     return NULL;

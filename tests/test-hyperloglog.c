@@ -2,11 +2,11 @@
 #include <stdlib.h>
 
 #include <twiddle/hyperloglog/hyperloglog.h>
-#include <twiddle/internal/utils.h>
 
 #include "test.h"
 
 #include "../src/twiddle/hyperloglog/hyperloglog_simd.c"
+#include "../src/twiddle/macrology.h"
 
 bool estimate_within_error(double estimate, double real)
 {

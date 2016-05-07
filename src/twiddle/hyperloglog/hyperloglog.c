@@ -5,9 +5,8 @@
 
 #include <twiddle/hash/metrohash.h>
 #include <twiddle/hyperloglog/hyperloglog.h>
-#include <twiddle/internal/simd.h>
-#include <twiddle/internal/utils.h>
 
+#include "../macrology.h"
 #include "hyperloglog_simd.c"
 
 #define TW_BYTES_PER_HLL_REGISTER sizeof(uint8_t)

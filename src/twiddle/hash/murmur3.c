@@ -9,7 +9,8 @@
  */
 
 #include <twiddle/hash/murmur3.h>
-#include <twiddle/hash/internal.h>
+
+#include "internal.h"
 
 /**
  * Block read - if your platform needs to do endian-swapping or can only

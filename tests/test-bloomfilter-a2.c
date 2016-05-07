@@ -2,8 +2,8 @@
 
 #include <twiddle/bloomfilter/bloomfilter.h>
 #include <twiddle/bloomfilter/bloomfilter_a2.h>
-#include <twiddle/internal/utils.h>
 
+#include "../src/twiddle/macrology.h"
 #include "test.h"
 
 START_TEST(test_bloomfilter_a2_basic)

@@ -1,8 +1,7 @@
 #include <stdlib.h>
-
 #include <twiddle/bloomfilter/bloomfilter.h>
-#include <twiddle/internal/utils.h>
 
+#include "../src/twiddle/macrology.h"
 #include "test.h"
 
 START_TEST(test_bloomfilter_basic)

@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 #include <twiddle/hash/minhash.h>
-#include <twiddle/internal/utils.h>
 
+#include "../src/twiddle/macrology.h"
 #include "test.h"
 
 static bool estimate_in_bounds(uint32_t n, float jaccard,

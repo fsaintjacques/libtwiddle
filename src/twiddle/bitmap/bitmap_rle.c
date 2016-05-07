@@ -3,7 +3,8 @@
 
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bitmap/bitmap_rle.h>
-#include <twiddle/internal/utils.h>
+
+#include "../macrology.h"
 
 #define TW_BITMAP_RLE_WORD_PER_CACHELINE                                       \
   (TW_CACHELINE / sizeof(struct tw_bitmap_rle_word))

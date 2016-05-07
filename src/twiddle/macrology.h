@@ -4,6 +4,7 @@
 #include <float.h>
 #include <math.h>
 #include <stdlib.h>
+#include <x86intrin.h>
 
 /* Number of bytes per cache line */
 #ifndef TW_CACHELINE
@@ -46,5 +47,14 @@ static inline void *__aligned_alloc(size_t align, size_t size)
 #else
 #define malloc_aligned aligned_alloc
 #endif
+
+#define tw_simd_equal(a, b, simd_cmpeq, simd_maskmove, mask)                   \
+  ((int)mask == simd_maskmove(simd_cmpeq(a, b)))
+
+#define tw_mm256_equal(a, b)                                                   \
+  tw_simd_equal(a, b, _mm256_cmpeq_epi8, _mm256_movemask_epi8, 0xFFFFFFFF)
+
+#define tw_mm_equal(a, b)                                                      \
+  tw_simd_equal(a, b, _mm_cmpeq_epi8, _mm_movemask_epi8, 0xFFFF)
 
 #endif /* TWIDDLE_INTERNAL_UTILS_H */

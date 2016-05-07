@@ -2,8 +2,8 @@
 
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bitmap/bitmap_rle.h>
-#include <twiddle/internal/utils.h>
 
+#include "../src/twiddle/macrology.h"
 #include "test.h"
 
 static const uint32_t sizes[] = {32,   64,   128,  256,  512,

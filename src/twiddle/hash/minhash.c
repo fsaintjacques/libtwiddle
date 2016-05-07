@@ -4,8 +4,8 @@
 
 #include <twiddle/hash/metrohash.h>
 #include <twiddle/hash/minhash.h>
-#include <twiddle/internal/simd.h>
-#include <twiddle/internal/utils.h>
+
+#include "../macrology.h"
 
 #define TW_BYTES_PER_MINHASH_REGISTER sizeof(uint32_t)
 

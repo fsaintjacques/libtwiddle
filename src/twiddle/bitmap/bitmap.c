@@ -3,8 +3,8 @@
 #include <x86intrin.h>
 
 #include <twiddle/bitmap/bitmap.h>
-#include <twiddle/internal/simd.h>
-#include <twiddle/internal/utils.h>
+
+#include "../macrology.h"
 
 #define TW_BYTES_PER_BITMAP sizeof(uint64_t)
 #define TW_BITS_PER_BITMAP (TW_BYTES_PER_BITMAP * TW_BITS_IN_WORD)

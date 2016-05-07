@@ -1,5 +1,7 @@
 #include <twiddle/hash/metrohash.h>
-#include <twiddle/hash/internal.h>
+
+#include "../macrology.h"
+#include "internal.h"
 
 static const uint64_t k0_64 = 0xD6D018F5;
 static const uint64_t k1_64 = 0xA2AA033B;

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include <twiddle/bitmap/bitmap.h>
-#include <twiddle/internal/utils.h>
 
+#include "../src/twiddle/macrology.h"
 #include "test.h"
 
 static void validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)

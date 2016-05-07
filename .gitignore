@@ -9,6 +9,11 @@
 libtwiddle.pc
 .gdb_history
 
+tools/docurium/.bundle/
+tools/docurium/Gemfile.lock
+tools/docurium/bin/
+tools/docurium/vendor/
+
 /libtwiddle*.tar.gz
 /libtwiddle*.tar.bz2
 

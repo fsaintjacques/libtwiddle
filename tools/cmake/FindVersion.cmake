@@ -16,13 +16,13 @@ message(STATUS "Current version: " ${VERSION})
 
 string(REGEX REPLACE "-.*" "-dev" BASE_VERSION "${VERSION}")
 
-if(BASE_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(-dev)?$")
+if(BASE_VERSION MATCHES "^v([0-9]+)\\.([0-9]+)\\.([0-9]+)(-.*)?$")
     set(VERSION_MAJOR "${CMAKE_MATCH_1}")
     set(VERSION_MINOR "${CMAKE_MATCH_2}")
     set(VERSION_PATCH "${CMAKE_MATCH_3}")
-else(BASE_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(-dev)?$")
+else()
     message(FATAL_ERROR "Invalid version number: ${VERSION}")
-endif(BASE_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(-dev)?$")
+endif()
 
 execute_process(
     COMMAND git rev-parse HEAD

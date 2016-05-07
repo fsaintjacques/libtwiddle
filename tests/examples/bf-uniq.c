@@ -5,6 +5,7 @@
 #include <time.h>
 
 #include <twiddle/bloomfilter/bloomfilter.h>
+#include <twiddle/internal/utils.h>
 
 static struct option long_options[] = {
     {"probability", required_argument, 0, 'p'},

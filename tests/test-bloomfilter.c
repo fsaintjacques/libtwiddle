@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include <twiddle/bloomfilter/bloomfilter.h>
+#include <twiddle/internal/utils.h>
 
 #include "test.h"
 
@@ -139,6 +140,66 @@ START_TEST(test_bloomfilter_set_operations)
 }
 END_TEST
 
+START_TEST(test_bloomfilter_errors)
+{
+  DESCRIBE_TEST;
+
+  uint8_t k = 8;
+  uint64_t size = 1 << 18;
+
+  struct tw_bloomfilter *a = tw_bloomfilter_new(size, k),
+                        *b = tw_bloomfilter_new(size + 1, k),
+                        *c = tw_bloomfilter_new(size, k + 1);
+
+  ck_assert_ptr_eq(tw_bloomfilter_clone(NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_copy(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_copy(NULL, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_copy(a, b), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_copy(a, c), c);
+
+  tw_bloomfilter_set(NULL, NULL, 0);
+  tw_bloomfilter_set(a, NULL, 1);
+  tw_bloomfilter_set(a, &k, 0);
+
+  tw_bloomfilter_fill(a);
+
+  ck_assert(!tw_bloomfilter_test(NULL, NULL, 0));
+  ck_assert(!tw_bloomfilter_test(a, NULL, 1));
+  ck_assert(!tw_bloomfilter_test(a, &k, 0));
+
+  ck_assert(!tw_bloomfilter_empty(NULL));
+  ck_assert(!tw_bloomfilter_full(NULL));
+  ck_assert_int_eq(tw_bloomfilter_count(NULL), 0);
+  ck_assert_ptr_eq(tw_bloomfilter_zero(NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_fill(NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_not(NULL), NULL);
+
+  ck_assert(!tw_bloomfilter_equal(NULL, NULL));
+  ck_assert(!tw_bloomfilter_equal(a, NULL));
+  ck_assert(!tw_bloomfilter_equal(a, b));
+  ck_assert(!tw_bloomfilter_equal(a, c));
+
+  ck_assert_ptr_eq(tw_bloomfilter_union(NULL, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_union(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_union(NULL, b), NULL);
+
+  ck_assert_ptr_eq(tw_bloomfilter_intersection(NULL, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_intersection(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_intersection(NULL, b), NULL);
+
+  ck_assert_ptr_eq(tw_bloomfilter_xor(NULL, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_xor(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_bloomfilter_xor(NULL, b), NULL);
+
+  tw_bloomfilter_density(NULL);
+
+  tw_bloomfilter_free(NULL);
+  tw_bloomfilter_free(c);
+  tw_bloomfilter_free(b);
+  tw_bloomfilter_free(a);
+}
+END_TEST
+
 int run_tests()
 {
   int number_failed;
@@ -149,6 +210,7 @@ int run_tests()
   tcase_add_test(tc, test_bloomfilter_basic);
   tcase_add_test(tc, test_bloomfilter_copy_and_clone);
   tcase_add_test(tc, test_bloomfilter_set_operations);
+  tcase_add_test(tc, test_bloomfilter_errors);
   suite_add_tcase(s, tc);
   srunner_run_all(runner, CK_NORMAL);
   number_failed = srunner_ntests_failed(runner);

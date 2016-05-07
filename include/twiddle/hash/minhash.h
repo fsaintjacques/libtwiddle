@@ -2,10 +2,7 @@
 #define TWIDDLE_HASH_MINHASH_H
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
-
-#define TW_BYTES_PER_MINHASH_REGISTER sizeof(uint32_t)
 
 /**
  * struct tw_minhash - minhash data structure
@@ -17,17 +14,17 @@ struct tw_minhash {
   uint32_t *registers;
 };
 
-#define TW_MINHASH_DEFAULT_SEED 18014475172444421775ULL
-
 /**
  * tw_minhash_new() - allocates a minhash structure
  * @n_registers: number of 64bit registers the structure holds
  *
+ * `n_registers' must be greater than 0.
+ *
  * Return: NULL if allocation failed, otherwise a pointer to the newly
- *         allocated `struct tw_minhash`.
+ * allocated `struct tw_minhash`.
  *
  * Note: The allocation will be rounded up to the closest multiple of a
- *       cacheline.
+ * cacheline.
  */
 struct tw_minhash *tw_minhash_new(uint32_t n_registers);
 
@@ -42,9 +39,10 @@ void tw_minhash_free(struct tw_minhash *hash);
  * @src: minhash to copy from
  * @dst: minhash to copy to
  *
- * Size and seed of hashes must be equals.
+ * `src' and `dst' must be non-null and must have the same register size.
  *
- * Return: NULL if copy failed, otherwise a pointer to dst.
+ * Return: NULL if pre-conditions are not met or copy failed, otherwise a
+ * pointer to dst.
  */
 struct tw_minhash *tw_minhash_copy(const struct tw_minhash *src,
                                    struct tw_minhash *dst);
@@ -52,6 +50,8 @@ struct tw_minhash *tw_minhash_copy(const struct tw_minhash *src,
 /**
  * tw_minhash_clone() - clone a minash into a new allocated minhash
  * @hash: minhash to clone
+ *
+ * `hash' must be non-null.
  *
  * Return: NULL if failed, otherwise a newly allocated minhash initialized from
  * the requests minhash. The caller is responsible to deallocated the minhash
@@ -64,40 +64,46 @@ struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash);
  * @hash:     minhash to add
  * @key:      buffer of the key to add
  * @key_size: size of the buffer of the key to add
+ *
+ * `hash' and `key' must be non-null, `key_size' must be greater than 0.
  */
 void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size);
 
 /**
  * tw_minhash_estimate() - estimate the jaccard index between two minhash.
- * @a: first minhash
- * @b: second minhash
+ * @fst: first minhash
+ * @snd: second minhash
  *
- * Return: estimated jaccard index of `a` and `b`.
+ * `fst' and `snd' must be non-null and of equal size.
+ *
+ * Return: 0.0 if pre-conditions are not met, otherwise the estimated jaccard
+ * index of `fst` and `snd`.
  */
-float tw_minhash_estimate(const struct tw_minhash *a,
-                          const struct tw_minhash *b);
+float tw_minhash_estimate(const struct tw_minhash *fst,
+                          const struct tw_minhash *snd);
 
 /**
  * tw_minhash_equal() - verify if hashes are equal
- * @a: first minhash
- * @b: second minhash
+ * @fst: first minhash
+ * @snd: second minhash
  *
- * Return: true if equal, false otherwise
+ * `fst' and `snd' must be non-null and of equal size.
  *
- * Note that this function will always return false if size and/or seed are
- * not equal.
+ * Return: false if pre-conditions are not met or not equal, otherwise
+ * indicator if hashes are equal.
  */
-bool tw_minhash_equal(const struct tw_minhash *a, const struct tw_minhash *b);
+bool tw_minhash_equal(const struct tw_minhash *fst,
+                      const struct tw_minhash *snd);
 
 /**
  * tw_minhash_merge() - merge src into dst
  * @src: minhash to merge from
  * @dst: minhash to merge to
  *
- * Return: pointer to merged minhash structure dst, NULL if failed.
+ * `src' and `dst' must be non-null and of equal size.
  *
- * Merged hashes must have the same size and seed. Otherwise
- * merging is refused.
+ * Return: NULL if pre-conditions are not met, otherwise pointer to dst with
+ * merged registers.
  */
 struct tw_minhash *tw_minhash_merge(const struct tw_minhash *src,
                                     struct tw_minhash *dst);

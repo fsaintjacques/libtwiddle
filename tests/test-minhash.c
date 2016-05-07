@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include <twiddle/internal/utils.h>
 #include <twiddle/hash/minhash.h>
+#include <twiddle/internal/utils.h>
 
 #include "test.h"
 
@@ -140,6 +140,45 @@ START_TEST(test_minhash_merge)
 }
 END_TEST
 
+START_TEST(test_minhash_errors)
+{
+  DESCRIBE_TEST;
+
+  const uint32_t a_size = 1 << 16, b_size = (1 << 16) + 1;
+
+  struct tw_minhash *a = tw_minhash_new(a_size);
+  struct tw_minhash *b = tw_minhash_new(b_size);
+
+  ck_assert_ptr_eq(tw_minhash_new(0), NULL);
+
+  ck_assert_ptr_eq(tw_minhash_copy(a, b), NULL);
+  ck_assert_ptr_eq(tw_minhash_copy(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_minhash_copy(NULL, a), NULL);
+  ck_assert_ptr_eq(tw_minhash_clone(NULL), NULL);
+
+  tw_minhash_add(NULL, NULL, 0);
+  tw_minhash_add(a, NULL, 1);
+  tw_minhash_add(a, &a_size, 0);
+  tw_minhash_add(a, &a_size, 1);
+
+  tw_minhash_estimate(a, b);
+  tw_minhash_estimate(a, NULL);
+  tw_minhash_estimate(NULL, NULL);
+
+  ck_assert(!tw_minhash_equal(a, b));
+  ck_assert(!tw_minhash_equal(NULL, b));
+  ck_assert(!tw_minhash_equal(a, NULL));
+
+  ck_assert_ptr_eq(tw_minhash_merge(a, b), NULL);
+  ck_assert_ptr_eq(tw_minhash_merge(a, NULL), NULL);
+  ck_assert_ptr_eq(tw_minhash_merge(NULL, b), NULL);
+
+  tw_minhash_free(NULL);
+  tw_minhash_free(b);
+  tw_minhash_free(a);
+}
+END_TEST
+
 int run_tests()
 {
   int number_failed;
@@ -150,6 +189,7 @@ int run_tests()
   tcase_add_test(tc, test_minhash_basic);
   tcase_add_test(tc, test_minhash_copy_and_clone);
   tcase_add_test(tc, test_minhash_merge);
+  tcase_add_test(tc, test_minhash_errors);
   /* added for travis slowness of clang */
   tcase_set_timeout(tc, 15);
   suite_add_tcase(s, tc);

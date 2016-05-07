@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>example-bloomfilter-a2.c</title>
+  <link rel="stylesheet" href="../css.css">
+  <style type="text/css">
+    a.fnlink {text-decoration: none}
+    a.fnlink:hover {text-decoration: underline}
+  </style>
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+        <a class="source" href="../../#v1.0.0">API Docs</a>
+          <a class="source" href="bf-uniq.html">bf-uniq.c</a>
+          <a class="source" href="example-bitmap-rle.html">example-bitmap-rle.c</a>
+          <a class="source" href="example-bitmap.html">example-bitmap.c</a>
+          <a class="source" href="example-bloomfilter-a2.html">example-bloomfilter-a2.c</a>
+          <a class="source" href="example-bloomfilter.html">example-bloomfilter.c</a>
+          <a class="source" href="example-hyperloglog.html">example-hyperloglog.c</a>
+          <a class="source" href="example-minhash.html">example-minhash.c</a>
+          <a class="source" href="hll-wc.html">hll-wc.c</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>example-bloomfilter-a2.c</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>
+<html><head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<title>404 Not Found</title>
+</head>
+<body text=#000000 bgcolor=#ffffff>
+<h1>Error: Not Found</h1>
+<h2>The requested URL <code>/</code> was not found on this server.</h2>
+<h2></h2>
+</body></html>
+</pre></div>
+      </td>
+    </tr>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>An active-active -bloomfilter (a2-bloomfilter) is a pair of bloomfilters,
+one active, one passive that gets rotated when
+active.density &gt;= density_thresold is reached. Before rotation the passive
+bloomfilter gets cleared.</p>
+
+<p>Since density is applied localy to the active bloom filter, the whole
+bloomfilter density is maximised by 2 * density.</p>
+
+<p>Thus an a2-bloomfilter a bloomfilter with a LRU (on write operation)
+eviction policy.</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

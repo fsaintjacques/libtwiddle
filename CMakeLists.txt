@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 set(PROJECT_NAME libtwiddle)
-set(RELEASE_DATE 2015-09-03)
+set(RELEASE_DATE 2016-05-07)
 project(${PROJECT_NAME})
 include(CTest)
 

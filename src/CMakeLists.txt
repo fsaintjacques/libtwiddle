@@ -26,7 +26,7 @@ add_c_library(
     libtwiddle
     OUTPUT_NAME twiddle
     PKGCONFIG_NAME libtwiddle
-    VERSION 0.0.0
+    VERSION 1.0.0
     SOURCES
         twiddle/bitmap/bitmap.c
         twiddle/bitmap/bitmap_rle.c

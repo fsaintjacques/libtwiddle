@@ -7,6 +7,7 @@
 
 
 libtwiddle.pc
+.gdb_history
 
 /libtwiddle*.tar.gz
 /libtwiddle*.tar.bz2

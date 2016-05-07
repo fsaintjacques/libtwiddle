@@ -10,9 +10,7 @@ Test infrastructure
 
 libtwiddle is backed by standard unit checks implemented with the Check
 library. Minimal Python bindings exist to test more thoroughly with the
-property-testing library [Hypothesis].
-
-[Hypothesis](https://github.com/DRMacIver/hypothesis)
+property-testing library [Hypothesis](https://github.com/DRMacIver/hypothesis).
 
 
 When developing, we recommend using the `Debug` release type, as it
@@ -26,6 +24,11 @@ $ make test
 ...
 ```
 
+One can also invoke the test suite with the `tools/travis/test` script which
+should create a grid of build directories: `build-{portable,avx,avx2}` and run
+the tests on each build directory. It should automagicaly detect CPU support for
+instruction sets required.
+
 To test with Hypothesis, one must prepare a virtualenv and install
 dependencies. This is only needed once.
 
@@ -37,6 +40,16 @@ $ pip install pytest hypothesis==1.19.0
 $ # run property tests
 $ PYTHONPATH=. py.test tests
 ```
+
+One can also invoke the travis test script to run integration test:
+`RUN_HYPOTHESIS=true tools/travis/test`.
+
+Travis
+------
+
+Travis will try to build and run the test infrastructure on each commit.
+To fasten up feedback, integration tests are only run on pull-request branches
+from github.
 
 Debugging
 ---------

@@ -1,8 +1,13 @@
-/build/
+/build*/
 /.build/
 /tmp/
+/python/.venv/
+/python/.hypothesis/
+/python/.cache/
+
 
 libtwiddle.pc
+.gdb_history
 
 /libtwiddle*.tar.gz
 /libtwiddle*.tar.bz2
@@ -11,3 +16,4 @@ libtwiddle.pc
 *.os
 *.so
 *.dylib
+*.pyc

@@ -1,108 +1,42 @@
-LIBTWIDDLE
+libtwiddle
 ==========
+[![Build Status](https://travis-ci.org/fsaintjacques/libtwiddle.svg?branch=develop)](https://travis-ci.org/fsaintjacques/libtwiddle)
+[![License](https://img.shields.io/badge/license-LGPL--3.0-blue.svg?style=flat)](https://github.com/fsaintjacques/libtwiddle/blob/develop/LICENSE)
 
-libtwiddle is a small library that implements bit data structures:
 
-  * bitmaps
-  * bloom filters
-  * tries
+libtwiddle is a data structure library aiming for speed on modern
+Linux x86-64 systems. The following data structures are implemented:
 
-USAGE
-=====
+  * bitmaps (dense & RLE);
+  * Bloom filters (standard & active-active);
+  * HyperLogLog
+  * MinHash
 
-bitmap
-------
+See [`EXAMPLES.md`](EXAMPLES.md) and
+[`tests/examples/`](tests/examples/) for examples.
 
-```C
-#include <assert.h>
-#include <libtwiddle/bitmap.h>
+Why should you use libtwiddle?
+------------------------------
 
-int main(int argc, char* argv[]) {
-  const uint32_t nbits = 1024;
-  struct tw_bitmap* bitmap = tw_bitmap_new(nbits);
+  * Written for the modern age; `gcc >= 4.8`, using C11 features, on x86-64
+  * Extensive testing; unit tests and random property testing with `hypothesis`
+  * Python bindings; courtesy of property testing
+  * Vectorized implementations; AVX, AVX2, and partial support for AVX512
+  * Continuous integration
 
-  assert(bitmap);
-
-  tw_bitmap_set(bitmap, 512);
-  assert(tw_bitmap_test_and_clear(bitmap, 512));
-  assert(!tw_bitmap_test(bitmap, 512));
-
-  tw_bitmap_set(bitmap, 768);
-  assert(tw_bitmap_find_first_bit(bitmap) == 768);
-
-  return 0;
-}
-```
-
-bitmap-rle
-------
-
-```C
-#include <assert.h>
-#include <libtwiddle/bitmap_rle.h>
-
-int main(int argc, char* argv[]) {
-  /** let's allocate a bitmap containing 2 billions bits */
-  const uint32_t nbits = 1UL << 31;
-  struct tw_bitmap_rle* bitmap = tw_bitmap_rle_new(nbits);
-
-  assert(bitmap);
-
-  /** let's fill 1 billion bits */
-  const uint32_t start = 0UL;
-  const uint32_t end = 1UL << 30;
-  tw_bitmap_rle_set_range(bitmap, start, end);
-
-  assert(tw_bitmap_rle_test(bitmap, start));
-  assert(tw_bitmap_rle_test(bitmap, end));
-  assert(tw_bitmap_rle_find_first_bit(bitmap)  == start);
-  assert(tw_bitmap_rle_find_first_zero(bitmap) == end + 1);
-
-  return 0;
-}
-```
-
-bloomfilter
------------
-
-```C
-#include <assert.h>
-#include <string.h>
-
-#include <libtwiddle/bloomfilter.h>
-
-int main(int argc, char *argv[]) {
-  const uint32_t nbits = 1024;
-  const uint32_t k = 7;
-  struct tw_bloomfilter *bf = tw_bloomfilter_new(nbits, k);
-  assert(bf);
-
-  char *values[] = {"herp", "derp", "ferp", "merp"};
-
-  for (int i = 0; i < ((sizeof(values) / sizeof(values[0]))); ++i) {
-    tw_bloomfilter_set(bf, strlen(values[i]), values[i]);
-    assert(tw_bloomfilter_test(bf, strlen(values[i]), values[i]));
-  }
-
-  assert(!tw_bloomfilter_test(bf, sizeof("nope"), "nope"));
-
-  return 0;
-}
-```
-
-INSTALL
+Install
 =======
 
-libtwiddle uses cmake as its build manager.
+libtwiddle uses CMake as its build manager.
 
 Prerequisite libraries
 ----------------------
 
-To build libtwiddle, you need the following libraries installed on
-your system:
+To build libtwiddle, you need the following:
 
-  * pkg-config
-  * check (http://check.sourceforge.net)
+  * pkg-config;
+  * Check (http://libcheck.github.io/check/);
+  * a recent C compiler (`gcc >= 4.8` or `clang >= 3.5`).
 
 Building from source
 --------------------
@@ -115,3 +49,24 @@ In most cases, you should be able to build the source code using the following:
     $ make
     $ make test
     $ make install
+
+Building with SIMD support
+--------------------------
+
+By default, libtwiddle will compile with AVX SIMD instructions. Use
+the following flags to enable newer instructions:
+
+  * For AVX2:   `-DUSE_AVX2=ON`;
+  * for AVX512: `-DUSE_AVX512=ON`.
+
+Note that AVX2 implies AVX, and AVX512 implies AVX2. Some functions
+can't be implemented with AVX512, and will fallback to AVX2 code.
+
+To compile without SIMD support, invoke CMake with `-DUSE_AVX=OFF
+-DUSE_AVX2=OFF -DUSE_AVX512=OFF`.
+
+Contributions
+-------------
+
+Contributions are more than welcome, see
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for details.

@@ -1,41 +1,9 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------
-# Copyright ©
-#     2015, François Saint-Jacques
-#     2011-2015, RedJack, LLC.
-# All rights reserved.
-#
-# Please see the COPYING file in this distribution for license details.
-# ----------------------------------------------------------------------
-
-#-----------------------------------------------------------------------
-# Build the test cases
-
-# Add calls to make_test for each .c test case in the tests/ directory.
 add_c_test(test-bitmap)
 add_c_test(test-bitmap-rle)
 add_c_test(test-bloomfilter)
+add_c_test(test-bloomfilter-a2)
+add_c_test(test-hyperloglog)
+add_c_test(test-minhash)
 
-#-----------------------------------------------------------------------
-# Command-line tests
-
-find_package(PythonInterp)
-
-if (PYTHON_EXECUTABLE)
-    file(GLOB_RECURSE TESTS "${CMAKE_CURRENT_SOURCE_DIR}/*.t")
-    foreach(TEST ${TESTS})
-        get_filename_component(TEST_NAME "${TEST}" NAME_WE)
-        add_test(
-            ${TEST_NAME}
-            ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}
-            ${CMAKE_SOURCE_DIR}/tools/cram/ccram
-                --python ${PYTHON_EXECUTABLE}
-                --root ${CMAKE_SOURCE_DIR}
-                --tests ${TEST}
-        )
-    endforeach(TEST)
-else (PYTHON_EXECUTABLE)
-    message(WARNING "Unable to find Python; skipping cram tests.")
-endif (PYTHON_EXECUTABLE)
-
+add_subdirectory(benchmarks)
 add_subdirectory(examples)

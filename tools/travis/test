@@ -4,28 +4,110 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-function set_travis_compiler {
+set -o xtrace
+
+: ${BUILD_TYPE:=Release}
+: ${RUN_VALGRIND:=false}
+: ${RUN_HYPOTHESIS:=false}
+: ${VERBOSE:=false}
+
+function set_travis_env {
+
+  VERBOSE=true
+
   if [[ -n "${CLANG_VERSION:-}" ]]; then
+    export CC="clang-${CLANG_VERSION}" ;
     export CXX="clang++-${CLANG_VERSION}" ;
     export GCOV="llvm-cov-${CLANG_VERSION}" ;
   elif [[ -n "${GCC_VERSION:-}" ]]; then
+    export CC="gcc-${GCC_VERSION}" ;
     export CXX="g++-${GCC_VERSION}" ;
     export GCOV="gcov-${GCC_VERSION}" ;
   fi
-}
 
-function prepare_build_dir {
-  mkdir -p build
-
-  # custom build cmake in path
-  if [[ -e ${PWD}/cmake ]]; then
-    export PATH=${PWD}/cmake/bin:${PATH}
+  if [[ ${TRAVIS_PULL_REQUEST:-false} != "false" ]]; then
+    RUN_HYPOTHESIS=true
+    RUN_VALGRIND=true
   fi
 
-  cd build
-  cmake -DCMAKE_BUILD_TYPE=Debug ..
 }
 
-set_travis_compiler
-prepare_build_dir
-make all test
+function run_tests {
+  local name=$1
+
+  local dir="build-${name}"
+
+  # if you change this, modify `python/twiddle/c.py` accordingly.
+  export BUILD_DIR=$dir
+
+  mkdir -p "$dir"
+
+  CMAKE_FLAGS="-DUSE_AVX=OFF"
+  if [[ ${name:-} = "avx512" ]]; then
+    CMAKE_FLAGS="-DUSE_AVX512=ON"
+  elif [[ ${name:-} = "avx2" ]]; then
+    CMAKE_FLAGS="-DUSE_AVX2=ON"
+  elif [[ ${name:-} = "avx" ]]; then
+    CMAKE_FLAGS="-DUSE_AVX=ON"
+    if [[ ${RUN_VALGRIND:-false} != "false" ]]; then
+      CMAKE_FLAGS="-DUSE_VALGRIND=ON ${CMAKE_FLAGS}$"
+    fi
+  fi
+
+
+  pushd $dir
+
+  cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+        ${CMAKE_FLAGS:-} ..
+
+  # disable FORK (and incidently timeouts)
+  export CK_FORK=no
+
+  if [[ ${VERBOSE:-false} != "false" ]]; then
+    VERBOSE_FLAG="VERBOSE=1"
+  fi
+
+  # unit tests
+  make all test ${VERBOSE_FLAG:-}
+  popd
+
+  if [[ ${RUN_HYPOTHESIS} != "false" ]]; then
+    # property python tests
+    run_property_tests
+  fi
+
+}
+
+function run_property_tests {
+  pushd python
+  py_dir=.
+  venv_dir=${py_dir}/.venv
+  virtualenv ${venv_dir}
+  set +o nounset
+  source ${venv_dir}/bin/activate
+  set -o nounset
+  pip install pytest hypothesis==1.19.0
+  PYTHONPATH=${py_dir} py.test tests
+  popd
+}
+
+function has_cpu_extension {
+  local ext=$1
+  cat /proc/cpuinfo | grep -q "$ext"
+}
+
+function run_tests_with_extension {
+  local ext=$1
+  if has_cpu_extension "${ext}"; then
+    run_tests "${ext}"
+  fi
+}
+
+
+if [[ -n "${TRAVIS:-}" ]]; then
+  set_travis_env
+fi
+
+run_tests portable
+run_tests_with_extension avx
+run_tests_with_extension avx2

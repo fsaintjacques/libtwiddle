@@ -1,9 +1,10 @@
 #include <assert.h>
-#include <libtwiddle/bitmap.h>
+#include <twiddle/bitmap/bitmap.h>
 
-int main(int argc, char* argv[]) {
-  const uint32_t nbits = 1024;
-  struct tw_bitmap* bitmap = tw_bitmap_new(nbits);
+int main()
+{
+  const uint64_t nbits = 1024;
+  struct tw_bitmap *bitmap = tw_bitmap_new(nbits);
 
   assert(bitmap);
 
@@ -13,6 +14,8 @@ int main(int argc, char* argv[]) {
 
   tw_bitmap_set(bitmap, 768);
   assert(tw_bitmap_find_first_bit(bitmap) == 768);
+
+  tw_bitmap_free(bitmap);
 
   return 0;
 }

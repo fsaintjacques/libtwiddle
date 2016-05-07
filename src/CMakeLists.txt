@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------
-# Copyright ©
-#     2015, François Saint-Jacques
-#     2011-2015, RedJack, LLC.
-# All rights reserved.
-#
-# Please see the COPYING file in this distribution for license details.
-# ----------------------------------------------------------------------
-
-
 # Update the VERSION property below according to the following rules (taken from
 # [1]):
 #
@@ -37,12 +26,16 @@ add_c_library(
     libtwiddle
     OUTPUT_NAME twiddle
     PKGCONFIG_NAME libtwiddle
-    VERSION 0.0.0
+    VERSION 1.0.0
     SOURCES
-        libtwiddle/bitmap.c
-        libtwiddle/bitmap_rle.c
-        libtwiddle/bloomfilter.c
-        libtwiddle/hash.c
-   #LIBRARIES
-       #libcork
+        twiddle/bitmap/bitmap.c
+        twiddle/bitmap/bitmap_rle.c
+        twiddle/bloomfilter/bloomfilter.c
+        twiddle/bloomfilter/bloomfilter_a2.c
+        twiddle/hash/hash.c
+        twiddle/hash/murmur3.c
+        twiddle/hash/metrohash.c
+        twiddle/hyperloglog/hyperloglog.c
+        twiddle/hyperloglog/hyperloglog_bias.c
+        twiddle/hash/minhash.c
 )

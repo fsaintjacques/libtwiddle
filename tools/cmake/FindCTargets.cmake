@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-# ----------------------------------------------------------------------
-# Copyright © 2015, RedJack, LLC.
-# All rights reserved.
-#
-# Please see the COPYING file in this distribution for license details.
-# ----------------------------------------------------------------------
-
-
 #-----------------------------------------------------------------------
 # Configuration options that control all of the below
 
@@ -20,6 +11,9 @@ set(ENABLE_STATIC YES CACHE BOOL "Whether to build a static library")
 # Library, with options to build both shared and static versions
 
 function(target_add_shared_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
+    foreach(lib ${LOCAL_LIBRARIES})
+        target_link_libraries(${TARGET_NAME} ${lib}-shared)
+    endforeach(lib)
     foreach(lib ${LIBRARIES})
         string(REPLACE "-" "_" lib ${lib})
         string(TOUPPER ${lib} upperlib)
@@ -28,12 +22,12 @@ function(target_add_shared_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
             ${${upperlib}_LDFLAGS}
         )
     endforeach(lib)
-    foreach(lib ${LOCAL_LIBRARIES})
-        target_link_libraries(${TARGET_NAME} ${lib}-shared)
-    endforeach(lib)
 endfunction(target_add_shared_libraries)
 
 function(target_add_static_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
+    foreach(lib ${LOCAL_LIBRARIES})
+        target_link_libraries(${TARGET_NAME} ${lib}-static)
+    endforeach(lib)
     foreach(lib ${LIBRARIES})
         string(REPLACE "-" "_" lib ${lib})
         string(TOUPPER ${lib} upperlib)
@@ -41,9 +35,6 @@ function(target_add_static_libraries TARGET_NAME LIBRARIES LOCAL_LIBRARIES)
             ${TARGET_NAME}
             ${${upperlib}_STATIC_LDFLAGS}
         )
-    endforeach(lib)
-    foreach(lib ${LOCAL_LIBRARIES})
-        target_link_libraries(${TARGET_NAME} ${lib}-static)
     endforeach(lib)
 endfunction(target_add_static_libraries)
 
@@ -199,8 +190,6 @@ endfunction(add_c_executable)
 #-----------------------------------------------------------------------
 # Test case
 
-pkgconfig_prereq(check OPTIONAL)
-
 function(add_c_test TEST_NAME)
     get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
     add_c_executable(
@@ -212,4 +201,31 @@ function(add_c_test TEST_NAME)
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
     add_test(${TEST_NAME} ${TEST_NAME})
+    if (USE_VALGRIND)
+      add_test(${TEST_NAME}-valgrind valgrind --quiet ./${TEST_NAME})
+    endif(USE_VALGRIND)
 endfunction(add_c_test)
+
+function(add_c_benchmark BENCHMARK_NAME)
+    get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
+    add_c_executable(
+        ${BENCHMARK_NAME}
+        SKIP_INSTALL
+        OUTPUT_NAME ${BENCHMARK_NAME}
+        SOURCES ${BENCHMARK_NAME}.c
+        LIBRARIES check
+        LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
+    )
+endfunction(add_c_benchmark)
+
+function(add_c_example EXAMPLE_NAME)
+    get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
+    add_c_executable(
+        ${EXAMPLE_NAME}
+        SKIP_INSTALL
+        OUTPUT_NAME ${EXAMPLE_NAME}
+        SOURCES ${EXAMPLE_NAME}.c
+        LIBRARIES check
+        LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
+    )
+endfunction(add_c_example)

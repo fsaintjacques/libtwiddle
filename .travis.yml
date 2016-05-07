@@ -1,7 +1,8 @@
-sudo: false
+sudo: required
+dist: trusty
+
 matrix:
   include:
-
     - env: GCC_VERSION=4.8
       addons: &gcc48
         apt:
@@ -11,8 +12,12 @@ matrix:
             - valgrind
             - check
             - pkg-config
+            - cmake
+            - cmake-data
+            - python-virtualenv
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
 
     - env: GCC_VERSION=4.9
       addons: &gcc49
@@ -23,8 +28,12 @@ matrix:
             - valgrind
             - check
             - pkg-config
+            - cmake
+            - cmake-data
+            - python-virtualenv
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
 
     - env: GCC_VERSION=5
       addons: &gcc50
@@ -35,12 +44,47 @@ matrix:
             - valgrind
             - check
             - pkg-config
+            - cmake
+            - cmake-data
+            - python-virtualenv
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
 
-install:
-  - cd ${TRAVIS_BUILD_DIR} && tools/travis/deps
+    - env: CLANG_VERSION=3.5
+      addons: &clang35
+        apt:
+          packages:
+            - clang-3.5
+            - llvm-3.5
+            - valgrind
+            - check
+            - pkg-config
+            - cmake
+            - cmake-data
+            - python-virtualenv
+          sources:
+            - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
+            - llvm-toolchain-precise-3.5
+
+    - env: CLANG_VERSION=3.6
+      addons: &clang36
+        apt:
+          packages:
+            - clang-3.6
+            - llvm-3.6
+            - valgrind
+            - check
+            - pkg-config
+            - cmake
+            - cmake-data
+            - python-virtualenv
+          sources:
+            - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
+            - llvm-toolchain-precise-3.6
+
+
 script:
   - cd ${TRAVIS_BUILD_DIR} && tools/travis/test
-# after_success:
-#   - cd ${TRAVIS_BUILD_DIR} && tools/coverage

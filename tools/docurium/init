@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -o errexit -o nounset
+
+DOCU_HOME="$(cd "$(dirname "$(which "$0")")"/.. >/dev/null; pwd -P)"/docurium
+
+: ${GEMFILE:-${DOCU_HOME}/Gemfile}
+: ${VENDOR:-vendor}
+
+install() {
+  pushd "$DOCU_HOME"
+  bundler install --binstubs=bin/ --path vendor
+  popd
+}
+
+install

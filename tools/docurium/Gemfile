@@ -1,0 +1,9 @@
+source "http://rubygems.org"
+
+platforms :rbx do
+    gem 'rubysl', '~> 2.0'
+end
+
+gem 'docurium', '~> 0.5', :git => 'https://github.com/libgit2/docurium.git'
+
+# vim:ft=ruby

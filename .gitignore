@@ -13,6 +13,7 @@ tools/docurium/.bundle/
 tools/docurium/Gemfile.lock
 tools/docurium/bin/
 tools/docurium/vendor/
+tools/docurium/mkmf.log
 
 /libtwiddle*.tar.gz
 /libtwiddle*.tar.bz2

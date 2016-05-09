@@ -8,10 +8,7 @@
 #define TW_BITMAP_MAX_POS (TW_BITMAP_MAX_BITS - 1)
 
 /**
- * struct tw_bitmap - bitmap data structure
- * @size:  storage capacity in bits
- * @count: number of active bits
- * @data:  buffer holding the bits
+ * dense bitmap data structure
  *
  * This is the most basic implementation of a bitmap. It does not support
  * resizing and concurrent operations (unless constrained to reads only).
@@ -21,248 +18,277 @@
  * operations.
  */
 struct tw_bitmap {
+  /** storage capacity in bits */
   uint64_t size;
+  /** number of active bits */
   uint64_t count;
+  /** pointer to stored bits */
   uint64_t *data;
 };
 
 /**
- * tw_bitmap_new() - allocates a bitmap
- * @size: number of bits the bitmap should hold
+ * Creates a `struct tw_bitmap` with the requested number of bits.
  *
- * Bitmaps are static and do not grow in size. Bitmaps cannot contain more
- * than TW_BITMAP_MAX_BITS.
+ * @param size number of bits the bitmap should hold, must be smaller or equal
+ *             than `TW_BITMAP_MAX_BITS`
  *
- * Return: NULL if allocation failed, otherwise a pointer to the newly
- *         allocated `struct tw_bitmap`.
+ * @return `NULL` if allocation failed, otherwise a pointer to the newly
+ *         allocated `struct tw_bitmap`
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_new(uint64_t size);
 
 /**
- * tw_bitmap_free() - free a bitmap
- * @bitmap: bitmap to free
+ * Free a `struct tw_bitmap`.
+ *
+ * @param bitmap to free
+ *
+ * @note group:bitmap
  */
 void tw_bitmap_free(struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_copy() - copy src bitmap into dst
- * @src: bitmap to copy from
- * @dst: bitmap to copy to
+ * Copy a source bitmap into a specified bitmap.
  *
- * `src' and `dst' must be non-null and of equal size.
+ * @param src non-null bitmap to copy from
+ * @param dst non-null bitmap to copy to
  *
- * Return: NULL if copy failed, otherwise a pointer to dst.
+ * @return `NULL` if copy failed, otherwise a pointer to dst
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_copy(const struct tw_bitmap *src,
                                  struct tw_bitmap *dst);
 
 /**
- * tw_bitmap_clone() - clone a bitmap into a new allocated bitmap
- * @bitmap: bitmap to clone
+ * Clone a bitmap into a new allocated bitmap.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to clone
  *
- * Return: NULL if failed, otherwise a newly allocated bitmap initialized from
- * the requests bitmap. The caller is responsible to deallocate the bitmap
- * with tw_bitmap_free.
+ * @return `NULL` if failed, otherwise a newly allocated bitmap initialized from
+ *         the requests bitmap. The caller is responsible to deallocate the
+ *         bitmap with tw_bitmap_free
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_clone(const struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_set() - set position in bitmap
- * @bitmap: bitmap affected
- * @pos:    position of the bit to set
+ * Set position in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null and `pos' must be smaller than `bitmap.size'.
+ * @param bitmap non-null bitmap to set the position
+ * @param pos position of the bit to set, must be smaller than `bitmap.size'
+ *
+ * @note group:bitmap
  */
 void tw_bitmap_set(struct tw_bitmap *bitmap, uint64_t pos);
 
 /**
- * tw_bitmap_clear() - clear position in bitmap
- * @bitmap: bitmap affected
- * @pos:    position of the bit to clear
+ * Clear position in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null and `pos' must be smaller than `bitmap.size'.
+ * @param bitmap bitmap non-null bitmap to clear the position
+ * @param pos position of the bit to clear, must be smaller than `bitmap.size'
+ *
+ * @note group:bitmap
  */
 void tw_bitmap_clear(struct tw_bitmap *bitmap, uint64_t pos);
 
 /**
- * tw_bitmap_test() - test postition in bitmap
- * @bitmap: bitmap targetted
- * @pos:    position of the bit to test
+ * Test a position in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null and `pos' must be smaller than `bitmap.size'.
+ * @param bitmap non-null bitmap to test position at
+ * @param pos position of the bit to test, must be smaller than `bitmap.size'
  *
- * Return: false if pre-conditions are not met, otherwise return the value
- * pos in the bitmap
+ * @return `false` if pre-conditions are not met, otherwise return the value
+ *         pos in the bitmap
+ *
+ * @note group:bitmap
  */
 bool tw_bitmap_test(const struct tw_bitmap *bitmap, uint64_t pos);
 
 /**
- * tw_bitmap_test_and_set() - test position in bitmap and set afterward
- * @bitmap: bitmap affected
- * @pos:    position of the bit to test and set
+ * Test a position in `struct tw_bitmap` and set the position afterward.
  *
- * `bitmap' must be non-null and `pos' must be smaller than `bitmap.size'.
+ * @param bitmap non-null bitmap to test and set potition at
+ * @param pos position of the bit to test and set
  *
- * Return: false if pre-conditions are not met, otherwise return the value
- * pos in the bitmap before setting it.
+ * @return `false` if pre-conditions are not met, otherwise return the value
+ *         pos in the bitmap before setting it
+ *
+ * @note group:bitmap
  */
 bool tw_bitmap_test_and_set(struct tw_bitmap *bitmap, uint64_t pos);
 
 /**
- * tw_bitmap_test_and_clear() - test position in bitmap and clear afterward
- * @bitmap: bitmap affected
- * @pos:    position of the bit to test and clear
+ * Test a position in `struct tw_bitmap` and clear the position afterward.
  *
- * `bitmap' must be non-null and `pos' must be smaller than `bitmap.size'.
+ * @param bitmap non-null bitmap to test and clear potition at
+ * @param pos position of the bit to test and clear, must be smaller than
+ *            `bitmap.size'
  *
- * Return: false if pre-conditions are not met, otherwise return the value
- * pos in the bitmap before clearing it.
+ * @return `false` if pre-conditions are not met, otherwise return the value
+ *         pos in the bitmap before clearing it
+ *
+ * @note group:bitmap
  */
 bool tw_bitmap_test_and_clear(struct tw_bitmap *bitmap, uint64_t pos);
 
 /**
- * tw_bitmap_empty() - verify if bitmap is empty
- * @bitmap: bitmap to verify
+ * Verify if a `struct tw_bitmap` is empty.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to verify emptyness
  *
- * Return: false if pre-conditions are not met, otherwise indicator if the
- * bitmap is empty.
+ * @return `false` if pre-conditions are not met, otherwise indicator if the
+ *         bitmap is empty
+ *
+ * @note group:bitmap
  */
 bool tw_bitmap_empty(const struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_full() - verify if bitmap is full
- * @bitmap: bitmap to verify
+ * Verify if a `struct tw_bitmap` is full.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to verify fullness
  *
- * Return: false if pre-conditions are not met, otherwise indicator if the
- * bitmap is full.
+ * @return `false` if pre-conditions are not met, otherwise indicator if the
+ *         bitmap is full
+ *
+ * @note group:bitmap
  */
 bool tw_bitmap_full(const struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_count() - count the number of active bits
- * @bitmap: bitmap to count
+ * Count the number of active bits in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to count the number of active bits
  *
- * Return: 0 if pre-conditions are not met, otherwise number of active bits.
+ * @return `0` if pre-conditions are not met, otherwise the number of active
+ *         bits.
+ *
+ * @note group:bitmap
  */
 uint64_t tw_bitmap_count(const struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_density() - count the percentage of active bits
- * @bitmap: bitmap to count the density
+ * Count the proportion of active bits in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to count the density
  *
- * Return: 0.0 if pre-conditions are not met, otherwise the portion of active
- * bits (count / size)
+ * @return `0.0` if pre-conditions are not met, otherwise the proportion of
+ *         active bits, i.e. `bitmap.count / bitmap.size`
+ *
+ * @note group:bitmap
  */
 float tw_bitmap_density(const struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_zero() - clear all bits in a bitmap
- * @bitmap: bitmap to empty
+ * Clear all bits in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to clear
  *
- * Return: NULL if pre-conditions are not met, otherwise `bitmap' with zeroed
- * bits.
+ * @return `NULL` if pre-conditions are not met, otherwise `bitmap' with zeroed
+ *         bits.
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_zero(struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_fill() - set all bits in a bitmap
- * @bitmap: bitmap to fill
+ * Set all bits in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to fill
  *
- * Return: NULL if pre-conditions are not met, otherwise `bitmap' with filled
- * bits.
+ * @return `NULL` if pre-conditions are not met, otherwise `bitmap' with filled
+ *         bits.
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_fill(struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_find_first_zero() - find the first zero
- * @bitmap: bitmap to find first zero
+ * Find the first zero in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to find first zero
  *
- * Return: -1 if not found or pre-conditions not met, otherwise the position
- * of the first zero.
+ * @return `-1` if not found or pre-conditions not met, otherwise the position
+ *         of the first zero.
+ *
+ * @note group:bitmap
  */
 int64_t tw_bitmap_find_first_zero(const struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_find_first_bit() - find the first bit
- * @bitmap: bitmap to find first bit
+ * Find the first bit in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to find first bit
  *
- * Return: -1 if not found or pre-conditions are not met, otherwise position
- * of the first bit.
+ * @return `-1` if not found or pre-conditions not met, otherwise the position
+ *         of the first bit.
+ *
+ * @note group:bitmap
  */
 int64_t tw_bitmap_find_first_bit(const struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_not() - inverse all bits and zeroes in the bitmap
- * @bitmap: bitmap to inverse
+ * Negate all bits and zeroes in a `struct tw_bitmap`.
  *
- * `bitmap' must be non-null.
+ * @param bitmap non-null bitmap to negate
  *
- * Return: NULL if failed, pointer to bitmap otherwise.
+ * @return `NULL` if failed, otherwise a pointer to `bitmap`
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_not(struct tw_bitmap *bitmap);
 
 /**
- * tw_bitmap_equal() - verify if bitmaps are equal
- * @fst: first bitmap to check
- * @snd: second bitmap to check
+ * Verify if `struct tw_bitmap`s are equals.
  *
- * `fst' and `snd' must be non-null and of same size.
+ * @param fst non-null first bitmap to check
+ * @param snd non-null second bitmap to check of same size as `fst`
  *
- * Return: false if pre-conditions are not met or bitmaps are not equal,
- * otherwise returns true.
+ * @return `false` if pre-conditions are not met or bitmaps are not equal,
+ *         otherwise returns `true`
+ *
+ * @note group:bitmap
  */
 bool tw_bitmap_equal(const struct tw_bitmap *fst, const struct tw_bitmap *snd);
 
 /**
- * tw_bitmap_union() - compute the union of src and dst into dst
- * @src: source bitmap to union
- * @dst: destionation bitmap to union
+ * Compute the in-place union of `struct tw_bitmap`s.
  *
- * `src' and `dst' must be non-null and of same size.
+ * @param src non-null source bitmap to union
+ * @param dst non-null destination bitmap to union of same size as `src`
  *
- * Return: NULL if pre-conditions are not met, otherwise pointer to dst.
+ * @return `NULL` if pre-conditions are not met, otherwise pointer to `dst`
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_union(const struct tw_bitmap *src,
                                   struct tw_bitmap *dst);
 
 /**
- * tw_bitmap_intersection() - compute the intersection of src and dst into dst
- * @src: source bitmap to intersect
- * @dst: destionation bitmap to intersect
+ * Compute the in-place intersection of `struct tw_bitmap`s.
  *
- * `src' and `dst' must be non-null and of same size.
+ * @param src non-null source bitmap to union
+ * @param dst non-null destination bitmap to intersect of same size as `src`
  *
- * Return: NULL if pre-conditions are not met, otherwise pointer to dst.
+ * @return `NULL` if pre-conditions are not met, otherwise pointer to `dst`
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_intersection(const struct tw_bitmap *src,
                                          struct tw_bitmap *dst);
 
 /**
- * tw_bitmap_xor() - compute the symetric difference of src and dst into dst
- * @src: source bitmap to xor
- * @dst: destionation bitmap to xor
+ * Compute the in-place xor of `struct tw_bitmap`s.
  *
- * `src' and `dst' must be non-null and of same size.
+ * @param src non-null source bitmap to union
+ * @param dst non-null destination bitmap to xor of same size as `src`
  *
- * Return: NULL if pre-conditions are not met, otherwise pointer to dst.
+ * @return `NULL` if pre-conditions are not met, otherwise pointer to `dst`
+ *
+ * @note group:bitmap
  */
 struct tw_bitmap *tw_bitmap_xor(const struct tw_bitmap *src,
                                 struct tw_bitmap *dst);

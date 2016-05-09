@@ -60,6 +60,8 @@ void tw_bitmap_rle_free(struct tw_bitmap_rle *bitmap);
  * `src' must be non-null.
  *
  * Return: NULL if copy failed, otherwise a pointer to dst.
+ *
+ * @note group:bitmap_rle
  */
 struct tw_bitmap_rle *tw_bitmap_rle_copy(const struct tw_bitmap_rle *src,
                                          struct tw_bitmap_rle *dst);
@@ -73,6 +75,8 @@ struct tw_bitmap_rle *tw_bitmap_rle_copy(const struct tw_bitmap_rle *src,
  * Return: NULL if failed, otherwise a newly allocated bitmap initialized from
  * the requests bitmap. The caller is responsible to deallocated the bitmap
  * with tw_bitmap_rle_free.
+ *
+ * @note group:bitmap_rle
  */
 struct tw_bitmap_rle *tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap);
 
@@ -84,6 +88,8 @@ struct tw_bitmap_rle *tw_bitmap_rle_clone(const struct tw_bitmap_rle *bitmap);
  * `bitmap' must be non-null and `pos' must be smaller than `bitmap.size'.
  * This function must always be called with a monotone increasing `pos'
  * argument.
+ *
+ * @note group:bitmap_rle
  */
 void tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint64_t pos);
 
@@ -97,6 +103,8 @@ void tw_bitmap_rle_set(struct tw_bitmap_rle *bitmap, uint64_t pos);
  * `bitmap.size', and `word.pos' + `word.count' must be smaller than
  * TW_BITMAP_MAX_BITS. This is a helper internal-ish function to add ranges in
  * one go instead of sequentially calling tw_bitmap_rle_set.
+ *
+ * @note group:bitmap_rle
  */
 void tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
                             const struct tw_bitmap_rle_word *word);
@@ -110,6 +118,8 @@ void tw_bitmap_rle_set_word(struct tw_bitmap_rle *bitmap,
  * and (`word.pos + word.count') must be smaller than TW_BITMAP_MAX_BITS.
  * This is a helper internal-ish function to add ranges in one go instead of
  * sequentially calling tw_bitmap_rle_set.
+ *
+ * @note group:bitmap_rle
  */
 void tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap, uint64_t start,
                              uint64_t end);
@@ -122,6 +132,8 @@ void tw_bitmap_rle_set_range(struct tw_bitmap_rle *bitmap, uint64_t start,
  * `bitmap' must be non-null and `pos' must be smaller than `bitmap.size'.
  *
  * Return: value of pos in the bitmap
+ *
+ * @note group:bitmap_rle
  */
 bool tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint64_t pos);
 
@@ -133,6 +145,8 @@ bool tw_bitmap_rle_test(const struct tw_bitmap_rle *bitmap, uint64_t pos);
  *
  * Return: return false if bitmap is null, otherwise indicator if the bitmap is
  * empty.
+ *
+ * @note group:bitmap_rle
  */
 bool tw_bitmap_rle_empty(const struct tw_bitmap_rle *bitmap);
 
@@ -144,6 +158,8 @@ bool tw_bitmap_rle_empty(const struct tw_bitmap_rle *bitmap);
  *
  * Return: return false if bitmap is null, otherwise indicator if the bitmap is
  * full.
+ *
+ * @note group:bitmap_rle
  */
 bool tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap);
 
@@ -154,6 +170,8 @@ bool tw_bitmap_rle_full(const struct tw_bitmap_rle *bitmap);
  * `bitmap' must be non-null.
  *
  * Return: 0 if pre-conditions are not met, otherwise number of active bits
+ *
+ * @note group:bitmap_rle
  */
 uint64_t tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap);
 
@@ -165,6 +183,8 @@ uint64_t tw_bitmap_rle_count(const struct tw_bitmap_rle *bitmap);
  *
  * Return: 0.0 if pre-conditions are not met, otherwise the portion of active
  * bits (count / size)
+ *
+ * @note group:bitmap_rle
  */
 float tw_bitmap_rle_density(const struct tw_bitmap_rle *bitmap);
 
@@ -176,6 +196,8 @@ float tw_bitmap_rle_density(const struct tw_bitmap_rle *bitmap);
  *
  * Return: NULL if pre-conditions are not met, otherswise the bitmap with
  * zeroed bits.
+ *
+ * @note group:bitmap_rle
  */
 struct tw_bitmap_rle *tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap);
 
@@ -187,6 +209,8 @@ struct tw_bitmap_rle *tw_bitmap_rle_zero(struct tw_bitmap_rle *bitmap);
  *
  * Return: NULL if pre-conditions are not met, otherswise the bitmap filled
  * with bits.
+ *
+ * @note group:bitmap_rle
  */
 struct tw_bitmap_rle *tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap);
 
@@ -198,6 +222,8 @@ struct tw_bitmap_rle *tw_bitmap_rle_fill(struct tw_bitmap_rle *bitmap);
  *
  * Return: -1 if not found or pre-conditions not met, otherwise the position
  * of the first zero.
+ *
+ * @note group:bitmap_rle
  */
 int64_t tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
 
@@ -207,6 +233,8 @@ int64_t tw_bitmap_rle_find_first_zero(const struct tw_bitmap_rle *bitmap);
  *
  * Return: -1 if not found or pre-conditions not met, otherwise the position
  * of the first bit.
+ *
+ * @note group:bitmap_rle
  */
 int64_t tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
 
@@ -220,6 +248,8 @@ int64_t tw_bitmap_rle_find_first_bit(const struct tw_bitmap_rle *bitmap);
  * bitmaps of the same size.
  *
  * Return: NULL if failed, pointer to dst otherwise.
+ *
+ * @note group:bitmap_rle
  */
 struct tw_bitmap_rle *tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
                                         struct tw_bitmap_rle *dst);
@@ -233,6 +263,8 @@ struct tw_bitmap_rle *tw_bitmap_rle_not(const struct tw_bitmap_rle *bitmap,
  *
  * Return: false if pre-conditions are not met, otherwise the indicator of
  * equality between both bitmaps.
+ *
+ * @note group:bitmap_rle
  */
 bool tw_bitmap_rle_equal(const struct tw_bitmap_rle *fst,
                          const struct tw_bitmap_rle *snd);
@@ -246,6 +278,8 @@ bool tw_bitmap_rle_equal(const struct tw_bitmap_rle *fst,
  * `a', `b', and `dst' must be non-null.
  *
  * Return: dst if operation successful, NULL otherwise.
+ *
+ * @note group:bitmap_rle
  */
 struct tw_bitmap_rle *tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
                                           const struct tw_bitmap_rle *b,
@@ -260,6 +294,8 @@ struct tw_bitmap_rle *tw_bitmap_rle_union(const struct tw_bitmap_rle *a,
  * `a', `b', and `dst' must be non-null.
  *
  * Return: dst if operation successful, NULL otherwise.
+ *
+ * @note group:bitmap_rle
  */
 struct tw_bitmap_rle *tw_bitmap_rle_intersection(const struct tw_bitmap_rle *a,
                                                  const struct tw_bitmap_rle *b,

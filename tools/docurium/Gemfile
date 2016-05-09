@@ -4,6 +4,6 @@ platforms :rbx do
     gem 'rubysl', '~> 2.0'
 end
 
-gem 'docurium', '~> 0.5', :git => 'https://github.com/libgit2/docurium.git'
+gem 'docurium', :git => 'https://github.com/fsaintjacques/docurium.git', :branch => 'feature/group-command'
 
 # vim:ft=ruby

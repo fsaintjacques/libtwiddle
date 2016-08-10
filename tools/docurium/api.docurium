@@ -5,5 +5,5 @@
   "prefix": "tw_",
   "branch": "gh-pages",
   "examples": "tests/examples",
-  "versions": ["v1.0.0"]
+  "versions": ["1.0.0"]
 }

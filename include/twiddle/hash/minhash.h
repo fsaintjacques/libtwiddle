@@ -5,105 +5,119 @@
 #include <stdint.h>
 
 /**
- * struct tw_minhash - minhash data structure
- * @n_registers: number of registers
- * @registers: registers holding computed values
+ * minhash data structure
+ *
+ * This implementation forces use of 32bits buckets. It also uses max instead
+ * of min, since it's homomorphic.
  */
 struct tw_minhash {
+  /** number of registers */
   uint32_t n_registers;
+  /** registers holding computed values */
   uint32_t *registers;
 };
 
 /**
- * tw_minhash_new() - allocates a minhash structure
- * @n_registers: number of 64bit registers the structure holds
+ * Allocate a `struct tw_minhash`.
  *
- * `n_registers' must be greater than 0.
- *
- * Return: NULL if allocation failed, otherwise a pointer to the newly
- * allocated `struct tw_minhash`.
- *
- * Note: The allocation will be rounded up to the closest multiple of a
+ * The allocation will be rounded up to the closest multiple of a
  * cacheline.
+ *
+ * @param n_registers stricly positive number of 32bit registers the structure
+ *                    holds
+ *
+ * @return `NULL` if allocation failed, otherwise a pointer to the newly
+ *         allocated `struct tw_minhash`.
+ *
+ * @note group:minhash
  */
 struct tw_minhash *tw_minhash_new(uint32_t n_registers);
 
 /**
- * tw_mihash_free() - free a minhash
- * @hash: hash to free
+ * Free a `struct tw_minhash`.
+ *
+ * @param hash to free
+ *
+ * @note group:minhash
  */
 void tw_minhash_free(struct tw_minhash *hash);
 
 /**
- * tw_mihash_copy() - copy `src` minhash into `dst`
- * @src: minhash to copy from
- * @dst: minhash to copy to
+ * Copy a source `struct tw_minhash` into a specified destination.
  *
- * `src' and `dst' must be non-null and must have the same register size.
+ * @param src non-null minhash to copy from
+ * @param dst non-null minhash to copy to
  *
- * Return: NULL if pre-conditions are not met or copy failed, otherwise a
- * pointer to dst.
+ * @return `NULL` if any hash is null or not of the same cardinality, otherwise
+ *         a pointer to dst
+ *
+ * @note group:minhash
  */
 struct tw_minhash *tw_minhash_copy(const struct tw_minhash *src,
                                    struct tw_minhash *dst);
 
 /**
- * tw_minhash_clone() - clone a minash into a new allocated minhash
- * @hash: minhash to clone
+ * Clone a `struct tw_minhash` into a newly allocated one.
  *
- * `hash' must be non-null.
+ * @param hash non-null minhash to clone
  *
- * Return: NULL if failed, otherwise a newly allocated minhash initialized from
- * the requests minhash. The caller is responsible to deallocated the minhash
- * with tw_minhash_free.
+ * @return `NULL` if failed, otherwise a newly allocated minhash initialized
+ *         from the requests minhash. The caller is responsible to deallocate
+ *         the minhash with tw_minhash_free
+ *
+ * @note group:minhash
  */
 struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash);
 
 /**
- * tw_minhash_add() - add an element into a minhash structure
- * @hash:     minhash to add
- * @key:      buffer of the key to add
- * @key_size: size of the buffer of the key to add
+ * Add an element into a `struct tw_minhash`.
  *
- * `hash' and `key' must be non-null, `key_size' must be greater than 0.
+ * @param hash non-null minhash to add
+ * @param key non-null buffer of the key to add
+ * @param key_size stricly positive size of the buffer of the key to add
+ *
+ * @note group:minhash
  */
 void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size);
 
 /**
- * tw_minhash_estimate() - estimate the jaccard index between two minhash.
- * @fst: first minhash
- * @snd: second minhash
+ * Estimate the jaccard index between two `struct tw_minhash`s.
  *
- * `fst' and `snd' must be non-null and of equal size.
+ * @param fst non-null first minhash
+ * @param snd non-null second minhash
  *
- * Return: 0.0 if pre-conditions are not met, otherwise the estimated jaccard
- * index of `fst` and `snd`.
+ * @return `0.0` if any hash is null or hashes are not of the same cardinality,
+ *         otherwise the estimated jaccard index between `fst` and `snd`
+ *
+ * @note group:minhash
  */
 float tw_minhash_estimate(const struct tw_minhash *fst,
                           const struct tw_minhash *snd);
 
 /**
- * tw_minhash_equal() - verify if hashes are equal
- * @fst: first minhash
- * @snd: second minhash
+ * Verify if `struct tw_minhash`s are equal.
  *
- * `fst' and `snd' must be non-null and of equal size.
+ * @param fst non-null first minhash
+ * @param snd non-null second minhash
  *
- * Return: false if pre-conditions are not met or not equal, otherwise
- * indicator if hashes are equal.
+ * @return `false` any hash is null or hashes are not of the same cardinality,
+ *         otherwise indicator if hashes are equal
+ *
+ * @note group:minhash
  */
 bool tw_minhash_equal(const struct tw_minhash *fst,
                       const struct tw_minhash *snd);
 
 /**
- * tw_minhash_merge() - merge src into dst
- * @src: minhash to merge from
- * @dst: minhash to merge to
+ * Merge a `struct tw_minhash` in a specified destination.
  *
- * `src' and `dst' must be non-null and of equal size.
+ * @param src non-null minhash to merge from
+ * @param dst non-null minhash to merge to
  *
- * Return: NULL if pre-conditions are not met, otherwise pointer to dst with
- * merged registers.
+ * @return `NULL` if any hash is null or hashes are not of the same cardinality,
+ *         otherwise pointer to dst with merged registers
+ *
+ * @note group:minhash
  */
 struct tw_minhash *tw_minhash_merge(const struct tw_minhash *src,
                                     struct tw_minhash *dst);

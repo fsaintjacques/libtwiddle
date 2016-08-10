@@ -12,9 +12,7 @@
 #define TW_HLL_MAX_PRECISION 18
 
 /**
- * struct tw_hyperloglog - hyperloglog data structure
- * @precision: number of registers will be defined as 2^precision.
- * @registers: allocated array containing the 8bit registers
+ * hyperloglog data structure
  *
  * This implementation does not use the 6-bit packing and/or mix dense/sparse
  * representation proposed in the [1].
@@ -25,94 +23,111 @@
  * Extending Database Technology. ACM, 2013.
  */
 struct tw_hyperloglog {
+  /** the number of registers will be defined as 2^precision */
   uint8_t precision;
+  /** allocated array containing the 8bit registers */
   uint8_t *registers;
 };
 
 /**
- * tw_hyperloglog_new() - allocates a hyperloglog data structure
- * @precision: precision hyperloglog should use
+ * Allocate a `struct tw_hyperloglog`.
  *
- * `precision' must be within [TW_HLL_MIN_PRECISION, TW_HLL_MAX_PRECISION].
+ * @param precision power-of-2 exponent number of bucket hyperloglog should use,
+ *                  must be greater or equal than `TW_HLL_MIN_PRECISION and
+ *                  smaller or equal than `TW_HLL_MAX_PRECISION`
  *
- * Return: NULL if allocation failed, otherwise a pointer to the newly
+ * @return `NULL` if allocation failed, otherwise a pointer to the newly
  *         allocated `struct tw_hyperloglog`.
+ *
+ * @note group:hyperloglog
  */
 struct tw_hyperloglog *tw_hyperloglog_new(uint8_t precision);
 
 /**
- * tw_hyperloglog_free() - free a hyperloglog
- * @hll: hyperloglog to free
+ * Free a `struct tw_hyperloglog`.
+ *
+ * @param hll to free
+ *
+ * @note group:hyperloglog
  */
 void tw_hyperloglog_free(struct tw_hyperloglog *hll);
 
 /**
- * tw_hyperloglog_copy() - copy src hyperloglog into dst
- * @src: hyperloglog to copy from
- * @dst: hyperloglog to copy to
+ * Copy a source `struct tw_hyperloglog` into a specified destination.
  *
- * `src' and `dst' must be non-null and of same precision.
+ * @param src non-null hyperloglog to copy from
+ * @param dst non-null hyperloglog of the same precision has src to copy to
  *
- * Return: NULL if copy failed, otherwise a pointer to dst.
+ * @return `NULL` if copy failed, otherwise a pointer to dst
+ *
+ * @note group:hyperloglog
  */
 struct tw_hyperloglog *tw_hyperloglog_copy(const struct tw_hyperloglog *src,
                                            struct tw_hyperloglog *dst);
 
 /**
- * tw_hyperloglog_clone() - clone a hyperloglog into a newly allocated one
- * @hll: hyperloglog to clone
+ * Clone a `struct tw_hyperloglog` into a newly allocated one.
  *
- * `hll' must be non-null.
+ * @param hll non-null hyperloglog to clone
  *
- * Return: NULL if failed, otherwise a newly allocated hyperloglog initialized
- * from the requested hyperloglog. The caller is responsible to deallocate
- * with tw_hyperloglog_free.
+ * @return `NULL` if failed, otherwise a newly allocated hyperloglog initialized
+ *         from the requested hyperloglog. The caller is responsible to
+ *         deallocate with tw_hyperloglog_free
+ *
+ * @note group:hyperloglog
  */
 struct tw_hyperloglog *tw_hyperloglog_clone(const struct tw_hyperloglog *hll);
 
 /**
- * tw_hyperloglog_add() - add an element in a hyperloglog structure
- * @hll:      hyperloglog affected
- * @key:      buffer of the key to add
- * @key_size: size of the key to add
+ * Add an element in a `struct tw_hyperloglog`.
  *
- * `hll' and `key' must be non-null, and key_size must be greater than 0.
+ * @param hll non-null hyperloglog to add the element to
+ * @param key non-null buffer of the key to add
+ * @param key_size positive integer size of the key to add
+ *
+ * @note group:hyperloglog
  */
 void tw_hyperloglog_add(struct tw_hyperloglog *hll, const void *key,
                         size_t key_size);
 
 /**
- * tw_hyperloglog_count() - estimate the number of elements in hll
- * @hll: hyperloglog to estimate
+ * Estimate the number of elements in a `struct tw_hyperloglog`.
  *
- * `hll' must be non-null.
+ * @param hll non-null hyperloglog to estimate
  *
- * Return: 0.0 if hll is NULL, otherwise theestimated number of elements in hll.
+ * @return `0.0` if hll is NULL, otherwise the estimated number of elements
+ *         in hll.
+ *
+ * @note group:hyperloglog
  */
 double tw_hyperloglog_count(const struct tw_hyperloglog *hll);
 
 /**
- * tw_hyperloglog_equal() - verify if hyperloglog are equal
- * @fst: first hyperloglog to check
- * @snd: second hyperloglog to check
+ * Verify if `struct tw_hyperloglog`s are equal.
  *
- * `src' and `dst' must be non-null and of same precision.
+ * @param fst non-null first hyperloglog to check
+ * @param snd non-null second hyperloglog to check
  *
- * Return: false if pre-conditions are not met, otherwise an indicator if
- * `src' and `dst' are equal.
+ * @return `false` if any is null or not of the same precision, otherwise an
+ *         indicator if `src' and `dst' are equal
+ *
+ * @note group:hyperloglog
  */
 bool tw_hyperloglog_equal(const struct tw_hyperloglog *fst,
                           const struct tw_hyperloglog *snd);
 
 /**
- * tw_hyperloglog_merge() - merge src into dst
- * @src: hyperloglog to merge from
- * @dst: hyperloglog to merge to
+ * Merge a `struct tw_hyperloglog` in a specified destination.
  *
- * `src' and `dst' must be non-null and of same precision.
+ * The merge operation is an elemwise max applied to the buckets.
  *
- * Return: NULL if precondition are not met, otherwise a pointer to merged
- * `dst'.
+ * @param src non-null hyperloglog to merge from
+ * @param dst non-null hyperloglog to merge to
+ *
+ * @return `NULL` if any is null or not of the same precision, otherwise a
+ *         pointer to merged `dst'
+ *
+ * @note group:hyperloglog
  */
 struct tw_hyperloglog *tw_hyperloglog_merge(const struct tw_hyperloglog *src,
                                             struct tw_hyperloglog *dst);

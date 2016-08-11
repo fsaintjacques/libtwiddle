@@ -27,8 +27,9 @@
 #define tw_likely(x) __builtin_expect((x), 1)
 #define tw_unlikely(x) __builtin_expect((x), 0)
 
-#define tw_min(a, b) ((a < b) ? a : b)
-#define tw_max(a, b) ((a < b) ? b : a)
+/* use with care, it evaluates twice a & b */
+#define tw_min(a, b) (((a) < (b)) ? (a) : (b))
+#define tw_max(a, b) (((a) < (b)) ? (b) : (a))
 
 #define tw_almost_equal(a, b) (fabs(a - b) < FLT_EPSILON)
 

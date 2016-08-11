@@ -7,224 +7,237 @@
 struct tw_bloomfilter;
 
 /**
- * struct tw_bloomfilter_a2 - aging bloom filter with active buffers
- * @density: density threshold to trigger rotation
- * @active:  pointer to active bloomfilter
- * @passive: pointer to passive bloomfilter
+ * Aging bloomfilter with active buffers data structure
  *
  * The paper "Aging bloom filter with two active buffers for dynamic sets"
  * describe a method where 2 bloom filters are used to implement a FIFO.
  *
- * Elements are added to `active` until `density` (on active).
- * Once this happen, `passive` is cleared and both filters are
- * swapped.
+ * Elements are added to `active` until `density` (on active) is attained;
+ * then `passive` is cleared and both filters are swapped.
  */
 struct tw_bloomfilter_a2 {
+  /** density threshold to trigger rotation */
   float density;
-
+  /** pointer to active bloomfilter */
   struct tw_bloomfilter *active;
+  /** pointer to passive bloomfilter */
   struct tw_bloomfilter *passive;
 };
 
 /**
- * tw_bloomfilter_a2_new() - allocates a bloomfilter
- * @size:    number of bits the bloomfilter should hold
- * @k:       number of hash functions used
- * @density: threshold for rotation
+ * Allocate a `struct tw_bloomfilter_a2`.
  *
- * `size' must be within (0, TW_BITMAP_MAX_BITS], `k' must be within
- * (0, UINT16_MAX] and `density' within (0, 1].
+ * @param size number of bits the bloomfilter should hold, between
+ *             (0, TW_BITMAP_MAX_BITS].
+ * @param k stricly positive number of hash functions used
+ * @param density threshold for rotation within (0, 1]
  *
- * Return: NULL if allocation failed, otherwise a pointer to the newly
- *         allocated `struct tw_bloomfilter_a2`.
+ * @return `NULL` if allocation failed, otherwise a pointer to the newly
+ *         allocated `struct tw_bloomfilter`
+ *
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_new(uint64_t size, uint16_t k,
                                                 float dentisy);
 
 /**
- * tw_bloomfilter_a2_free() - free a bloomfilter
- * @bf: bloomfilter to free
+ * Free a `struct tw_bloomfilter_a2`.
+ *
+ * @param bf bloomfilter to free
+ *
+ * @note group:bloomfilter_a2
  */
 void tw_bloomfilter_a2_free(struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_copy() - copy src bloomfilter into dst
- * @src: bloomfilter to copy from
- * @dst: bloomfilter to copy to
+ * Copy a source `struct tw_bloomfilter_a2` into a specified destination.
  *
- * `src' and `dst' must be non-null.
+ * @param src non-null bloomfilter to copy from
+ * @param dst non-null bloomfilter to copy to
  *
- * Size of bloomfilter must be equals.
+ * @return `NULL` if any filter is null or not of the same cardinality,
+ *         otherwise a pointer to dst
  *
- * Return: NULL if copy failed, otherwise a pointer to dst.
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_copy(const struct tw_bloomfilter_a2 *src,
                        struct tw_bloomfilter_a2 *dst);
 
 /**
- * tw_bloomfilter_a2_clone() - clone a bloomfilter into a newly allocated one
- * @bf: bloomfilter to clone
+ * Clone a `struct tw_bloomfilter_a2` into a newly allocated one.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to clone
  *
- * Return: NULL if failed, otherwise a newly allocated bloomfilter initialized
- * from the requested bloomfilter. The caller is responsible to deallocate
- * with tw_bloomfilter_a2_free.
+ * @return `NULL` if failed, otherwise a newly allocated bloomfilter initialized
+ *         from the requested bloomfilter. The caller is responsible to
+ *         deallocate with tw_bloomfilter_a2_free
+ *
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_clone(const struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_set() - set an element in a bloomfilter
- * @bf:       bloomfilter affected
- * @key:      buffer of the key to add
- * @key_size: size of the buffer of the key to add
+ * Set an element in a `struct tw_bloomfilter_a2`.
+ *
+ * @param bf non-null bloomfilter affected
+ * @param key non-null buffer of the key to add
+ * @param key_size stricly positive size of the buffer key to add
+ *
+ * @note group:bloomfilter_a2
  */
 void tw_bloomfilter_a2_set(struct tw_bloomfilter_a2 *bf, const void *key,
                            size_t key_size);
 
 /**
- * tw_bloomfilter_a2_test() - test an element in a bloomfilter
- * @bf:   bloomfilter affected
- * @key:      buffer of the key to test
- * @key_size: size of the buffer of the key to test
+ * Verify if an element is present in a `struct tw_bloomfilter_a2`.
  *
- * `bf' and `key' must be non-null, `key_size' must be greater than 0.
+ * @param bf non-null bloomfilter affected
+ * @param key non-null buffer of the key to test
+ * @param key_size stricly positive size of the buffer key to test
  *
- * Return: false if the element is not in the bloomfilter, true otherwise.
+ * @return `false` if preconditions are not met, otherwise indicator if the
+ *         element is in the bloomfilter (with possibility of false positives)
+ *
+ * @note group:bloomfilter_a2
  */
 bool tw_bloomfilter_a2_test(const struct tw_bloomfilter_a2 *bf, const void *key,
                             size_t key_size);
 
 /**
- * tw_bloomfilter_a2_empty() - verify if bloomfilter is empty
- * @bf: bloomfilter to verify
+ * Verify if a `struct tw_bloomfilter_a2` is empty.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to verify emptyness
  *
- * Return: true if the bloomfilter is empty, false otherwise.
+ * @return `false` if bf is null, otherwise indicator if the bloomfilter is
+ *         empty.
+ *
+ * @note group:bloomfilter_a2
  */
 bool tw_bloomfilter_a2_empty(const struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_full() - verify if bloomfilter is full
- * @bf: bloomfilter to verify
+ * Verify if a `struct tw_bloomfilter_a2` is full.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to verify fullness
  *
- * Return: true if both bloomfilters are full, false otherwise.
+ * @return `false` if bf is null, otherwise indicator if the bloomfilter is
+ *         full.
+ *
+ * @note group:bloomfilter_a2
  */
 bool tw_bloomfilter_a2_full(const struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_count() - count the number of active bits
- * @bf: bloomfilter to count
+ * Count the number of active bits in a `struct tw_bloomfilter_a2`.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to count active bits
  *
- * Return: number of active bits in both bloomfilters
+ * @return `0` if bf is null, otherwise the number of active bits
+ *
+ * @note group:bloomfilter_a2
  */
 uint64_t tw_bloomfilter_a2_count(const struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_density() - count the percentage of active bits
- * @bf: bloomfilter to count the density
+ * Count the percentage of active bits in a `struct tw_bloomfilter_a2`.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to count the density
  *
- * Return: the portion of active bits (count / size)
+ * @return `0.0` if bf is null, otherwise the portion of active bits
+ *         expressed as (count / size).
+ *
+ * @note group:bloomfilter_a2
  */
 float tw_bloomfilter_a2_density(const struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_zero() - clear all bits in a bloomfilter
- * @bf: bloomfilter to empty
+ * Zero all bits in a `struct tw_bloomfilter_a2`.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to zero
  *
- * Return: the bloomfilter cleared
+ * @return `NULL` if bf is null, otherwise a pointer to bf on successful
+ *         operation
+ *
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_zero(struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_fill() - set all bits in a bloomfilter
- * @bf: bloomfilter to fill
+ * Fill all bits in a `struct tw_bloomfilter_a2`.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to fill
  *
- * Return: the bloomfilter filled
+ * @return `NULL` if bf is null, otherwise a pointer to bf on successful
+ *         operation
+ *
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_fill(struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_not() - inverse all bits and zeroes in the bloomfilter
- * @bf: bloomfilter to inverse
+ * Inverse all bits and zeroes in a `struct tw_bloomfilter_a2`.
  *
- * `bf' must be non-null.
+ * @param bf non-null bloomfilter to inverse
  *
- * Return: NULL if failed, otherwise the bloomfilter.
+ * @return `NULL` if failed, otherwise the bloomfilter
+ *
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *tw_bloomfilter_a2_not(struct tw_bloomfilter_a2 *bf);
 
 /**
- * tw_bloomfilter_a2_equal() - verify if bloomfilters are equal
- * @fst: first bloomfilter to check
- * @snd: second bloomfilter to check
+ * Verify if `struct tw_bloomfilter_a2`s are equal.
  *
- * `fst' and `snd' must be non-null.
+ * @param fst first non-null bloomfilter to check
+ * @param snd second non-null bloomfilter to check
  *
- * Return: true if equal, false otherwise
+ * @return `false` any bloomfilter is null or hashes are not of the same
+ *         cardinality, otherwise indicator if filters are equal
  *
- * In order to be comparable, bloomfilters must have the same size and the
- * same number of hash functions (k).
+ * @note group:bloomfilter_a2
  */
 bool tw_bloomfilter_a2_equal(const struct tw_bloomfilter_a2 *fst,
                              const struct tw_bloomfilter_a2 *snd);
 
 /**
- * tw_bloomfilter_a2_union() - computer the union of bloomfilters
- * @src: source bloomfilter to union
- * @dst: destionation bloomfilter to union
+ * Compute the union of `struct tw_bloomfilter_a2`s.
  *
- * `src' and `dst' must be non-null.
+ * @param src non-null bloomfilter to union from
+ * @param dst non-null bloomfilter to union to
  *
- * Return: NULL if failed, otherwise pointer to dst.
+ * @return: `NULL` if failed, otherwise pointer to dst
  *
- * Only works on bloomfilter of the same size and same number of hash
- * functions(k). This store the results in dst.
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_union(const struct tw_bloomfilter_a2 *src,
                         struct tw_bloomfilter_a2 *dst);
 
 /**
- * tw_bloomfilter_a2_intersection() - compute the intersection of bloomfilters
- * @src: source bloomfilter to intersection
- * @dst: destionation bloomfilter to intersection
+ * Compute the intersection of `struct tw_bloomfilter_a2`s.
  *
- * `src' and `dst' must be non-null.
+ * @param src non-null bloomfilter to intersect from
+ * @param dst non-null bloomfilter to intersect to
  *
- * Return: NULL if failed, otherwise pointer to dst.
+ * @return: `NULL` if failed, otherwise pointer to dst
  *
- * Only works on bloomfilter of the same size and same number of hash
- * functions(k). This store the results in dst.
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_intersection(const struct tw_bloomfilter_a2 *src,
                                struct tw_bloomfilter_a2 *dst);
 
 /**
- * tw_bloomfilter_a2_xor() - compute the symetric difference of bloomfilters
- * @src: source bloomfilter to xor
- * @dst: destionation bloomfilter to xor
+ * Compute the symetric difference of `struct tw_bloomfilter_a2`s.
  *
- * `src' and `dst' must be non-null.
+ * @param src non-null bloomfilter to xor from
+ * @param dst non-null bloomfilter to xor to
  *
- * Return: NULL if failed, otherwise pointer to dst.
+ * @return: `NULL` if failed, otherwise pointer to dst
  *
- * Only works on bloomfilter of the same size and same number of hash
- * functions(k). This store the results in dst.
+ * @note group:bloomfilter_a2
  */
 struct tw_bloomfilter_a2 *
 tw_bloomfilter_a2_xor(const struct tw_bloomfilter_a2 *src,

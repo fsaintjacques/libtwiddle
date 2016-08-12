@@ -97,7 +97,9 @@ function(add_c_library __TARGET_NAME)
 
     if (ENABLE_STATIC OR NOT ENABLE_SHARED_EXECUTABLES)
         add_library(${__TARGET_NAME}-static STATIC ${__SOURCES})
-        set_property(TARGET ${__TARGET_NAME}-static PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+        if (USE_STATIC_PIC)
+            set_property(TARGET ${__TARGET_NAME}-static PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+        endif ()
         set_target_properties(
             ${__TARGET_NAME}-static PROPERTIES
             OUTPUT_NAME ${__OUTPUT_NAME}

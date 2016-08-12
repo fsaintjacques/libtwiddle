@@ -8,6 +8,7 @@ option(USE_AVX "Enable AVX instructions" ON)
 option(USE_AVX2 "Enable AVX2 instructions" OFF)
 option(USE_AVX512 "Enable AVX512 instructions" OFF)
 option(USE_LTO "Enable LTO compilation optimization" ON)
+option(USE_STATIC_PIC "Enable -fPIC on static library" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake")
 find_package(ParseArguments)

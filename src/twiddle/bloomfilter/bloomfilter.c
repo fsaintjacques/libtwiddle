@@ -78,7 +78,7 @@ void tw_bloomfilter_set(struct tw_bloomfilter *bf, const void *key,
   const tw_uint128_t hash = tw_metrohash_128(TW_BF_DEFAULT_SEED, key, key_size);
   const uint16_t k = bf->k;
   struct tw_bitmap *bitmap = bf->bitmap;
-  const uint32_t b_size = bitmap->size;
+  const uint64_t b_size = bitmap->size;
 
   for (size_t i = 0; i < k; ++i) {
     tw_bitmap_set(bitmap, (hash.h + i * hash.l) % b_size);
@@ -96,7 +96,7 @@ bool tw_bloomfilter_test(const struct tw_bloomfilter *bf, const void *key,
 
   const uint16_t k = bf->k;
   const struct tw_bitmap *bitmap = bf->bitmap;
-  const uint32_t b_size = bitmap->size;
+  const uint64_t b_size = bitmap->size;
 
   for (size_t i = 0; i < k; ++i) {
     if (!tw_bitmap_test(bitmap, (hash.h + i * hash.l) % b_size)) {

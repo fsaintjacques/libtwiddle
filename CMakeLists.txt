@@ -4,17 +4,18 @@ set(RELEASE_DATE 2016-05-07)
 project(${PROJECT_NAME})
 include(CTest)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake")
-
 option(USE_AVX "Enable AVX instructions" ON)
 option(USE_AVX2 "Enable AVX2 instructions" OFF)
 option(USE_AVX512 "Enable AVX512 instructions" OFF)
+option(USE_LTO "Enable LTO compilation optimization" ON)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake")
 find_package(ParseArguments)
 find_package(Prereqs)
 find_package(CTargets)
 find_package(Version)
 find_package(Options)
+find_package(LTO)
 
 pkgconfig_prereq(check OPTIONAL)
 

@@ -57,6 +57,12 @@ function run_tests {
 
   pushd $dir
 
+  if [[ -n "${CLANG_VERSION:-}" ]]; then
+    LLVM_AR=$(which llvm-ar-${CLANG_VERSION})
+    LLVM_RANLIB=$(which llvm-ranlib-${CLANG_VERSION})
+    CMAKE_FLAGS="-DCMAKE_AR=${LLVM_AR} -DCMAKE_RANLIB=${LLVM_RANLIB} ${CMAKE_FLAGS}"
+  fi
+
   cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
         ${CMAKE_FLAGS:-} ..
 

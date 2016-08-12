@@ -2,8 +2,8 @@
 #include <string.h>
 #include <x86intrin.h>
 
-#include <twiddle/hash/metrohash.h>
 #include <twiddle/hash/minhash.h>
+#include <twiddle/utils/hash.h>
 
 #include "../macrology.h"
 

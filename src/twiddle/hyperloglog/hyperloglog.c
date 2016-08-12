@@ -3,8 +3,8 @@
 #include <string.h>
 #include <x86intrin.h>
 
-#include <twiddle/hash/metrohash.h>
 #include <twiddle/hyperloglog/hyperloglog.h>
+#include <twiddle/utils/hash.h>
 
 #include "../macrology.h"
 #include "hyperloglog_simd.c"

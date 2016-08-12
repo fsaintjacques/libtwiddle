@@ -8,7 +8,7 @@
  * non-native version will be less than optimal.
  */
 
-#include <twiddle/hash/murmur3.h>
+#include <twiddle/utils/hash.h>
 
 #include "internal.h"
 

@@ -2,7 +2,7 @@
 
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bloomfilter/bloomfilter.h>
-#include <twiddle/hash/metrohash.h>
+#include <twiddle/utils/hash.h>
 #include <twiddle/utils/projection.h>
 
 #define TW_BF_DEFAULT_SEED 3781869495ULL

@@ -1,4 +1,4 @@
-#include <twiddle/hash/hash.h>
+#include <twiddle/utils/hash.h>
 
 uint64_t tw_hash_128_64(tw_uint128_t x)
 {

@@ -32,10 +32,10 @@ add_c_library(
         twiddle/bitmap/bitmap_rle.c
         twiddle/bloomfilter/bloomfilter.c
         twiddle/bloomfilter/bloomfilter_a2.c
-        twiddle/hash/hash.c
-        twiddle/hash/murmur3.c
-        twiddle/hash/metrohash.c
         twiddle/hyperloglog/hyperloglog.c
         twiddle/hyperloglog/hyperloglog_bias.c
         twiddle/hash/minhash.c
+        twiddle/utils/hash.c
+        twiddle/utils/murmur3.c
+        twiddle/utils/metrohash.c
 )

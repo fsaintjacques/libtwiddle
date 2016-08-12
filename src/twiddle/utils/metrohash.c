@@ -1,4 +1,4 @@
-#include <twiddle/hash/metrohash.h>
+#include <twiddle/utils/hash.h>
 
 #include "../macrology.h"
 #include "internal.h"

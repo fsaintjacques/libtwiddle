@@ -3,6 +3,7 @@
 #include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bloomfilter/bloomfilter.h>
 #include <twiddle/hash/metrohash.h>
+#include <twiddle/utils/projection.h>
 
 #define TW_BF_DEFAULT_SEED 3781869495ULL
 
@@ -81,7 +82,9 @@ void tw_bloomfilter_set(struct tw_bloomfilter *bf, const void *key,
   const uint64_t b_size = bitmap->size;
 
   for (size_t i = 0; i < k; ++i) {
-    tw_bitmap_set(bitmap, (hash.h + i * hash.l) % b_size);
+    const uint64_t hash_fn_i = hash.h + (i * hash.l);
+    const uint64_t idx = tw_projection_mul_64(hash_fn_i, b_size);
+    tw_bitmap_set(bitmap, idx);
   }
 }
 
@@ -99,7 +102,9 @@ bool tw_bloomfilter_test(const struct tw_bloomfilter *bf, const void *key,
   const uint64_t b_size = bitmap->size;
 
   for (size_t i = 0; i < k; ++i) {
-    if (!tw_bitmap_test(bitmap, (hash.h + i * hash.l) % b_size)) {
+    const uint64_t hash_fn_i = hash.h + (i * hash.l);
+    const uint64_t idx = tw_projection_mul_64(hash_fn_i, b_size);
+    if (!tw_bitmap_test(bitmap, idx)) {
       return false;
     }
   }

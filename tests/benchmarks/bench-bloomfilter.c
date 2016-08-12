@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include <twiddle/bitmap/bitmap.h>
 #include <twiddle/bloomfilter/bloomfilter.h>
 
 #include "benchmark.h"
@@ -21,7 +22,8 @@ void bloomfilter_setup(struct benchmark *b)
 
 void bloomfilter_teardown(struct benchmark *b)
 {
-  free(b->opaque);
+  struct tw_bloomfilter *bf = (struct tw_bloomfilter *)b->opaque;
+  tw_bloomfilter_free(bf);
   b->opaque = NULL;
 }
 
@@ -29,19 +31,20 @@ void bloomfilter_set(void *opaque)
 {
   struct tw_bloomfilter *bf = (struct tw_bloomfilter *)opaque;
 
-  const size_t i = 0;
-
-  tw_bloomfilter_set(bf, &i, sizeof(i));
+  const size_t n_rounds = (bf->bitmap->size) / (8 * 128);
+  for (size_t i = 0; i < n_rounds; ++i) {
+    tw_bloomfilter_set(bf, &i, sizeof(i));
+  }
 }
 
 void bloomfilter_test(void *opaque)
 {
   struct tw_bloomfilter *bf = (struct tw_bloomfilter *)opaque;
 
-  const size_t i = 0;
-
-  bool res = tw_bloomfilter_test(bf, &i, sizeof(i));
-  (void)res;
+  const size_t n_rounds = (bf->bitmap->size) / (8 * 128);
+  for (size_t i = 0; i < n_rounds; ++i) {
+    tw_bloomfilter_test(bf, &i, sizeof(i));
+  }
 }
 
 int main(int argc, char *argv[])
@@ -57,9 +60,9 @@ int main(int argc, char *argv[])
   (void)size;
 
   struct benchmark benchmarks[] = {
-      BENCHMARK_FIXTURE(bloomfilter_set, repeat, 1, bloomfilter_setup,
+      BENCHMARK_FIXTURE(bloomfilter_set, repeat, size, bloomfilter_setup,
                         bloomfilter_teardown),
-      BENCHMARK_FIXTURE(bloomfilter_test, repeat, 1, bloomfilter_setup,
+      BENCHMARK_FIXTURE(bloomfilter_test, repeat, size, bloomfilter_setup,
                         bloomfilter_teardown),
   };
 

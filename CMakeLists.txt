@@ -18,8 +18,6 @@ find_package(Version)
 find_package(Options)
 find_package(LTO)
 
-pkgconfig_prereq(check OPTIONAL)
-
 add_subdirectory(docs)
 add_subdirectory(include)
 add_subdirectory(src)

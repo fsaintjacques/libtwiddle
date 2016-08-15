@@ -141,10 +141,60 @@ function(add_c_library __TARGET_NAME)
     )
     install(
         FILES ${CMAKE_CURRENT_BINARY_DIR}/${__PKGCONFIG_NAME}.pc
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-    )
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endfunction(add_c_library)
 
+function(add_c_test_library __TARGET_NAME)
+    set(options)
+    set(one_args OUTPUT_NAME)
+    set(multi_args LIBRARIES LOCAL_LIBRARIES SOURCES)
+    cmake_parse_arguments(_ "${options}" "${one_args}" "${multi_args}" ${ARGN})
+
+    get_property(ALL_LOCAL_LIBRARIES GLOBAL PROPERTY ALL_LOCAL_LIBRARIES)
+    list(APPEND ALL_LOCAL_LIBRARIES ${__TARGET_NAME})
+    set_property(GLOBAL PROPERTY ALL_LOCAL_LIBRARIES "${ALL_LOCAL_LIBRARIES}")
+
+    if (ENABLE_SHARED OR ENABLE_SHARED_EXECUTABLES)
+        add_library(${__TARGET_NAME}-shared SHARED ${__SOURCES})
+
+        include_directories(
+            ${__TARGET_NAME}-shared PUBLIC
+            ${CMAKE_SOURCE_DIR}/include
+            ${CMAKE_BINARY_DIR}/include)
+
+        target_add_shared_libraries(
+            ${__TARGET_NAME}-shared
+            "${__LIBRARIES}"
+            "${__LOCAL_LIBRARIES}"
+        )
+    endif (ENABLE_SHARED OR ENABLE_SHARED_EXECUTABLES)
+
+    if (ENABLE_STATIC OR NOT ENABLE_SHARED_EXECUTABLES)
+        add_library(${__TARGET_NAME}-static STATIC ${__SOURCES})
+        if (USE_STATIC_PIC)
+            set_property(TARGET ${__TARGET_NAME}-static PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+        endif ()
+        set_target_properties(
+            ${__TARGET_NAME}-static PROPERTIES
+            OUTPUT_NAME ${__OUTPUT_NAME}
+            CLEAN_DIRECT_OUTPUT 1
+        )
+
+        target_include_directories(
+            ${__TARGET_NAME}-static PUBLIC
+            ${CMAKE_SOURCE_DIR}/include
+            ${CMAKE_BINARY_DIR}/include
+        )
+
+        target_add_static_libraries(
+            ${__TARGET_NAME}-static
+            "${__LIBRARIES}"
+            "${__LOCAL_LIBRARIES}"
+        )
+    endif (ENABLE_STATIC OR NOT ENABLE_SHARED_EXECUTABLES)
+
+    set(prefix ${CMAKE_INSTALL_PREFIX})
+endfunction(add_c_test_library)
 
 #-----------------------------------------------------------------------
 # Executable

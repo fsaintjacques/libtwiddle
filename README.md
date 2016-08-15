@@ -34,9 +34,8 @@ Prerequisite libraries
 
 To build libtwiddle, you need the following:
 
-  * pkg-config;
-  * Check (http://libcheck.github.io/check/);
   * a recent C compiler (`gcc >= 4.8` or `clang >= 3.5`).
+  * CMake build tool (`cmake >= 3.0`)
 
 Building from source
 --------------------

@@ -1,4 +1,4 @@
-#include <check.h>
+#include "check/check.h"
 #include <inttypes.h>
 #include <stdio.h>
 

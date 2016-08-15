@@ -1,3 +1,5 @@
+add_subdirectory(check)
+
 add_c_test(test-bitmap)
 add_c_test(test-bitmap-rle)
 add_c_test(test-bloomfilter)

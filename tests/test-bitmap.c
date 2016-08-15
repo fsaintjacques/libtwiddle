@@ -23,9 +23,9 @@ static void validate_bitmap(struct tw_bitmap *bitmap, uint32_t nbits)
   ck_assert(tw_bitmap_full(bitmap));
 
   for (uint32_t pos = 0; pos < nbits; ++pos) {
-    ck_assert_msg(tw_bitmap_test(bitmap, pos));
+    ck_assert(tw_bitmap_test(bitmap, pos));
     tw_bitmap_clear(bitmap, pos);
-    ck_assert_msg(!tw_bitmap_test(bitmap, pos));
+    ck_assert(!tw_bitmap_test(bitmap, pos));
   }
 
   ck_assert(tw_bitmap_empty(bitmap));

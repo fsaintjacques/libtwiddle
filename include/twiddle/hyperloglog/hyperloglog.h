@@ -14,10 +14,36 @@
 /**
  * hyperloglog data structure
  *
- * This implementation does not use the 6-bit packing and/or mix dense/sparse
- * representation proposed in the [1].
+ * (source https://en.wikipedia.org/wiki/HyperLogLog)
  *
- * [1] Heule, Stefan, Marc Nunkesser, and Alexander Hall. "HyperLogLog in
+ * The basis of the HyperLogLog algorithm is the observation that the
+ * cardinality of a multiset of uniformly distributed random numbers can be
+ * estimated by calculating the maximum number of leading zeros in the binary
+ * representation of each number in the set. If the maximum number of leading
+ * zeros observed is `n`, an estimate for the number of
+ * distinct elements in the set is `2^{n}`.
+ *
+ * In the HyperLogLog algorithm, a hash function is applied to each element in
+ * the original multiset, to obtain a multiset of uniformly distributed random
+ * numbers with the same cardinality as the original multiset. The cardinality
+ * of this randomly distributed set can then be estimated using the algorithm
+ * above.
+ *
+ * The simple estimate of cardinality obtained using the algorithm above has
+ * the disadvantage of a large variance. In the HyperLogLog algorithm, the
+ * variance is minimised by splitting the multiset into numerous subsets,
+ * calculating the maximum number of leading zeros in the numbers in each of
+ * these subsets, and using a harmonic mean to combine these estimates for each
+ * subset into an estimate of the cardinality of the whole set.
+ *
+ * For small cardinality, the algorithm fallback to the linear counting
+ * algorithm, see [1] for a detailed analysis. This implementation's estimator
+ * use the bias correction proposed in [2].
+ *
+ * [1] Flajolet, Philippe, et al. "Hyperloglog: the analysis of a near-optimal
+ * cardinality estimation algorithm." DMTCS Proceedings 1 (2008).
+ *
+ * [2] Heule, Stefan, Marc Nunkesser, and Alexander Hall. "HyperLogLog in
  * practice: Algorithmic engineering of a state of the art cardinality
  * estimation algorithm." Proceedings of the 16th International Conference on
  * Extending Database Technology. ACM, 2013.

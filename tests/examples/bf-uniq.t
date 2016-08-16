@@ -1,4 +1,4 @@
-  $ echo $'a\na\nb\nc\nb\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\na' | bf-uniq
+  $ (echo 'a'; echo 'a'; echo 'b'; echo 'c'; echo 'b'; echo 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'; echo 'a') | bf-uniq
   a
   b
   c

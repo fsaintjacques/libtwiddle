@@ -94,13 +94,16 @@ void tw_hyperloglog_add(struct tw_hyperloglog *hll, const void *key,
 
   const uint64_t hash = tw_metrohash_64(TW_HLL_DEFAULT_SEED, key, key_size);
   const uint8_t precision = hll->precision;
-  const uint32_t bucket_idx = hash >> (64 - precision);
-  const uint8_t leading_zeros = (__builtin_clzll(hash << precision |
-                                                 (1 << (precision - 1))) +
-                                 1),
-                old_val = hll->registers[bucket_idx];
-  hll->registers[bucket_idx] =
-      (leading_zeros > old_val) ? leading_zeros : old_val;
+
+  /* take the low bits for the register index */
+  const uint32_t register_idx = hash >> (64 - precision);
+  /* take the high bits, and pad a trailing `1` such that the __builtin_clzll
+   * (count leading zeros) builtin will not be undefined behaviour */
+  const uint64_t high_bits = (hash << precision) | (1 << (precision - 1));
+
+  const uint8_t leading_zeros = __builtin_clzll(high_bits) + 1;
+  const uint8_t cur_leading_zeros = hll->registers[register_idx];
+  hll->registers[register_idx] = tw_max(leading_zeros, cur_leading_zeros);
 }
 
 extern double estimate(uint8_t precision, uint32_t n_zeros, float inverse_sum);

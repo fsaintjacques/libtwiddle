@@ -38,7 +38,8 @@
  *
  * For small cardinality, the algorithm fallback to the linear counting
  * algorithm, see [1] for a detailed analysis. This implementation's estimator
- * use the bias correction proposed in [2].
+ * use the bias correction proposed in [2]. Refering to the original paper,
+ * we're using `m` registers of fixed size 64 bits.
  *
  * [1] Flajolet, Philippe, et al. "Hyperloglog: the analysis of a near-optimal
  * cardinality estimation algorithm." DMTCS Proceedings 1 (2008).

@@ -1,10 +1,15 @@
 #ifndef TWIDDLE_INTERNAL_UTILS_H
 #define TWIDDLE_INTERNAL_UTILS_H
 
+#include <assert.h>
 #include <float.h>
 #include <math.h>
 #include <stdlib.h>
 #include <x86intrin.h>
+
+#ifndef static_assert
+#define static_assert _Static_assert
+#endif
 
 /* Number of bytes per cache line */
 #ifndef TW_CACHELINE

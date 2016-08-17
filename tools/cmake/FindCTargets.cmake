@@ -254,7 +254,7 @@ function(add_c_test TEST_NAME)
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
     add_test(${TEST_NAME} ${TEST_NAME})
-    target_link_libraries(${TEST_NAME} m)
+    target_link_libraries(${TEST_NAME} m rt)
     if (USE_VALGRIND)
       add_test(${TEST_NAME}-valgrind valgrind --quiet ./${TEST_NAME})
     endif(USE_VALGRIND)
@@ -270,7 +270,7 @@ function(add_c_benchmark BENCHMARK_NAME)
         LIBRARIES check
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
-    target_link_libraries(${BENCHMARK_NAME} m)
+    target_link_libraries(${BENCHMARK_NAME} m rt)
 endfunction(add_c_benchmark)
 
 function(add_c_example EXAMPLE_NAME)
@@ -283,5 +283,5 @@ function(add_c_example EXAMPLE_NAME)
         LIBRARIES check
         LOCAL_LIBRARIES ${ALL_LOCAL_LIBRARIES}
     )
-    target_link_libraries(${EXAMPLE_NAME} m)
+    target_link_libraries(${EXAMPLE_NAME} m rt)
 endfunction(add_c_example)

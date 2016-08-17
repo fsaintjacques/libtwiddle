@@ -33,8 +33,10 @@
 
 #define tw_almost_equal(a, b) (fabs((a) - (b)) < FLT_EPSILON)
 
-/* OSX doesn't provide `aligned_alloc` like C11 mandates (we're in 2016). */
-#if defined(__APPLE__)
+#ifdef _ISOC11_SOURCE
+#define malloc_aligned aligned_alloc
+#else
+#if _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600
 static inline void *__aligned_alloc(size_t align, size_t size)
 {
   void *ptr = NULL;
@@ -46,7 +48,8 @@ static inline void *__aligned_alloc(size_t align, size_t size)
 }
 #define malloc_aligned __aligned_alloc
 #else
-#define malloc_aligned aligned_alloc
+static_assert(false, "you're in hell.");
+#endif
 #endif
 
 #define tw_simd_equal(a, b, simd_cmpeq, simd_maskmove, mask)                   \

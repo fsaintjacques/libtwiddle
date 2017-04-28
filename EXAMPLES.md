@@ -142,11 +142,11 @@ int main()
   const uint32_t n_elems = 10 * n_registers;
   for (size_t i = 0; i < n_elems; ++i) {
     if (i % 3 == 0) {
-      tw_minhash_add(a, sizeof(i), (char *)&i);
+      tw_minhash_add(a, (char *)&i, sizeof(i));
     }
 
     if (i % 5 == 0) {
-      tw_minhash_add(b, sizeof(i), (char *)&i);
+      tw_minhash_add(b, (char *)&i, sizeof(i));
     }
   }
 

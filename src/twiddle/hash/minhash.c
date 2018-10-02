@@ -82,11 +82,41 @@ void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
   const uint64_t hashed =
       tw_metrohash_64(TW_MINHASH_DEFAULT_SEED, key, key_size);
 
+  const uint32_t a = (uint32_t) hashed;
+  const uint32_t b = (uint32_t) (hashed >> 32);
+
   const uint32_t n_registers = hash->n_registers;
+
+#define MINH_ADD_LOOP(simd_t, simd_load, simd_add, simd_max, simd_store, simd_set1) \
+  const size_t vec_elts = sizeof(simd_t)/sizeof(uint32_t);                          \
+  uint32_t ib[vec_elts];                                                            \
+  for(int i = 0; i < vec_elts; i++)                                                 \
+    ib[i]  = i * b;                                                                 \
+  simd_t acc = simd_add(simd_set1(a), simd_load((simd_t *)ib));		            \
+  simd_t inc = simd_set1(vec_elts * b);                                             \
+  const size_t n_vectors =                                                          \
+    n_registers * sizeof(uint32_t) / sizeof(simd_t);                                \
+                                                                                    \
+  for(size_t i=0; i < n_vectors; i++) {                                             \
+    simd_t *dst =  (simd_t *)hash->registers + i;                                   \
+    simd_store(dst, simd_max(acc, simd_load(dst)));                                 \
+    acc = simd_add(acc, inc);                                                       \
+  }
+
+#ifdef USE_AVX2
+  MINH_ADD_LOOP( __m256i, _mm256_loadu_si256, _mm256_add_epi32, _mm256_max_epu32, 
+		 _mm256_storeu_si256, _mm256_set1_epi32 )
+#elif defined USE_AVX
+  MINH_ADD_LOOP( __m128i, _mm_load_si128, _mm_add_epi32, _mm_max_epu32, 
+		 _mm_store_si128, _mm_set1_epi32 )
+#else
   for (size_t i = 0; i < n_registers; ++i) {
-    const uint32_t hashed_i = ((uint32_t)hashed + i * (uint32_t)(hashed >> 32));
+    const uint32_t hashed_i = a + i * b;
     hash->registers[i] = tw_max(hash->registers[i], hashed_i);
   }
+#endif
+
+#undef MINH_ADD_LOOP
 }
 
 float tw_minhash_estimate(const struct tw_minhash *a,

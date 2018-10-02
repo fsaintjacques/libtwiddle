@@ -90,7 +90,7 @@ void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
 #define MINH_ADD_LOOP(simd_t, simd_load, simd_add, simd_max, simd_store, simd_set1) \
   const size_t vec_elts = sizeof(simd_t)/sizeof(uint32_t);                          \
   uint32_t ib[vec_elts];                                                            \
-  for(int i = 0; i < vec_elts; i++)                                                 \
+  for(size_t i = 0; i < vec_elts; i++)                                                 \
     ib[i]  = i * b;                                                                 \
   simd_t acc = simd_add(simd_set1(a), simd_load((simd_t *)ib));		            \
   simd_t inc = simd_set1(vec_elts * b);                                             \

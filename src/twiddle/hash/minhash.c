@@ -87,10 +87,9 @@ void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
 
   const uint32_t n_registers = hash->n_registers;
 
-#define MINH_ADD_LOOP(simd_t, simd_load, simd_add, simd_max, simd_store, simd_set1) \
-  const size_t vec_elts = sizeof(simd_t)/sizeof(uint32_t);                          \
+#define MINH_ADD_LOOP(simd_t, simd_load, simd_add, simd_max, simd_store, simd_set1, vec_elts) \
   uint32_t ib[vec_elts];                                                            \
-  for(size_t i = 0; i < vec_elts; i++)                                                 \
+  for(size_t i = 0; i < vec_elts; i++)                                              \
     ib[i]  = i * b;                                                                 \
   simd_t acc = simd_add(simd_set1(a), simd_load((simd_t *)ib));		            \
   simd_t inc = simd_set1(vec_elts * b);                                             \
@@ -105,10 +104,10 @@ void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
 
 #ifdef USE_AVX2
   MINH_ADD_LOOP( __m256i, _mm256_loadu_si256, _mm256_add_epi32, _mm256_max_epu32, 
-		 _mm256_storeu_si256, _mm256_set1_epi32 )
+		 _mm256_storeu_si256, _mm256_set1_epi32, sizeof(__m256i)/sizeof(uint32_t) )
 #elif defined USE_AVX
   MINH_ADD_LOOP( __m128i, _mm_load_si128, _mm_add_epi32, _mm_max_epu32, 
-		 _mm_store_si128, _mm_set1_epi32 )
+		 _mm_store_si128, _mm_set1_epi32, sizeof(__m128i)/sizeof(uint32_t) )
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     const uint32_t hashed_i = a + i * b;

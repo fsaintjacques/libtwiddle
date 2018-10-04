@@ -93,13 +93,18 @@ void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
     ib[i]  = i * b;                                                                 \
   simd_t acc = simd_add(simd_set1(a), simd_load((simd_t *)ib));		            \
   simd_t inc = simd_set1(vec_elts * b);                                             \
+  simd_t acc2 = simd_add(acc,inc);                                                  \
+  inc = simd_add(inc,inc);                                                          \
   const size_t n_vectors =                                                          \
     n_registers * sizeof(uint32_t) / sizeof(simd_t);                                \
                                                                                     \
-  for(size_t i=0; i < n_vectors; i++) {                                             \
+  for(size_t i=0; i < n_vectors; i+=2) {                                            \
     simd_t *dst =  (simd_t *)hash->registers + i;                                   \
-    simd_store(dst, simd_max(acc, simd_load(dst)));                                 \
+    simd_t *dst2 =  (simd_t *)hash->registers + i + 1;                              \
+    *dst = simd_max(acc, simd_load(dst));                                           \
+    *dst2 = simd_max(acc2, simd_load(dst2));                                        \
     acc = simd_add(acc, inc);                                                       \
+    acc2 = simd_add(acc2, inc);                                                     \
   }
 
 #ifdef USE_AVX2

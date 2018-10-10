@@ -74,7 +74,7 @@ struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash)
 }
 
 #ifdef __clang__
-#pragma clang loop unroll_count(N)
+#pragma clang loop unroll_count(4)
 #else
 #pragma GCC optimize ("unroll-loops")
 #endif

@@ -73,9 +73,7 @@ struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash)
   return tw_minhash_copy(hash, copy);
 }
 
-#ifdef __clang__
-#pragma clang loop unroll_count(4)
-#else
+#ifndef __clang__
 #pragma GCC optimize ("unroll-loops")
 #endif
 

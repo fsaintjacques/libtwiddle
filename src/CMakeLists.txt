@@ -21,7 +21,7 @@
 # packaging, so once an API has stabilized, this should be a rare occurrence.
 #
 # [1] http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html#Updating-version-info
-
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -funroll-loops")
 add_c_library(
     libtwiddle
     OUTPUT_NAME twiddle

@@ -73,10 +73,6 @@ struct tw_minhash *tw_minhash_clone(const struct tw_minhash *hash)
   return tw_minhash_copy(hash, copy);
 }
 
-#ifndef __clang__
-#pragma GCC optimize ("unroll-loops")
-#endif
-
 void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
 {
   if (!hash || !key || !key_size) {

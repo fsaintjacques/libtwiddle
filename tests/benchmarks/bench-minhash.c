@@ -4,12 +4,10 @@
 
 #include "benchmark.h"
 
-
 void minhash_setup(struct benchmark *b)
 {
 
-  b->opaque = (void *) tw_minhash_new(b->size);
-  
+  b->opaque = (void *)tw_minhash_new(b->size);
 }
 
 void minhash_teardown(struct benchmark *b)
@@ -20,20 +18,18 @@ void minhash_teardown(struct benchmark *b)
 
 void minhash_add(void *opaque)
 {
-  struct tw_minhash *h  = (struct tw_minhash *)opaque;
+  struct tw_minhash *h = (struct tw_minhash *)opaque;
 
-  for( size_t i = 0; i < 10000; i++)
+  for (size_t i = 0; i < 10000; i++)
     tw_minhash_add(h, &i, sizeof(i));
-
 }
 
 void minhash_est(void *opaque)
 {
-  struct tw_minhash *h  = (struct tw_minhash *)opaque;
+  struct tw_minhash *h = (struct tw_minhash *)opaque;
 
-  for( size_t i = 0; i < 10000; i++)
-    tw_minhash_estimate(h,h);
-
+  for (size_t i = 0; i < 10000; i++)
+    tw_minhash_estimate(h, h);
 }
 
 int main(int argc, char *argv[])
@@ -51,8 +47,7 @@ int main(int argc, char *argv[])
       BENCHMARK_FIXTURE(minhash_add, repeat, size, minhash_setup,
                         minhash_teardown),
       BENCHMARK_FIXTURE(minhash_est, repeat, size, minhash_setup,
-                        minhash_teardown)
-  };
+                        minhash_teardown)};
 
   run_benchmarks(benchmarks, sizeof(benchmarks) / sizeof(benchmarks[0]));
 

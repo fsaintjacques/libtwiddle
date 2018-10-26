@@ -145,15 +145,15 @@ float tw_minhash_estimate(const struct tw_minhash *a,
            *b_addr = (simd_t *)b->registers + i;                               \
     acc = simd_add(acc, simd_cmpeq(*a_addr, *b_addr));                         \
   }                                                                            \
-  for(size_t i = 0; i < sizeof(simd_t)/sizeof(uint32_t); i++)	               \
+  for (size_t i = 0; i < sizeof(simd_t) / sizeof(uint32_t); i++)               \
     n_registers_eq -= ((uint32_t *)&acc)[i];
 
 #ifdef USE_AVX2
   MINH_EST_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
                 _mm256_add_epi32, _mm256_set1_epi32)
 #elif defined USE_AVX
-  MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32,
-                _mm_add_epi32, _mm_set1_epi32)
+  MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_add_epi32,
+                _mm_set1_epi32)
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     n_registers_eq += (a->registers[i] == b->registers[i]);

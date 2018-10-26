@@ -27,6 +27,15 @@ void minhash_add(void *opaque)
 
 }
 
+void minhash_est(void *opaque)
+{
+  struct tw_minhash *h  = (struct tw_minhash *)opaque;
+
+  for( size_t i = 0; i < 10000; i++)
+    tw_minhash_estimate(h,h);
+
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -40,6 +49,8 @@ int main(int argc, char *argv[])
 
   struct benchmark benchmarks[] = {
       BENCHMARK_FIXTURE(minhash_add, repeat, size, minhash_setup,
+                        minhash_teardown),
+      BENCHMARK_FIXTURE(minhash_est, repeat, size, minhash_setup,
                         minhash_teardown)
   };
 

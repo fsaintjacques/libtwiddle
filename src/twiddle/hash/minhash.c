@@ -136,23 +136,24 @@ float tw_minhash_estimate(const struct tw_minhash *a,
 
   uint32_t n_registers_eq = 0;
 
-#define MINH_EST_LOOP(simd_t, simd_load, simd_cmpeq, simd_maskmove, eq_mask)   \
+#define MINH_EST_LOOP(simd_t, simd_load, simd_cmpeq, simd_add, simd_set1)      \
   const size_t n_vectors =                                                     \
       n_registers * TW_BYTES_PER_MINHASH_REGISTER / sizeof(simd_t);            \
+  simd_t acc = simd_set1(0);                                                   \
   for (size_t i = 0; i < n_vectors; ++i) {                                     \
     simd_t *a_addr = (simd_t *)a->registers + i,                               \
            *b_addr = (simd_t *)b->registers + i;                               \
-    const simd_t v_cmp = simd_cmpeq(simd_load(a_addr), simd_load(b_addr));     \
-    const int h_cmp = simd_maskmove(v_cmp);                                    \
-    n_registers_eq += __builtin_popcount(h_cmp & eq_mask);                     \
-  }
+    acc = simd_add(acc, simd_cmpeq(*a_addr, *b_addr));                         \
+  }                                                                            \
+  for(size_t i = 0; i < sizeof(simd_t)/sizeof(uint32_t); i++)	               \
+    n_registers_eq -= ((uint32_t *)&acc)[i];
 
 #ifdef USE_AVX2
   MINH_EST_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
-                _mm256_movemask_epi8, 0x11111111)
+                _mm256_add_epi32, _mm256_set1_epi32)
 #elif defined USE_AVX
-  MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_movemask_epi8,
-                0x1111)
+  MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32,
+                _mm_add_epi32, _mm_set1_epi32)
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     n_registers_eq += (a->registers[i] == b->registers[i]);

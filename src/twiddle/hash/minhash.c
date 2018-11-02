@@ -87,34 +87,33 @@ void tw_minhash_add(struct tw_minhash *hash, const void *key, size_t key_size)
 
   const uint32_t n_registers = hash->n_registers;
 
-#define MINH_ADD_LOOP(simd_t, simd_load, simd_add, simd_max, simd_store,       \
-                      simd_set1, vec_elts)                                     \
+#define MINH_ADD_LOOP(simd_t, simd_add, simd_max, simd_set1, vec_elts)         \
   uint32_t ib[vec_elts];                                                       \
   for (size_t i = 0; i < vec_elts; i++)                                        \
     ib[i] = i * b;                                                             \
-  simd_t acc = simd_add(simd_set1(a), simd_load((simd_t *)ib));                \
+  simd_t acc = simd_add(simd_set1(a), *(simd_t *)ib);                          \
   simd_t inc = simd_set1(vec_elts * b);                                        \
   simd_t acc2 = simd_add(acc, inc);                                            \
   inc = simd_add(inc, inc);                                                    \
   const size_t n_vectors = n_registers * sizeof(uint32_t) / sizeof(simd_t);    \
                                                                                \
+  simd_t *p_dst = (simd_t *)hash->registers;                                   \
   for (size_t i = 0; i < n_vectors; i += 2) {                                  \
-    simd_t *dst = (simd_t *)hash->registers + i;                               \
-    simd_t *dst2 = (simd_t *)hash->registers + i + 1;                          \
-    *dst = simd_max(acc, simd_load(dst));                                      \
-    *dst2 = simd_max(acc2, simd_load(dst2));                                   \
+    p_dst[i] = simd_max(acc, p_dst[i]);				               \
+    p_dst[i+1] = simd_max(acc2, p_dst[i+1]);				       \
     acc = simd_add(acc, inc);                                                  \
     acc2 = simd_add(acc2, inc);                                                \
   }
 
-#ifdef USE_AVX2
-  MINH_ADD_LOOP(__m256i, _mm256_loadu_si256, _mm256_add_epi32, _mm256_max_epu32,
-                _mm256_storeu_si256, _mm256_set1_epi32,
-                sizeof(__m256i) / sizeof(uint32_t))
+#ifdef USE_AVX512
+  MINH_ADD_LOOP(__m512i, _mm512_add_epi32, _mm512_max_epu32,
+                _mm512_set1_epi32, sizeof(__m512i) / sizeof(uint32_t))
+#elif defined USE_AVX2
+  MINH_ADD_LOOP(__m256i, _mm256_add_epi32, _mm256_max_epu32,
+                _mm256_set1_epi32, sizeof(__m256i) / sizeof(uint32_t))
 #elif defined USE_AVX
-  MINH_ADD_LOOP(__m128i, _mm_load_si128, _mm_add_epi32, _mm_max_epu32,
-                _mm_store_si128, _mm_set1_epi32,
-                sizeof(__m128i) / sizeof(uint32_t))
+  MINH_ADD_LOOP(__m128i, _mm_add_epi32, _mm_max_epu32,
+                _mm_set1_epi32, sizeof(__m128i) / sizeof(uint32_t))
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     const uint32_t hashed_i = a + i * b;
@@ -136,24 +135,23 @@ float tw_minhash_estimate(const struct tw_minhash *a,
 
   uint32_t n_registers_eq = 0;
 
-#define MINH_EST_LOOP(simd_t, simd_load, simd_cmpeq, simd_add, simd_set1)      \
+#define MINH_EST_LOOP(simd_t, simd_cmpeq, simd_add, simd_setzero)              \
   const size_t n_vectors =                                                     \
       n_registers * TW_BYTES_PER_MINHASH_REGISTER / sizeof(simd_t);            \
-  simd_t acc = simd_set1(0);                                                   \
-  for (size_t i = 0; i < n_vectors; ++i) {                                     \
-    simd_t *a_addr = (simd_t *)a->registers + i,                               \
-           *b_addr = (simd_t *)b->registers + i;                               \
-    acc = simd_add(acc, simd_cmpeq(*a_addr, *b_addr));                         \
-  }                                                                            \
+  simd_t acc = simd_setzero();                                                 \
+  simd_t *p_a = (simd_t *)a->registers;                                        \
+  simd_t *p_b = (simd_t *)b->registers;                                        \
+  for (size_t i = 0; i < n_vectors; ++i)                                       \
+    acc = simd_add(acc, simd_cmpeq(p_a[i], p_b[i]));                           \
   for (size_t i = 0; i < sizeof(simd_t) / sizeof(uint32_t); i++)               \
     n_registers_eq -= ((uint32_t *)&acc)[i];
 
-#ifdef USE_AVX2
-  MINH_EST_LOOP(__m256i, _mm256_load_si256, _mm256_cmpeq_epi32,
-                _mm256_add_epi32, _mm256_set1_epi32)
+#ifdef USE_AVX512
+  MINH_EST_LOOP(__m512i, _mm512_cmpeq_epi32, _mm512_add_epi32, _mm512_setzero_si512)
+#elif defined USE_AVX2
+  MINH_EST_LOOP(__m256i, _mm256_cmpeq_epi32, _mm256_add_epi32, _mm256_setzero_si256)
 #elif defined USE_AVX
-  MINH_EST_LOOP(__m128i, _mm_load_si128, _mm_cmpeq_epi32, _mm_add_epi32,
-                _mm_set1_epi32)
+  MINH_EST_LOOP(__m128i, _mm_cmpeq_epi32, _mm_add_epi32, _mm_setzero_si128)
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     n_registers_eq += (a->registers[i] == b->registers[i]);
@@ -210,24 +208,24 @@ struct tw_minhash *tw_minhash_merge(const struct tw_minhash *src,
 
   const uint32_t n_registers = src->n_registers;
 
-#define MINH_MAX_LOOP(simd_t, simd_load, simd_max, simd_store)                 \
+#define MINH_MAX_LOOP(simd_t, simd_max)                                        \
   const size_t n_vectors =                                                     \
       n_registers * TW_BYTES_PER_MINHASH_REGISTER / sizeof(simd_t);            \
-  for (size_t i = 0; i < n_vectors; ++i) {                                     \
-    simd_t *src_vec = (simd_t *)src->registers + i,                            \
-           *dst_vec = (simd_t *)dst->registers + i;                            \
-    const simd_t res = simd_max(simd_load(src_vec), simd_load(dst_vec));       \
-    simd_store(dst_vec, res);                                                  \
+  simd_t *p_src = (simd_t *)src->registers;                                    \
+  simd_t *p_dst = (simd_t *)dst->registers;                                    \
+  for (size_t i = 0; i < n_vectors; i += 4) {                                  \
+    p_dst[i] = simd_max(p_src[i], p_dst[i]);                                   \
+    p_dst[i+1] = simd_max(p_src[i+1], p_dst[i+1]);                             \
+    p_dst[i+2] = simd_max(p_src[i+2], p_dst[i+2]);                             \
+    p_dst[i+3] = simd_max(p_src[i+3], p_dst[i+3]);                             \
   }
 
 #ifdef USE_AVX512
-  MINH_MAX_LOOP(__m512i, _mm512_load_si512, _mm512_max_epu32,
-                _mm512_store_si512)
+  MINH_MAX_LOOP(__m512i, _mm512_max_epu32)
 #elif defined USE_AVX2
-  MINH_MAX_LOOP(__m256i, _mm256_load_si256, _mm256_max_epu32,
-                _mm256_store_si256)
+  MINH_MAX_LOOP(__m256i, _mm256_max_epu32)
 #elif defined USE_AVX
-  MINH_MAX_LOOP(__m128i, _mm_load_si128, _mm_max_epu32, _mm_store_si128)
+  MINH_MAX_LOOP(__m128i, _mm_max_epu32)
 #else
   for (size_t i = 0; i < n_registers; ++i) {
     dst->registers[i] = tw_max(dst->registers[i], src->registers[i]);
